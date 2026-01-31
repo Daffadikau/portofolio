@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Portfolio | Daffa Dikau</title>
+    <meta name="description" content="Portfolio website showcasing projects, experience, and skills." />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="header">
+      <nav class="nav">
+        <a class="logo" href="#top">Portofolio</a>
+        <div class="nav-links">
+          <a href="#projects">Projects</a>
+          <a href="#experience">Experience</a>
+          <a href="#skills">Skills</a>
+          <a href="#contact">Contact</a>
+        </div>
+        <button class="menu-button" aria-label="Open menu" aria-expanded="false">
+          ☰
+        </button>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-content">
+          <p class="eyebrow">Hi, I’m</p>
+          <h1>Daffa Adika</h1>
+          <p class="subtitle">Your Role · Your Specialty</p>
+          <p class="summary">
+            Short intro about who you are, what you build, and the value you bring.
+            Keep it concise (2–3 lines).
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#projects">View Projects</a>
+            <a class="button" href="#contact">Get in Touch</a>
+          </div>
+          <div class="socials">
+            <a href="https://www.linkedin.com/in/daffadikau/" target="_blank" rel="noreferrer">
+              LinkedIn
+            </a>
+            <a href="https://github.com/your-handle" target="_blank" rel="noreferrer">
+              GitHub
+            </a>
+            <a href="mailto:you@email.com">Email</a>
+          </div>
+        </div>
+        <div class="hero-card">
+          <div class="stat">
+            <span class="stat-number">5+</span>
+            <span class="stat-label">Years Experience</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">12</span>
+            <span class="stat-label">Projects Shipped</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">3</span>
+            <span class="stat-label">Awards</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="projects" class="section">
+        <div class="section-header">
+          <h2>Projects</h2>
+          <p>Selected work showcasing my skills and impact.</p>
+        </div>
+        <div class="grid">
+          <article class="card">
+            <h3>Project Title</h3>
+            <p>
+              Short description of the project, problem, and results. Mention your
+              role and tools used.
+            </p>
+            <div class="tags">
+              <span>React</span>
+              <span>Node.js</span>
+              <span>PostgreSQL</span>
+            </div>
+            <div class="card-actions">
+              <a href="https://example.com" target="_blank" rel="noreferrer">Live Demo</a>
+              <a href="https://github.com/your-handle" target="_blank" rel="noreferrer">Source</a>
+            </div>
+          </article>
+          <article class="card">
+            <h3>Project Title</h3>
+            <p>Describe what you built, who it helps, and outcomes.</p>
+            <div class="tags">
+              <span>Python</span>
+              <span>Data</span>
+              <span>APIs</span>
+            </div>
+            <div class="card-actions">
+              <a href="https://example.com" target="_blank" rel="noreferrer">Case Study</a>
+              <a href="https://github.com/your-handle" target="_blank" rel="noreferrer">Source</a>
+            </div>
+          </article>
+          <article class="card">
+            <h3>Project Title</h3>
+            <p>Highlight the tech stack and business impact.</p>
+            <div class="tags">
+              <span>Mobile</span>
+              <span>UI/UX</span>
+              <span>Design</span>
+            </div>
+            <div class="card-actions">
+              <a href="https://example.com" target="_blank" rel="noreferrer">Live Demo</a>
+              <a href="https://github.com/your-handle" target="_blank" rel="noreferrer">Source</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="experience" class="section alt">
+        <div class="section-header">
+          <h2>Experience</h2>
+          <p>Roles and responsibilities that shaped my expertise.</p>
+        </div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-role">
+              <h3>Job Title · Company</h3>
+              <span>2023 — Present</span>
+            </div>
+            <ul>
+              <li>Key achievement or responsibility.</li>
+              <li>Impact metrics (e.g., +25% performance).</li>
+              <li>Tech stack: X, Y, Z.</li>
+            </ul>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-role">
+              <h3>Job Title · Company</h3>
+              <span>2021 — 2023</span>
+            </div>
+            <ul>
+              <li>Key achievement or responsibility.</li>
+              <li>Impact metrics (e.g., reduced costs 15%).</li>
+              <li>Tech stack: A, B, C.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="skills" class="section">
+        <div class="section-header">
+          <h2>Skills</h2>
+          <p>Tools and technologies I use regularly.</p>
+        </div>
+        <div class="skills">
+          <div class="skill-group">
+            <h3>Frontend</h3>
+            <ul>
+              <li>HTML, CSS, JavaScript</li>
+              <li>React, Vue, or Angular</li>
+              <li>Accessibility & Performance</li>
+            </ul>
+          </div>
+          <div class="skill-group">
+            <h3>Backend</h3>
+            <ul>
+              <li>Node.js / Python / Java</li>
+              <li>REST & GraphQL APIs</li>
+              <li>SQL & NoSQL Databases</li>
+            </ul>
+          </div>
+          <div class="skill-group">
+            <h3>Tools</h3>
+            <ul>
+              <li>Git, CI/CD</li>
+              <li>Docker</li>
+              <li>Cloud (AWS/GCP/Azure)</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" class="section alt">
+        <div class="section-header">
+          <h2>Contact</h2>
+          <p>Let’s build something together. I’m open to opportunities.</p>
+        </div>
+        <div class="contact-card">
+          <div>
+            <h3>Let’s connect</h3>
+            <p>Send me an email and I’ll reply within 24–48 hours.</p>
+          </div>
+          <div class="contact-actions">
+            <a class="button primary" href="mailto:you@email.com">Email Me</a>
+            <a class="button" href="https://www.linkedin.com/in/daffadikau/" target="_blank" rel="noreferrer">
+              LinkedIn
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>© 2026 Daffa Adika. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
