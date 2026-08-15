@@ -58,6 +58,7 @@
     p.id = `panel-${id}`;
     p.setAttribute('role', 'tabpanel');
     p.setAttribute('aria-labelledby', `tab-${id}`);
+    p.tabIndex = 0;
     p.hidden = true;
     panels.appendChild(p);
   });
@@ -78,11 +79,18 @@
   window.addEventListener('hashchange', fromHash);
 
   tabbar.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
     const cur = TABS.indexOf(location.hash.replace('#', '') || 'about');
-    if (e.key === 'ArrowRight') location.hash = TABS[(cur + 1) % TABS.length];
-    if (e.key === 'ArrowLeft') location.hash = TABS[(cur - 1 + TABS.length) % TABS.length];
+    let next;
+    if (e.key === 'ArrowRight') next = TABS[(cur + 1) % TABS.length];
+    else if (e.key === 'ArrowLeft') next = TABS[(cur - 1 + TABS.length) % TABS.length];
+    else return;
+    e.preventDefault();
+    location.hash = next;
+    document.getElementById(`tab-${next}`).focus();
   });
   document.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     const n = Number(e.key);
     if (n >= 1 && n <= TABS.length) location.hash = TABS[n - 1];
@@ -134,7 +142,7 @@
       d.appendChild(ul);
       p.appendChild(d);
     });
-    p.appendChild(el('h2', null, 'Honors & Awards'));
+    p.appendChild(el('h2', null, 'Honors & Awards (selected)'));
     const ul = el('ul', 'awards');
     D.awards.forEach((a) => {
       const li = el('li');
@@ -174,6 +182,8 @@
         const row = el('div', 'skill');
         row.appendChild(techTag(s));
         const bar = el('div', 'bar');
+        bar.setAttribute('role', 'img');
+        bar.setAttribute('aria-label', `${s.label} proficiency: ${s.level} of 5`);
         for (let i = 1; i <= 5; i += 1) bar.appendChild(el('i', i <= s.level ? 'on' : null));
         row.appendChild(bar);
         wrap.appendChild(row);
@@ -192,7 +202,7 @@
       extLink('pxbtn big', 'GitHub', D.socials.github),
       extLink('pxbtn big', 'LinkedIn', D.socials.linkedin));
     p.append(h,
-      el('p', 'bio', 'Open to internships, freelance, and collaboration. I usually reply within 24–48 hours.'),
+      el('p', 'bio', `${D.availability} ${D.replyNote}`),
       btns,
       el('p', 'fineprint', "© 2026 Daffa Adika · tech icons: Jerry's Pixel Icons (MIT)"));
   })();
@@ -228,21 +238,30 @@
   (function trafficLights() {
     const toast = el('div', 'toast');
     toast.hidden = true;
+    toast.setAttribute('role', 'status');
     document.body.appendChild(toast);
     let toastTimer;
     win.querySelector('.tl-red').addEventListener('click', () => {
       win.classList.remove('shake'); void win.offsetWidth; win.classList.add('shake');
-      toast.textContent = 'nice try 😏'; toast.hidden = false;
+      toast.hidden = false; toast.textContent = 'nice try 😏';
       clearTimeout(toastTimer); toastTimer = setTimeout(() => { toast.hidden = true; }, 1800);
     });
     win.querySelector('.tl-yellow').addEventListener('click', () => {
       win.classList.add('minimized');
       document.getElementById('dock').classList.add('holds-window');
+      const d = document.querySelector('#dock .dock-item.active[data-tab]')
+        || document.querySelector('#dock .dock-item[data-tab]');
+      if (d) d.focus();
     });
     win.querySelector('.tl-green').addEventListener('click', () => win.classList.toggle('maximized'));
     function restore() {
+      const wasMin = win.classList.contains('minimized');
       win.classList.remove('minimized');
       document.getElementById('dock').classList.remove('holds-window');
+      if (wasMin) {
+        const tab = document.getElementById(`tab-${location.hash.replace('#', '') || 'about'}`);
+        if (tab) tab.focus();
+      }
     }
     window.addEventListener('hashchange', restore);
     document.getElementById('dock').addEventListener('click', (e) => {

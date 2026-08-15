@@ -48,7 +48,7 @@
         `Email:    ${D.socials.email}`,
         `GitHub:   ${D.socials.github}`,
         `LinkedIn: ${D.socials.linkedin}`, '',
-        'Usually replies within 24-48 hours.',
+        D.replyNote,
       ]),
       neofetch: () => line([
         ' /\\_/\\      daffa@portfolio',
@@ -170,19 +170,26 @@
       if (!cmd) return;
       if (cmd === 'clear') {
         history.length = 0;
+        announce('Screen cleared');
         renderHistory();
         return;
       }
-      const fn = commands[cmd] || commands[cmd.split(/\s+/)[0]];
+      const lookup = (k) => (Object.prototype.hasOwnProperty.call(commands, k) ? commands[k] : null);
+      const fn = lookup(cmd) || lookup(cmd.split(/\s+/)[0]);
       const output = fn ? fn() : `Command not found: ${cmd}\nType help to see available commands.`;
       history.push({ command: raw, output });
-      live.textContent = output;
+      announce(output);
       renderHistory();
+    }
+
+    function announce(msg) {
+      live.textContent = '';
+      requestAnimationFrame(() => { live.textContent = msg; });
     }
 
     function setInputFromHistory(nextIndex) {
       const recent = history.filter((h) => h.command !== '/welcome');
-      if (recent.length === 0 || nextIndex === -1) {
+      if (recent.length === 0 || nextIndex <= -1) {
         historyIndex = -1;
         input.value = '';
         return;
@@ -197,7 +204,10 @@
       else if (e.key === 'ArrowDown') { e.preventDefault(); setInputFromHistory(historyIndex - 1); }
     });
     panel.addEventListener('click', (e) => {
-      if (e.target.tagName !== 'A') input.focus();
+      if (e.target.tagName === 'A') return;
+      const sel = window.getSelection();
+      if (sel && sel.toString()) return;
+      input.focus();
     });
 
     renderHistory();

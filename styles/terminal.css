@@ -7,6 +7,7 @@
   flex: 1; background: transparent; border: 0; outline: none;
   color: inherit; font: inherit; caret-color: #33ff66;
 }
+#panel-terminal :focus-visible { outline: 3px solid #33ff66; outline-offset: 1px; }
 #panel-terminal .sr-only {
   position: absolute; width: 1px; height: 1px; overflow: hidden;
   clip: rect(0 0 0 0); white-space: nowrap;

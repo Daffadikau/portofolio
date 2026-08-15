@@ -13,11 +13,13 @@
   border-bottom: 3px solid var(--ink);
   background: repeating-linear-gradient(180deg, var(--win) 0 3px, var(--win-dark) 3px 6px);
 }
-.traffic-lights { display: flex; gap: 6px; }
+.traffic-lights { display: flex; gap: 12px; }
 .traffic-lights button {
   width: 14px; height: 14px; border: 2px solid var(--ink);
   padding: 0; background: var(--tl-red);
+  position: relative;
 }
+.traffic-lights button::after { content: ''; position: absolute; inset: -6px; }
 .traffic-lights .tl-yellow { background: var(--tl-yellow); }
 .traffic-lights .tl-green { background: var(--tl-green); }
 .win-title {
@@ -46,7 +48,7 @@
 }
 #dock.holds-window .dock-item.active svg { opacity: .5; }
 @media (max-width: 640px) {
-  #window { width: 96vw; height: min(84vh, calc(100vh - 120px)); }
+  #window { width: 96vw; height: min(84vh, calc(100vh - 120px)); height: min(84dvh, calc(100dvh - 120px)); }
   .tabbar { overflow-x: auto; }
   .tab { font-size: 11px; padding: 8px 10px; white-space: nowrap; flex: 0 0 auto; }
   .panel { padding: 14px; }

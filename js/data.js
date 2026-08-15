@@ -4,6 +4,8 @@ window.PORTFOLIO_DATA = {
   role: 'Computer Engineering Student · Fullstack Developer',
   location: 'Bandung, West Java, Indonesia',
   status: 'Open to opportunities',
+  availability: 'Open to internships, freelance, and collaboration.',
+  replyNote: 'I usually reply within 24-48 hours.',
   bio: 'Computer Engineering student at Universitas Pendidikan Indonesia (UPI) focused on bridging advanced technology and social impact. I build fullstack web apps, mobile apps, and IoT systems.',
   education: { school: 'Universitas Pendidikan Indonesia (UPI)', program: 'Computer Engineering', detail: '3rd year (6th semester)' },
   socials: {

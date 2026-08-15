@@ -17,4 +17,5 @@
 @media (max-width: 640px) {
   #dock { gap: 4px; padding: 6px 8px 8px; max-width: 96vw; overflow-x: auto; }
   .dock-item { width: 40px; height: 40px; }
+  .dock-item.active::after { bottom: 2px; }
 }
