@@ -38,3 +38,10 @@
 #window.minimized { display: none; }
 @keyframes winshake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
 #window.shake { animation: winshake .3s steps(2) 2; }
+.toast {
+  position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+  font-family: var(--font-pixel); font-size: 13px;
+  background: var(--ink); color: var(--win); padding: 8px 14px;
+  border: 3px solid var(--win); box-shadow: 4px 4px 0 rgba(0,0,0,.4); z-index: 30;
+}
+#dock.holds-window .dock-item.active svg { opacity: .5; }

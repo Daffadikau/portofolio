@@ -202,6 +202,31 @@
     });
   })();
 
+  (function trafficLights() {
+    const toast = el('div', 'toast');
+    toast.hidden = true;
+    document.body.appendChild(toast);
+    let toastTimer;
+    win.querySelector('.tl-red').addEventListener('click', () => {
+      win.classList.remove('shake'); void win.offsetWidth; win.classList.add('shake');
+      toast.textContent = 'nice try 😏'; toast.hidden = false;
+      clearTimeout(toastTimer); toastTimer = setTimeout(() => { toast.hidden = true; }, 1800);
+    });
+    win.querySelector('.tl-yellow').addEventListener('click', () => {
+      win.classList.add('minimized');
+      document.getElementById('dock').classList.add('holds-window');
+    });
+    win.querySelector('.tl-green').addEventListener('click', () => win.classList.toggle('maximized'));
+    function restore() {
+      win.classList.remove('minimized');
+      document.getElementById('dock').classList.remove('holds-window');
+    }
+    window.addEventListener('hashchange', restore);
+    document.getElementById('dock').addEventListener('click', (e) => {
+      if (e.target.closest('[data-tab]')) restore();
+    });
+  })();
+
   window.App = { showTab, TABS };
   fromHash();
 })();
