@@ -17,6 +17,48 @@
   const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // Sound effect 8-bit sintetis (WebAudio, tanpa file). Volume kecil, bisa dimute.
+  const Sfx = (function () {
+    let ctx = null;
+    let muted = sessionStorage.getItem('smoky-muted') === '1';
+    const SEQ = {
+      happy: [[880, 0.07], [1318, 0.1]],
+      annoyed: [[233, 0.11], [174, 0.14]],
+      feed: [[523, 0.06], [523, 0.06], [659, 0.1]],
+      brush: [[196, 0.16], [220, 0.16], [196, 0.2]],
+      play: [[659, 0.06], [880, 0.06], [1108, 0.1]],
+      wake: [[1046, 0.05], [784, 0.1]],
+    };
+    function play(name) {
+      if (muted || !SEQ[name]) return;
+      try {
+        ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+        let t = ctx.currentTime + 0.01;
+        SEQ[name].forEach(([freq, dur]) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'square';
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0.045, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+          osc.connect(gain).connect(ctx.destination);
+          osc.start(t); osc.stop(t + dur);
+          t += dur * 0.9;
+        });
+      } catch (e) { /* audio unavailable — stay silent */ }
+    }
+    return {
+      play,
+      isMuted: () => muted,
+      toggle() {
+        muted = !muted;
+        sessionStorage.setItem('smoky-muted', muted ? '1' : '0');
+        if (!muted) play('happy');
+        return muted;
+      },
+    };
+  })();
+
   const stored = sessionStorage.getItem('smoky-hearts');
   let hearts = stored === null ? 4 : Number(stored);
   if (!(hearts >= 0 && hearts <= 5)) hearts = 4;
@@ -40,6 +82,7 @@
       lineKey = refused ? `${kind}Refuse` : kind;
     }
     setHearts(hearts + (refused ? -1 : HEART_DELTA[kind]));
+    Sfx.play(refused ? 'annoyed' : (kind === 'poke' ? 'happy' : kind));
     const result = { expression, line: pick(LINES[lineKey] || LINES.happy), refused };
     instances.forEach((inst) => inst.react(result));
     return result;
@@ -97,7 +140,7 @@
       const wasSleeping = sleeping;
       sleeping = false;
       scheduleIdle();
-      if (wasSleeping) { setFace('catAnnoyed'); say(pick(LINES.wake)); return; }
+      if (wasSleeping) { setFace('catAnnoyed'); say(pick(LINES.wake)); Sfx.play('wake'); return; }
       setFace(result.expression);
       say(result.line);
       if (!result.refused) floatHearts(2);
@@ -127,5 +170,6 @@
     interact,
     getHearts: () => hearts,
     onHearts: (f) => heartListeners.push(f),
+    sfx: Sfx,
   };
 })();

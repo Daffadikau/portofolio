@@ -10,6 +10,7 @@
 .dock-item svg { image-rendering: pixelated; }
 @keyframes dockbounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 .dock-item:hover, .dock-item:focus-visible { animation: dockbounce .4s steps(3) 1; }
+.dock-item:active { animation: none; transform: translateY(3px); }
 .dock-item.active::after {
   content: ''; position: absolute; bottom: -7px; width: 6px; height: 6px; background: var(--ink);
 }

@@ -72,6 +72,7 @@
       tab.setAttribute('aria-selected', String(active));
       tab.tabIndex = active ? 0 : -1;
       panel.hidden = !active;
+      if (active) { panel.classList.remove('pop'); void panel.offsetWidth; panel.classList.add('pop'); }
     });
     document.dispatchEvent(new CustomEvent('tabshown', { detail: { id } }));
   }
@@ -113,6 +114,11 @@
     a.href = url; a.target = '_blank'; a.rel = 'noreferrer';
     return a;
   }
+  function h2icon(map, text) {
+    const h = el('h2', 'h2i');
+    h.append(window.PixelArt.render(map, 2), document.createTextNode(text));
+    return h;
+  }
   (function renderAbout() {
     const p = document.getElementById('panel-about');
     const hero = el('div', 'hero');
@@ -131,9 +137,9 @@
       stats.appendChild(d);
     });
     p.append(hero, el('p', 'bio', D.bio), stats,
-      el('h2', null, 'Education'),
+      h2icon('cap', 'Education'),
       el('p', null, `${D.education.program} — ${D.education.school}, ${D.education.detail}`),
-      el('h2', null, 'Experience'));
+      h2icon('case', 'Experience'));
     D.experience.forEach((x) => {
       const d = el('div', 'xp');
       d.append(el('h3', null, `${x.role} · ${x.org}`), el('span', 'period', x.period));
@@ -142,7 +148,7 @@
       d.appendChild(ul);
       p.appendChild(d);
     });
-    p.appendChild(el('h2', null, 'Honors & Awards'));
+    p.appendChild(h2icon('trophy', 'Honors & Awards'));
     const ul = el('ul', 'awards');
     D.awards.forEach((a) => {
       const li = el('li');
@@ -153,12 +159,49 @@
   })();
   (function renderProjects() {
     const p = document.getElementById('panel-projects');
-    D.projects.forEach((pr) => {
-      const card = el('article', 'miniwin');
+    // Palet kategorikal tervalidasi (dataviz validator, urutan tetap per project)
+    const COLORS = ['#e0662f', '#4a90d9', '#d9a616', '#7c5cc4', '#8fb83a', '#c94867', '#2fa392'];
+    const N = D.projects.length;
+    const SIZE = 96;
+    p.appendChild(h2icon('folder', 'Project Wheel'));
+    const wrap = el('div', 'projwheel');
+    const left = el('div', 'wheel-left');
+    const canvas = document.createElement('canvas');
+    canvas.width = SIZE; canvas.height = SIZE;
+    canvas.className = 'wheel-canvas';
+    canvas.setAttribute('role', 'img');
+    canvas.setAttribute('aria-label', `Project wheel with ${N} slices — browse with the project buttons below`);
+    const legend = el('div', 'wheel-legend');
+    const detail = el('article', 'miniwin wheel-detail');
+    const ctx = canvas.getContext('2d');
+    let sel = 0;
+    function draw() {
+      ctx.clearRect(0, 0, SIZE, SIZE);
+      const cx = SIZE / 2, cy = SIZE / 2, r = 42;
+      for (let i = 0; i < N; i += 1) {
+        const a0 = (i / N) * Math.PI * 2 - Math.PI / 2;
+        const a1 = ((i + 1) / N) * Math.PI * 2 - Math.PI / 2;
+        const mid = (a0 + a1) / 2;
+        const off = i === sel ? 4 : 0;
+        const ox = cx + Math.cos(mid) * off, oy = cy + Math.sin(mid) * off;
+        ctx.beginPath();
+        ctx.moveTo(ox, oy);
+        ctx.arc(ox, oy, r, a0, a1);
+        ctx.closePath();
+        ctx.fillStyle = COLORS[i % COLORS.length];
+        ctx.fill();
+        ctx.strokeStyle = '#1a1a1a';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+    }
+    function renderDetail() {
+      const pr = D.projects[sel];
+      detail.replaceChildren();
       const bar = el('div', 'miniwin-bar');
-      const dots = el('span', 'mw-dots');
-      dots.append(el('i'), el('i'), el('i'));
-      bar.append(dots, el('span', null, pr.title));
+      const sw = el('i', 'wheel-swatch');
+      sw.style.background = COLORS[sel % COLORS.length];
+      bar.append(sw, el('span', null, pr.title));
       const body = el('div', 'miniwin-body');
       body.appendChild(el('p', null, pr.desc));
       const tags = el('div', 'tags');
@@ -169,9 +212,38 @@
         pr.links.forEach((l) => links.appendChild(extLink('pxbtn', l.label, l.url)));
         body.appendChild(links);
       }
-      card.append(bar, body);
-      p.appendChild(card);
+      detail.append(bar, body);
+    }
+    function select(i) {
+      sel = i;
+      draw();
+      renderDetail();
+      legend.querySelectorAll('button').forEach((b, j) => b.setAttribute('aria-pressed', String(j === sel)));
+    }
+    function sliceAt(e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * SIZE - SIZE / 2;
+      const y = ((e.clientY - rect.top) / rect.height) * SIZE - SIZE / 2;
+      if (Math.hypot(x, y) > 46) return -1;
+      let ang = Math.atan2(y, x) + Math.PI / 2;
+      if (ang < 0) ang += Math.PI * 2;
+      return Math.min(N - 1, Math.floor((ang / (Math.PI * 2)) * N));
+    }
+    canvas.addEventListener('mousemove', (e) => { const i = sliceAt(e); if (i >= 0 && i !== sel) select(i); });
+    canvas.addEventListener('click', (e) => { const i = sliceAt(e); if (i >= 0) select(i); });
+    D.projects.forEach((pr, i) => {
+      const b = el('button', 'wheel-chip');
+      const sw = el('i', 'wheel-swatch');
+      sw.style.background = COLORS[i % COLORS.length];
+      b.append(sw, document.createTextNode(pr.title));
+      b.addEventListener('click', () => select(i));
+      legend.appendChild(b);
     });
+    left.append(canvas, legend);
+    wrap.append(left, detail);
+    p.appendChild(wrap);
+    draw();
+    select(0);
   })();
   (function renderSkills() {
     const p = document.getElementById('panel-skills');
@@ -205,7 +277,15 @@
     });
     info.append(nameRow, el('p', 'char-class', `CLASS: ${C.class}`), hearts, care);
     card.append(portrait, info);
-    p.append(el('h2', null, 'Character'), card, el('h2', null, 'Status'));
+    const snd = el('button', 'pxbtn care', `SOUND: ${window.Smoky.sfx.isMuted() ? 'OFF' : 'ON'}`);
+    snd.setAttribute('aria-pressed', String(!window.Smoky.sfx.isMuted()));
+    snd.addEventListener('click', () => {
+      const muted = window.Smoky.sfx.toggle();
+      snd.textContent = `SOUND: ${muted ? 'OFF' : 'ON'}`;
+      snd.setAttribute('aria-pressed', String(!muted));
+    });
+    care.appendChild(snd);
+    p.append(h2icon('about', 'Character'), card, h2icon('chip', 'Status'));
     D.skills.forEach((g) => {
       p.appendChild(el('h3', 'stat-group', g.group));
       const wrap = el('div', 'skillgrid');
@@ -224,20 +304,37 @@
   })();
   (function renderContact() {
     const p = document.getElementById('panel-contact');
-    const h = el('h1', 'display', "LET'S CONNECT");
+    const h = el('h1', 'display h2i', "LET'S CONNECT");
     h.style.fontSize = '28px';
+    h.prepend(window.PixelArt.render('mail', 2));
+    // dialog ala Win98: warning box dengan dua tombol yang sama-sama setuju
+    const dlg = el('div', 'miniwin dialog');
+    const bar = el('div', 'miniwin-bar');
+    const dots = el('span', 'mw-dots');
+    dots.append(el('i'), el('i'), el('i'));
+    bar.append(dots, el('span', null, 'hire-daffa.exe'));
+    const body = el('div', 'miniwin-body dialog-body');
+    const msg = el('div', 'dialog-msg');
+    msg.append(window.PixelArt.render('warn', 3),
+      el('p', null, 'Daffa is open to internships, freelance, and collaboration. Proceed to hire?'));
+    const choice = el('div', 'contact-btns');
+    const yes = el('a', 'pxbtn big', 'Yes');
+    yes.href = `mailto:${D.socials.email}`;
+    const abs = el('a', 'pxbtn big', 'Absolutely');
+    abs.href = `mailto:${D.socials.email}?subject=${encodeURIComponent('Hiring Daffa — absolutely')}`;
+    choice.append(yes, abs);
+    body.append(msg, choice);
+    dlg.append(bar, body);
     const btns = el('div', 'contact-btns');
-    const mail = el('a', 'pxbtn big', '✉ Email me');
-    mail.href = `mailto:${D.socials.email}`;
-    btns.append(mail,
+    btns.append(
       extLink('pxbtn big', 'GitHub', D.socials.github),
       extLink('pxbtn big', 'LinkedIn', D.socials.linkedin));
     const guard = el('div', 'contact-smoky');
     guard.appendChild(window.PixelArt.render('catBox', 4));
     guard.appendChild(el('span', 'char-partner', 'Smoky guards the inbox'));
     p.append(h,
-      el('p', 'bio', `${D.availability} ${D.replyNote}`),
-      btns, guard,
+      el('p', 'bio', D.replyNote),
+      dlg, btns, guard,
       el('p', 'fineprint', "© 2026 Daffa Adika · tech icons: Jerry's Pixel Icons (MIT)"));
   })();
 
@@ -302,6 +399,15 @@
       if (e.target.closest('[data-tab]')) restore();
     });
   })();
+
+  // haptic "boing" — semua kontrol utama membal sesaat setelah diklik
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('.tab, .dock-item, .pxbtn, .traffic-lights button, .smoky-btn, .wheel-chip');
+    if (!t) return;
+    t.classList.remove('boing');
+    void t.offsetWidth;
+    t.classList.add('boing');
+  });
 
   window.App = { showTab, TABS };
   fromHash();
