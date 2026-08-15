@@ -11,8 +11,6 @@ window.PORTFOLIO_DATA = {
     class: 'AI × Fullstack Adventurer',
     level: 6,
     levelLabel: 'semester',
-    hearts: 4,
-    interests: ['Tomodachi Life', 'Tamagotchi', 'Neko Atsume'],
     partner: {
       name: 'Smoky',
       species: 'Neko Atsume regular cat',

@@ -38,8 +38,20 @@
 .char-class { font-family: var(--font-pixel); font-size: 12px; }
 .char-hearts { font-size: 20px; letter-spacing: 5px; color: #c94867; }
 .char-hearts .hh:not(.on) { color: var(--ink); opacity: .35; }
-.tag.badge { background: #fff0e0; }
-.likes { margin-top: 8px; }
+.smoky-box { position: relative; }
+.smoky-btn { border: 0; background: none; padding: 0; display: grid; place-items: center; }
+.smoky-btn svg { image-rendering: pixelated; animation: catbob 1.2s steps(2) infinite; }
+.smoky-bubble {
+  position: absolute; top: -6px; left: 68%; white-space: nowrap;
+  font-family: var(--font-pixel); font-size: 11px;
+  background: #fff; border: 2px solid var(--ink); padding: 3px 8px;
+  box-shadow: 2px 2px 0 var(--ink); z-index: 5;
+}
+@keyframes heartfloat { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-34px); opacity: 0; } }
+.heart-float { position: absolute; top: 18%; color: #c94867; font-size: 16px; animation: heartfloat .9s steps(5) forwards; pointer-events: none; }
+.care-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.pxbtn.care { display: inline-flex; align-items: center; gap: 6px; background: var(--win); }
+.pxbtn.care svg { image-rendering: pixelated; }
 .stat-group { font-family: var(--font-pixel); font-size: 13px; margin: 14px 0 6px; }
 .skillgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px 20px; }
 .skill { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
@@ -47,4 +59,6 @@
 .bar i { width: 14px; height: 14px; border: 2px solid var(--ink); background: #fff; }
 .bar i.on { background: var(--tl-green); }
 .contact-btns { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 24px; }
+.contact-smoky { display: inline-grid; place-items: center; gap: 6px; margin-top: 8px; }
+.contact-smoky svg { image-rendering: pixelated; }
 .fineprint { font-size: 11px; opacity: .7; margin-top: 30px; }

@@ -117,15 +117,12 @@
     const p = document.getElementById('panel-about');
     const hero = el('div', 'hero');
     const art = el('div', 'hero-art');
-    art.appendChild(window.PixelArt.render('cat', 6));
+    window.Smoky.attach(art, 6);
     const head = el('div');
     head.append(el('h1', 'display', D.name), el('p', 'role', D.role));
     const status = el('p', 'status');
     status.append(el('span', 'dot'), document.createTextNode(D.status));
     head.appendChild(status);
-    const likes = el('div', 'tags likes');
-    D.character.interests.forEach((it) => likes.appendChild(el('span', 'tag badge', `♥ ${it}`)));
-    head.appendChild(likes);
     hero.append(art, head);
     const stats = el('div', 'stats');
     D.stats.forEach((s) => {
@@ -181,7 +178,7 @@
     const C = D.character;
     const card = el('div', 'char-card');
     const portrait = el('div', 'char-portrait');
-    portrait.appendChild(window.PixelArt.render('cat', 5));
+    window.Smoky.attach(portrait, 5);
     portrait.appendChild(el('span', 'char-partner', `${C.partner.name} · Lv.${C.partner.powerLevel}`));
     const info = el('div', 'char-info');
     const nameRow = el('div', 'char-name');
@@ -191,11 +188,22 @@
     );
     const hearts = el('div', 'char-hearts');
     hearts.setAttribute('role', 'img');
-    hearts.setAttribute('aria-label', `motivation: ${C.hearts} of 5 hearts`);
-    for (let i = 1; i <= 5; i += 1) hearts.appendChild(el('span', i <= C.hearts ? 'hh on' : 'hh', i <= C.hearts ? '♥' : '♡'));
-    const likes = el('div', 'tags');
-    C.interests.forEach((it) => likes.appendChild(el('span', 'tag badge', `★ ${it}`)));
-    info.append(nameRow, el('p', 'char-class', `CLASS: ${C.class}`), hearts, likes);
+    function renderHearts(n) {
+      hearts.setAttribute('aria-label', `Smoky affection: ${n} of 5 hearts`);
+      hearts.replaceChildren();
+      for (let i = 1; i <= 5; i += 1) hearts.appendChild(el('span', i <= n ? 'hh on' : 'hh', i <= n ? '♥' : '♡'));
+    }
+    renderHearts(window.Smoky.getHearts());
+    window.Smoky.onHearts(renderHearts);
+    const care = el('div', 'care-btns');
+    [['feed', 'fish', 'FEED'], ['brush', 'brush', 'BRUSH'], ['play', 'ball', 'PLAY']].forEach(([kind, map, label]) => {
+      const b = el('button', 'pxbtn care');
+      b.appendChild(window.PixelArt.render(map, 2));
+      b.appendChild(el('span', null, label));
+      b.addEventListener('click', () => window.Smoky.interact(kind));
+      care.appendChild(b);
+    });
+    info.append(nameRow, el('p', 'char-class', `CLASS: ${C.class}`), hearts, care);
     card.append(portrait, info);
     p.append(el('h2', null, 'Character'), card, el('h2', null, 'Status'));
     D.skills.forEach((g) => {
@@ -224,9 +232,12 @@
     btns.append(mail,
       extLink('pxbtn big', 'GitHub', D.socials.github),
       extLink('pxbtn big', 'LinkedIn', D.socials.linkedin));
+    const guard = el('div', 'contact-smoky');
+    guard.appendChild(window.PixelArt.render('catBox', 4));
+    guard.appendChild(el('span', 'char-partner', 'Smoky guards the inbox'));
     p.append(h,
       el('p', 'bio', `${D.availability} ${D.replyNote}`),
-      btns,
+      btns, guard,
       el('p', 'fineprint', "© 2026 Daffa Adika · tech icons: Jerry's Pixel Icons (MIT)"));
   })();
 
