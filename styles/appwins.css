@@ -1,0 +1,116 @@
+/* App windows — jendela "aplikasi" pixel yang overlay window utama */
+.appwin {
+  position: fixed;
+  background: #fff;
+  border: 3px solid var(--ink);
+  box-shadow: 6px 6px 0 rgba(26, 26, 26, 0.45);
+  font-family: var(--font-mono);
+  max-width: 96vw;
+}
+@keyframes winspawn {
+  0% { transform: scale(0.85); }
+  60% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+.appwin.spawn { animation: winspawn 0.2s steps(3); }
+.appwin-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 8px; border-bottom: 3px solid var(--ink);
+  font-family: var(--font-pixel); font-size: 12px;
+  cursor: inherit; user-select: none; touch-action: none;
+  color: #fff;
+}
+.appwin-bar svg { image-rendering: pixelated; width: 18px; height: 18px; }
+.appwin-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.appwin-close {
+  border: 2px solid currentColor; background: none; color: inherit;
+  font-family: var(--font-pixel); font-size: 12px; line-height: 1;
+  width: 20px; height: 20px; padding: 0;
+}
+.appwin-body { max-height: 46vh; overflow: auto; font-size: 12px; }
+
+/* skins — warna titlebar per aplikasi */
+.skin-excel .appwin-bar { background: #217346; }
+.skin-word .appwin-bar { background: #2b579a; }
+.skin-notion .appwin-bar { background: #1a1a1a; }
+.skin-vscode .appwin-bar { background: #0065a9; }
+.skin-idea .appwin-bar { background: #1a1a1a; color: #fe6b8f; }
+.skin-docker .appwin-bar { background: #1d63ed; }
+.skin-wireshark .appwin-bar { background: #1679a7; }
+
+/* Excel */
+.xl-formula { display: flex; gap: 8px; padding: 5px 8px; border-bottom: 2px solid var(--ink); background: var(--win); font-size: 11px; }
+.xl-formula b { font-style: italic; }
+.xl-grid { border-collapse: collapse; width: 100%; }
+.xl-grid th, .xl-grid td { border: 1px solid #b5b5b5; padding: 3px 8px; text-align: left; font-size: 11px; white-space: nowrap; }
+.xl-grid th { background: #d8e4d8; font-weight: 700; }
+.xl-grid td:first-child { background: #d8e4d8; font-weight: 700; width: 22px; text-align: center; }
+.xl-grid tr:nth-child(2) td { font-weight: 700; background: #eef3ee; }
+
+/* Word */
+.wd-ribbon { display: flex; gap: 14px; padding: 5px 10px; background: #e8eefc; border-bottom: 2px solid var(--ink); font-size: 11px; }
+.wd-page { padding: 14px 18px; }
+.wd-page h3 { font-family: var(--font-pixel); font-size: 15px; margin-bottom: 8px; }
+.wd-page h4 { font-size: 12px; margin: 10px 0 4px; }
+.wd-page p { font-size: 12px; line-height: 1.55; }
+.wd-note { margin-top: 10px; opacity: 0.65; font-style: italic; }
+
+/* Notion */
+.nt-wrap { display: flex; min-height: 180px; }
+.nt-side { width: 128px; flex: 0 0 auto; background: #f4f1ec; border-right: 2px solid var(--ink); padding: 8px 6px; font-size: 11px; display: grid; gap: 6px; align-content: start; }
+.nt-side .on { font-weight: 700; background: #e8e2d8; }
+.nt-main { flex: 1; padding: 10px 12px; }
+.nt-main h3 { font-size: 14px; margin-bottom: 8px; }
+.nt-board { display: flex; gap: 10px; align-items: flex-start; }
+.nt-col { flex: 1; background: #f7f6f3; border: 2px solid var(--ink); padding: 6px; }
+.nt-col h4 { font-size: 11px; opacity: 0.7; margin-bottom: 6px; }
+.nt-card { background: #fff; border: 2px solid var(--ink); box-shadow: 2px 2px 0 rgba(26,26,26,.25); padding: 5px 6px; margin-bottom: 6px; font-size: 11px; display: grid; gap: 4px; }
+.nt-tag { justify-self: start; font-size: 10px; color: #fff; padding: 1px 6px; border: 1px solid var(--ink); font-style: normal; }
+
+/* editor umum (VS Code / IntelliJ) */
+.vs-tabs, .ij-tabs { display: flex; gap: 2px; padding: 4px 6px 0; font-size: 11px; border-bottom: 2px solid #000; }
+.vs-tabs { background: #252526; }
+.ij-tabs { background: #3c3f41; }
+.vs-tabs span, .ij-tabs span { padding: 3px 10px; color: #9a9a9a; }
+.vs-tabs .on { background: #1e1e1e; color: #fff; }
+.ij-tabs .on { background: #2b2b2b; color: #fff; }
+.vs-code { background: #1e1e1e; }
+.ij-code { background: #2b2b2b; }
+.vs-code, .ij-code { padding: 10px 12px; font-size: 12px; line-height: 1.6; counter-reset: ln; }
+.code-line { white-space: pre; }
+.code-line::before { counter-increment: ln; content: counter(ln); display: inline-block; width: 2ch; margin-right: 12px; color: #6a6a6a; text-align: right; }
+.tok-kw { color: #c586c0; }
+.tok-var { color: #9cdcfe; }
+.tok-key { color: #9cdcfe; }
+.tok-str { color: #ce9178; }
+.tok-num { color: #b5cea8; }
+.tok-cm { color: #6a9955; }
+.tok-p { color: #d4d4d4; }
+
+/* Docker */
+.dk-grid { border-collapse: collapse; width: 100%; }
+.dk-grid th, .dk-grid td { padding: 5px 10px; text-align: left; font-size: 11px; border-bottom: 1px solid #d5d5d5; white-space: nowrap; }
+.dk-grid th { background: #eef3fb; }
+.dk-status i { display: inline-block; width: 8px; height: 8px; background: #2e9e44; border: 1px solid var(--ink); margin-right: 2px; }
+.dk-note { padding: 6px 10px; font-size: 11px; opacity: 0.65; }
+
+/* Wireshark */
+.ws-filter { display: flex; gap: 8px; padding: 5px 8px; background: #e6f2e6; border-bottom: 2px solid var(--ink); font-size: 11px; }
+.ws-grid { border-collapse: collapse; width: 100%; }
+.ws-grid th, .ws-grid td { padding: 3px 8px; text-align: left; font-size: 11px; border-bottom: 1px solid #d0d0d0; white-space: nowrap; }
+.ws-grid th { background: #dcdcdc; }
+.ws-http td { background: #e8f4e8; }
+.ws-mqtt td { background: #e8ecf8; }
+.ws-icmp td { background: #fbe9ef; }
+
+/* launcher di panel */
+.launcher { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.launch-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-pixel); font-size: 12px; color: var(--ink);
+  border: 3px solid var(--ink); background: #fff; padding: 8px 12px;
+  box-shadow: 3px 3px 0 var(--ink);
+}
+.launch-btn:active { transform: translate(3px, 3px); box-shadow: none; }
+.launch-btn svg { image-rendering: pixelated; width: 22px; height: 22px; }
+.launch-hint { font-size: 12px; opacity: 0.7; margin-top: 8px; }

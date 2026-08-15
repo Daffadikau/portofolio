@@ -157,93 +157,24 @@
     });
     p.appendChild(ul);
   })();
+  function launcherFor(group) {
+    const grid = el('div', 'launcher');
+    window.AppWins.GROUPS[group].forEach((id) => {
+      const def = window.AppWins.DEFS[id];
+      const b = el('button', 'launch-btn');
+      b.appendChild(window.PixelArt.render(def.icon, 2));
+      b.appendChild(document.createTextNode(def.title.split(' — ')[1] || def.title));
+      b.addEventListener('click', () => window.AppWins.open(id));
+      grid.appendChild(b);
+    });
+    return grid;
+  }
   (function renderProjects() {
     const p = document.getElementById('panel-projects');
-    // Palet kategorikal tervalidasi (dataviz validator, urutan tetap per project)
-    const COLORS = ['#e0662f', '#4a90d9', '#d9a616', '#7c5cc4', '#8fb83a', '#c94867', '#2fa392'];
-    const N = D.projects.length;
-    const SIZE = 96;
-    p.appendChild(h2icon('folder', 'Project Wheel'));
-    const wrap = el('div', 'projwheel');
-    const left = el('div', 'wheel-left');
-    const canvas = document.createElement('canvas');
-    canvas.width = SIZE; canvas.height = SIZE;
-    canvas.className = 'wheel-canvas';
-    canvas.setAttribute('role', 'img');
-    canvas.setAttribute('aria-label', `Project wheel with ${N} slices — browse with the project buttons below`);
-    const legend = el('div', 'wheel-legend');
-    const detail = el('article', 'miniwin wheel-detail');
-    const ctx = canvas.getContext('2d');
-    let sel = 0;
-    function draw() {
-      ctx.clearRect(0, 0, SIZE, SIZE);
-      const cx = SIZE / 2, cy = SIZE / 2, r = 42;
-      for (let i = 0; i < N; i += 1) {
-        const a0 = (i / N) * Math.PI * 2 - Math.PI / 2;
-        const a1 = ((i + 1) / N) * Math.PI * 2 - Math.PI / 2;
-        const mid = (a0 + a1) / 2;
-        const off = i === sel ? 4 : 0;
-        const ox = cx + Math.cos(mid) * off, oy = cy + Math.sin(mid) * off;
-        ctx.beginPath();
-        ctx.moveTo(ox, oy);
-        ctx.arc(ox, oy, r, a0, a1);
-        ctx.closePath();
-        ctx.fillStyle = COLORS[i % COLORS.length];
-        ctx.fill();
-        ctx.strokeStyle = '#1a1a1a';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-      }
-    }
-    function renderDetail() {
-      const pr = D.projects[sel];
-      detail.replaceChildren();
-      const bar = el('div', 'miniwin-bar');
-      const sw = el('i', 'wheel-swatch');
-      sw.style.background = COLORS[sel % COLORS.length];
-      bar.append(sw, el('span', null, pr.title));
-      const body = el('div', 'miniwin-body');
-      body.appendChild(el('p', null, pr.desc));
-      const tags = el('div', 'tags');
-      pr.tech.forEach((t) => tags.appendChild(techTag(t)));
-      body.appendChild(tags);
-      if (pr.links.length) {
-        const links = el('p', 'links');
-        pr.links.forEach((l) => links.appendChild(extLink('pxbtn', l.label, l.url)));
-        body.appendChild(links);
-      }
-      detail.append(bar, body);
-    }
-    function select(i) {
-      sel = i;
-      draw();
-      renderDetail();
-      legend.querySelectorAll('button').forEach((b, j) => b.setAttribute('aria-pressed', String(j === sel)));
-    }
-    function sliceAt(e) {
-      const rect = canvas.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * SIZE - SIZE / 2;
-      const y = ((e.clientY - rect.top) / rect.height) * SIZE - SIZE / 2;
-      if (Math.hypot(x, y) > 46) return -1;
-      let ang = Math.atan2(y, x) + Math.PI / 2;
-      if (ang < 0) ang += Math.PI * 2;
-      return Math.min(N - 1, Math.floor((ang / (Math.PI * 2)) * N));
-    }
-    canvas.addEventListener('mousemove', (e) => { const i = sliceAt(e); if (i >= 0 && i !== sel) select(i); });
-    canvas.addEventListener('click', (e) => { const i = sliceAt(e); if (i >= 0) select(i); });
-    D.projects.forEach((pr, i) => {
-      const b = el('button', 'wheel-chip');
-      const sw = el('i', 'wheel-swatch');
-      sw.style.background = COLORS[i % COLORS.length];
-      b.append(sw, document.createTextNode(pr.title));
-      b.addEventListener('click', () => select(i));
-      legend.appendChild(b);
-    });
-    left.append(canvas, legend);
-    wrap.append(left, detail);
-    p.appendChild(wrap);
-    draw();
-    select(0);
+    p.appendChild(h2icon('folder', 'Projects'));
+    p.appendChild(el('p', 'bio', 'Opening the project suite — each app shows my work from a different angle.'));
+    p.appendChild(launcherFor('projects'));
+    p.appendChild(el('p', 'launch-hint', 'Tip: drag the windows around · click one to bring it to front · Esc or × closes it'));
   })();
   (function renderSkills() {
     const p = document.getElementById('panel-skills');
@@ -285,22 +216,10 @@
       snd.setAttribute('aria-pressed', String(!muted));
     });
     care.appendChild(snd);
-    p.append(h2icon('about', 'Character'), card, h2icon('chip', 'Status'));
-    D.skills.forEach((g) => {
-      p.appendChild(el('h3', 'stat-group', g.group));
-      const wrap = el('div', 'skillgrid');
-      g.items.forEach((s) => {
-        const row = el('div', 'skill');
-        row.appendChild(techTag(s));
-        const bar = el('div', 'bar');
-        bar.setAttribute('role', 'img');
-        bar.setAttribute('aria-label', `${s.label} proficiency: ${s.level} of 5`);
-        for (let i = 1; i <= 5; i += 1) bar.appendChild(el('i', i <= s.level ? 'on' : null));
-        row.appendChild(bar);
-        wrap.appendChild(row);
-      });
-      p.appendChild(wrap);
-    });
+    p.append(h2icon('about', 'Character'), card, h2icon('chip', 'Toolbox'));
+    p.appendChild(el('p', 'bio', 'My skills, opened in their natural habitat — a very busy desktop.'));
+    p.appendChild(launcherFor('skills'));
+    p.appendChild(el('p', 'launch-hint', 'Tip: drag the windows around · click one to bring it to front · Esc or × closes it'));
   })();
   (function renderContact() {
     const p = document.getElementById('panel-contact');
@@ -399,6 +318,14 @@
       if (e.target.closest('[data-tab]')) restore();
     });
   })();
+
+  // tab Projects/Skills membuka jendela "aplikasi"; tab lain menutup semuanya
+  document.addEventListener('tabshown', (e) => {
+    if (!window.AppWins) return;
+    window.AppWins.closeAll();
+    if (e.detail.id === 'projects') window.AppWins.openGroup('projects');
+    else if (e.detail.id === 'skills') window.AppWins.openGroup('skills');
+  });
 
   // haptic "boing" — semua kontrol utama membal sesaat setelah diklik
   document.addEventListener('click', (e) => {
