@@ -174,6 +174,34 @@
       el('p', 'fineprint', "© 2026 Daffa Adika · tech icons: Jerry's Pixel Icons (MIT)"));
   })();
 
+  (function buildDock() {
+    const dock = document.getElementById('dock');
+    const items = [
+      { map: 'about', tab: 'about', label: 'About' },
+      { map: 'folder', tab: 'projects', label: 'Projects' },
+      { map: 'chip', tab: 'skills', label: 'Skills' },
+      { map: 'mail', tab: 'contact', label: 'Contact' },
+      { map: 'term', tab: 'terminal', label: 'Terminal' },
+      { sep: true },
+      { map: 'github', url: D.socials.github, label: 'GitHub' },
+      { map: 'linkedin', url: D.socials.linkedin, label: 'LinkedIn' },
+    ];
+    items.forEach((it) => {
+      if (it.sep) { dock.appendChild(el('span', 'dock-sep')); return; }
+      const btn = el(it.url ? 'a' : 'button', 'dock-item');
+      btn.setAttribute('aria-label', it.label);
+      btn.title = it.label;
+      if (it.url) { btn.href = it.url; btn.target = '_blank'; btn.rel = 'noreferrer'; }
+      else { btn.dataset.tab = it.tab; btn.addEventListener('click', () => { location.hash = it.tab; }); }
+      btn.appendChild(window.PixelArt.render(it.map, 2));
+      dock.appendChild(btn);
+    });
+    document.addEventListener('tabshown', (e) => {
+      dock.querySelectorAll('.dock-item[data-tab]').forEach((b) =>
+        b.classList.toggle('active', b.dataset.tab === e.detail.id));
+    });
+  })();
+
   window.App = { showTab, TABS };
   fromHash();
 })();
