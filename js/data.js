@@ -1,13 +1,14 @@
 window.PORTFOLIO_DATA = {
   name: 'DAFFA ADIKA',
   fullName: 'Muhammad Daffa Adika Utama',
-  role: 'Computer Engineering Student · Fullstack Developer',
+  role: 'Computer Engineering Student · AI & Fullstack Developer',
   location: 'Bandung, West Java, Indonesia',
   status: 'Open to opportunities',
+  bio: 'Computer Engineering student at Universitas Pendidikan Indonesia (UPI), concentrating in Intelligent Device Development. I build AI-powered systems, fullstack web apps, and IoT solutions — with a focus on impactful technology for social and environmental challenges.',
   availability: 'Open to internships, freelance, and collaboration.',
   replyNote: 'I usually reply within 24-48 hours.',
   character: {
-    class: 'Fullstack Adventurer',
+    class: 'AI × Fullstack Adventurer',
     level: 6,
     levelLabel: 'semester',
     hearts: 4,
@@ -22,19 +23,31 @@ window.PORTFOLIO_DATA = {
       memento: 'Soft Brush',
     },
   },
-  bio: 'Computer Engineering student at Universitas Pendidikan Indonesia (UPI) focused on bridging advanced technology and social impact. I build fullstack web apps, mobile apps, and IoT systems.',
-  education: { school: 'Universitas Pendidikan Indonesia (UPI)', program: 'Computer Engineering', detail: '3rd year (6th semester)' },
+  education: {
+    school: 'Universitas Pendidikan Indonesia (UPI)',
+    program: 'Computer Engineering',
+    detail: '2023–2027 (expected) · GPA 3.65/4.00 · concentration: Intelligent Device Development',
+  },
   socials: {
     email: 'daffadikau@gmail.com',
     github: 'https://github.com/Daffadikau',
     linkedin: 'https://www.linkedin.com/in/daffadikau/',
   },
   stats: [
-    { number: '3rd Year', label: 'Current Education' },
+    { number: '3.65', label: 'GPA (of 4.00)' },
     { number: '15+', label: 'Licenses & Certificates' },
     { number: '7', label: 'Awards' },
   ],
   projects: [
+    {
+      title: 'CBRN Drone Monitoring',
+      desc: 'Real-time CBRN (Chemical, Biological, Radiological, Nuclear) monitoring platform for UAVs at PT IROSTECH — backend for high-frequency sensor telemetry, low-latency drone-to-command-center streams, AI-driven hazard detection.',
+      tech: [
+        { label: 'Backend', icon: 'node' }, { label: 'AI Analytics', icon: 'py' },
+        { label: 'IoT Telemetry', icon: null },
+      ],
+      links: [],
+    },
     {
       title: 'TestKit Gas Monitor',
       desc: 'Real-time IoT gas monitoring platform: sensor ingestion API, live dashboard with charts and alerting, time-series storage, Dockerized VPS deployment.',
@@ -54,6 +67,24 @@ window.PORTFOLIO_DATA = {
       links: [{ label: 'GitHub', url: 'https://github.com/Daffadikau/bengkelbot' }],
     },
     {
+      title: 'OMR Automated Grading',
+      desc: 'AI answer-sheet grading app (Intelligent Device Systems, graded 4.00/4.00) — pattern recognition + image preprocessing, 99.7% accuracy, cuts manual grading time by 90%.',
+      tech: [
+        { label: 'YOLO', icon: null }, { label: 'Python', icon: 'py' },
+        { label: 'Flutter', icon: 'dart' }, { label: 'Firebase', icon: null },
+      ],
+      links: [{ label: 'GitHub', url: 'https://github.com/Daffadikau' }],
+    },
+    {
+      title: 'Trias Bakti MSME Platform',
+      desc: 'Web platform digitalizing MSMEs in Drawati Village — backend services, database schemas for inventory & transactions, full SRS documentation, and onboarding for local stakeholders.',
+      tech: [
+        { label: 'Backend', icon: 'php' }, { label: 'SQL', icon: 'sql' },
+        { label: 'Systems Design', icon: null },
+      ],
+      links: [],
+    },
+    {
       title: 'Mentorly',
       desc: 'Cross-platform mobile mentoring platform with 2FA, RBAC, AES-256 encryption, real-time chat, payments, and mentor ratings. Published in Jurnal Informatika Teknologi dan Sains.',
       tech: [
@@ -63,17 +94,8 @@ window.PORTFOLIO_DATA = {
       links: [{ label: 'GitHub', url: 'https://github.com/Daffadikau' }],
     },
     {
-      title: 'OMR Automated Grading',
-      desc: 'AI answer-sheet grading with YOLOv11/YOLOv8 — 99.2% accuracy, hybrid cloud-mobile architecture, automated PDF/CSV analytics reports.',
-      tech: [
-        { label: 'YOLO', icon: null }, { label: 'Python', icon: 'py' },
-        { label: 'Flutter', icon: 'dart' }, { label: 'Firebase', icon: null },
-      ],
-      links: [{ label: 'GitHub', url: 'https://github.com/Daffadikau' }],
-    },
-    {
       title: 'Kuai DryVault',
-      desc: 'IoT shoe-drying cabinet: ESP32 driving 14 DC fans via 8-channel relays, Flutter app with Firebase realtime monitoring, 87.4W optimized power draw. Published in Jurnal Ilmiah Pendidikan.',
+      desc: 'IoT shoe-drying cabinet for a local shoe laundry: ESP32 with temperature & humidity sensors automating airflow and heating, Flutter app with Firebase realtime monitoring.',
       tech: [
         { label: 'ESP32', icon: 'c' }, { label: 'IoT', icon: null },
         { label: 'Flutter', icon: 'dart' }, { label: 'Firebase', icon: null },
@@ -83,47 +105,67 @@ window.PORTFOLIO_DATA = {
   ],
   skills: [
     { group: 'Languages', items: [
-      { label: 'JavaScript', icon: 'js', level: 4 }, { label: 'TypeScript', icon: 'ts', level: 3 },
-      { label: 'Python', icon: 'py', level: 4 }, { label: 'Java', icon: 'java', level: 3 },
-      { label: 'Dart', icon: 'dart', level: 4 }, { label: 'PHP', icon: 'php', level: 3 },
+      { label: 'Python', icon: 'py', level: 4 }, { label: 'TypeScript', icon: 'ts', level: 4 },
+      { label: 'JavaScript', icon: 'js', level: 4 }, { label: 'Dart', icon: 'dart', level: 4 },
+      { label: 'PHP', icon: 'php', level: 3 }, { label: 'SQL', icon: 'sql', level: 4 },
     ]},
-    { group: 'Frontend', items: [
-      { label: 'HTML', icon: 'html', level: 5 }, { label: 'CSS', icon: 'css', level: 4 },
-      { label: 'React', icon: 'jsx', level: 3 }, { label: 'Vue', icon: 'vue', level: 3 },
-      { label: 'Next.js', icon: 'next', level: 3 }, { label: 'Flutter', icon: 'dart', level: 4 },
+    { group: 'Web & Mobile', items: [
+      { label: 'HTML/CSS', icon: 'html', level: 5 }, { label: 'React', icon: 'jsx', level: 3 },
+      { label: 'Next.js', icon: 'next', level: 3 }, { label: 'Node.js', icon: 'node', level: 4 },
+      { label: 'FastAPI', icon: 'py', level: 4 }, { label: 'Flutter', icon: 'dart', level: 4 },
     ]},
-    { group: 'Backend', items: [
-      { label: 'Node.js', icon: 'node', level: 4 }, { label: 'FastAPI', icon: 'py', level: 4 },
-      { label: 'REST & GraphQL', icon: 'gql', level: 4 }, { label: 'SQL & NoSQL', icon: 'sql', level: 4 },
-      { label: 'Firebase', icon: null, level: 4 },
+    { group: 'AI & Data', items: [
+      { label: 'Machine Learning', icon: null, level: 4 }, { label: 'Computer Vision (YOLO)', icon: null, level: 4 },
+      { label: 'Data Analysis', icon: null, level: 4 }, { label: 'Gemini API', icon: null, level: 3 },
     ]},
-    { group: 'DevOps & Tools', items: [
+    { group: 'DevOps, Cloud & IoT', items: [
       { label: 'Git', icon: 'git', level: 4 }, { label: 'Docker', icon: 'docker', level: 4 },
-      { label: 'CI/CD', icon: null, level: 3 }, { label: 'Linux/VPS', icon: 'shell', level: 4 },
+      { label: 'AWS', icon: null, level: 3 }, { label: 'Azure', icon: null, level: 3 },
+      { label: 'Linux/VPS', icon: 'shell', level: 4 }, { label: 'Microcontroller/IoT', icon: 'c', level: 4 },
     ]},
   ],
   experience: [
     {
-      role: 'Service to Society Dept (P2M) Head of Staff', org: 'HIMA TEKKOM UPI',
-      period: 'Jan 2025 — Jan 2026',
+      role: 'Backend Developer & AI Engineer Intern', org: 'PT IROSTECH Solusi Intelejen',
+      period: 'Feb 2026 — Aug 2026',
       points: [
-        'Led community service initiatives for the Computer Engineering student association.',
-        'Managed planning and execution of social impact programs.',
+        'Building a real-time CBRN monitoring platform for UAV/drone surveillance.',
+        'Engineering backend architecture for high-frequency sensor telemetry with low-latency drone-to-command-center communication.',
+        'Implementing AI-driven analytics for automated hazardous-material detection.',
       ],
     },
     {
-      role: 'Community Service Staff', org: 'Palang Merah Indonesia (KSR PMI UPI)',
+      role: 'Staff of Research and Creativity', org: 'Rumah Prestasi Kemahasiswaan UPI',
+      period: 'Jan 2026 — now',
+      points: [
+        'Curating and mentoring student digital-innovation projects for the national LIDM competition.',
+        'Reviewing research methodologies and system architectures against national competition standards.',
+      ],
+    },
+    {
+      role: 'Service to Society Dept (P2M) Head of Staff', org: 'HIMA TEKKOM UPI',
+      period: 'Jan 2025 — Jan 2026',
+      points: [
+        'Orchestrated BASKOM, a flagship social program — mobilized and distributed IDR 5,000,000+ in humanitarian aid.',
+        'Managed end-to-end fundraising for disaster relief (Bekasi floods, Sumatra) and orphanage support with transparent reporting.',
+      ],
+    },
+    {
+      role: 'Staff of Bakti Sosial', org: 'KSR PMI UPI (Indonesian Red Cross)',
       period: 'Sep 2024 — Jan 2026',
       points: [
-        'Volunteered with the university humanitarian corps.',
-        'Provided emergency medical support and community services.',
+        'First responder & field medic in emergency missions and disaster relief operations.',
+        'Spearheaded a blood donation program with PMI Kabupaten Bandung — large-scale donor recruitment and logistics.',
       ],
     },
   ],
   awards: [
-    { title: 'Best Department of the Year 2025', org: 'HIMA TEKKOM UPI', when: 'Jan 2026' },
-    { title: '2nd Place (Silver Medal), National Digital Learning Video Competition (LIDM 2025)', org: 'Ministry of Education', when: 'Dec 2025' },
-    { title: '2nd Place, Mobile App UI/UX Design Challenge', org: 'HIMA TEKKOM UPI', when: 'Dec 2025' },
-    { title: 'Staff of the Month', org: 'KSR PMI UPI', when: 'Jul 2025' },
+    { title: 'Best Department of the Year (P2M)', org: 'HIMA TEKKOM UPI', when: '2026' },
+    { title: '2nd Place (Silver Medal), National Digital Learning Video Competition (LIDM)', org: 'Ministry of Education', when: '2025' },
+    { title: 'Best Biro of the Year (Pengabdian)', org: 'KSR PMI Unit UPI Kampus Cibiru', when: '2026' },
+    { title: '2nd Place Winner, Best UI/UX Front-End Design', org: 'HIMA UPI', when: '2025' },
+    { title: 'Staff of the Month (July)', org: 'KSR PMI Unit UPI Kampus Cibiru', when: '2025' },
+    { title: 'Biro of the Month (September)', org: 'KSR PMI Unit UPI Kampus Cibiru', when: '2025' },
+    { title: 'Best Robotics and IT Student Program', org: 'SMAI PB Soedirman Bekasi', when: '2022' },
   ],
 };

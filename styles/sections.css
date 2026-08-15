@@ -27,6 +27,20 @@
 .pxbtn { display: inline-block; font-family: var(--font-pixel); font-size: 12px; color: var(--ink); text-decoration: none; border: 3px solid var(--ink); background: var(--tl-yellow); padding: 4px 10px; box-shadow: 3px 3px 0 var(--ink); margin-right: 8px; }
 .pxbtn:active { transform: translate(3px, 3px); box-shadow: none; }
 .pxbtn.big { font-size: 14px; padding: 10px 16px; margin-bottom: 8px; }
+.char-card { display: flex; gap: 18px; align-items: stretch; flex-wrap: wrap; border: 3px solid var(--ink); background: #fff; padding: 14px; box-shadow: 4px 4px 0 rgba(26,26,26,.3); }
+.char-portrait { display: grid; place-items: center; gap: 6px; border: 3px solid var(--ink); background: var(--win); padding: 10px 16px; }
+.char-portrait svg { image-rendering: pixelated; animation: catbob 1.2s steps(2) infinite; }
+.char-partner { font-family: var(--font-pixel); font-size: 11px; }
+.char-info { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 8px; }
+.char-name { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.char-display { font-size: 24px; }
+.char-lv { font-family: var(--font-pixel); font-size: 11px; border: 2px solid var(--ink); background: var(--tl-yellow); padding: 2px 8px; }
+.char-class { font-family: var(--font-pixel); font-size: 12px; }
+.char-hearts { font-size: 20px; letter-spacing: 5px; color: #c94867; }
+.char-hearts .hh:not(.on) { color: var(--ink); opacity: .35; }
+.tag.badge { background: #fff0e0; }
+.likes { margin-top: 8px; }
+.stat-group { font-family: var(--font-pixel); font-size: 13px; margin: 14px 0 6px; }
 .skillgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px 20px; }
 .skill { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .bar { display: flex; gap: 3px; }

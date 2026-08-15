@@ -123,6 +123,9 @@
     const status = el('p', 'status');
     status.append(el('span', 'dot'), document.createTextNode(D.status));
     head.appendChild(status);
+    const likes = el('div', 'tags likes');
+    D.character.interests.forEach((it) => likes.appendChild(el('span', 'tag badge', `♥ ${it}`)));
+    head.appendChild(likes);
     hero.append(art, head);
     const stats = el('div', 'stats');
     D.stats.forEach((s) => {
@@ -142,7 +145,7 @@
       d.appendChild(ul);
       p.appendChild(d);
     });
-    p.appendChild(el('h2', null, 'Honors & Awards (selected)'));
+    p.appendChild(el('h2', null, 'Honors & Awards'));
     const ul = el('ul', 'awards');
     D.awards.forEach((a) => {
       const li = el('li');
@@ -175,8 +178,28 @@
   })();
   (function renderSkills() {
     const p = document.getElementById('panel-skills');
+    const C = D.character;
+    const card = el('div', 'char-card');
+    const portrait = el('div', 'char-portrait');
+    portrait.appendChild(window.PixelArt.render('cat', 5));
+    portrait.appendChild(el('span', 'char-partner', `${C.partner.name} · Lv.${C.partner.powerLevel}`));
+    const info = el('div', 'char-info');
+    const nameRow = el('div', 'char-name');
+    nameRow.append(
+      el('span', 'display char-display', D.name),
+      el('span', 'char-lv', `LV ${C.level} (${C.levelLabel})`),
+    );
+    const hearts = el('div', 'char-hearts');
+    hearts.setAttribute('role', 'img');
+    hearts.setAttribute('aria-label', `motivation: ${C.hearts} of 5 hearts`);
+    for (let i = 1; i <= 5; i += 1) hearts.appendChild(el('span', i <= C.hearts ? 'hh on' : 'hh', i <= C.hearts ? '♥' : '♡'));
+    const likes = el('div', 'tags');
+    C.interests.forEach((it) => likes.appendChild(el('span', 'tag badge', `★ ${it}`)));
+    info.append(nameRow, el('p', 'char-class', `CLASS: ${C.class}`), hearts, likes);
+    card.append(portrait, info);
+    p.append(el('h2', null, 'Character'), card, el('h2', null, 'Status'));
     D.skills.forEach((g) => {
-      p.appendChild(el('h2', null, g.group));
+      p.appendChild(el('h3', 'stat-group', g.group));
       const wrap = el('div', 'skillgrid');
       g.items.forEach((s) => {
         const row = el('div', 'skill');
