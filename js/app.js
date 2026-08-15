@@ -5,6 +5,29 @@
     if (text != null) n.textContent = text;
     return n;
   };
+  (function boot() {
+    const bootEl = document.getElementById('boot');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced || sessionStorage.getItem('booted')) { bootEl.remove(); return; }
+    sessionStorage.setItem('booted', '1');
+    bootEl.hidden = false;
+    const inner = el('div', 'boot-inner');
+    const cat = el('div', 'boot-cat');
+    cat.appendChild(window.PixelArt.render('cat', 5));
+    const bar = el('div', 'boot-bar');
+    for (let i = 0; i < 6; i += 1) bar.appendChild(el('i'));
+    inner.append(cat, el('p', 'boot-title', 'daffa.dev OS'), bar);
+    bootEl.appendChild(inner);
+    let step = 0;
+    const t = setInterval(() => {
+      bar.children[step].className = 'on'; step += 1;
+      if (step === 6) { clearInterval(t); setTimeout(done, 220); }
+    }, 200);
+    function done() { clearInterval(t); bootEl.remove(); }
+    bootEl.addEventListener('click', done);
+    document.addEventListener('keydown', done, { once: true });
+  })();
+
   const TABS = ['about', 'projects', 'skills', 'contact', 'terminal'];
   const LABELS = { about: 'About', projects: 'Projects', skills: 'Skills', contact: 'Contact', terminal: '>_ Terminal' };
   const win = document.getElementById('window');
