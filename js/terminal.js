@@ -11,6 +11,7 @@
         'education   academic background',
         'contact     how to reach me',
         'neofetch    system info',
+        'smoky       meet the mascot',
         'clear       clear screen',
       ]),
       about: () => line([
@@ -51,13 +52,32 @@
         D.replyNote,
       ]),
       neofetch: () => line([
-        ' /\\_/\\      daffa@portfolio',
-        '( o.o )     ---------------',
-        ' > ^ <      OS: daffaOS 2.0 (pixel)',
-        `            Host: ${D.location}`,
-        '            Shell: zsh + oh-my-zsh',
-        '            Uptime: since 2003',
-        `            Status: ${D.status}`,
+        '    /\\_____/\\      daffa@portfolio',
+        '   /  ●   ●  \\     ----------------',
+        '  |     ▲     |    OS: daffaOS 2.1 (pixel)',
+        '   \\  ═╦═╦═  /     Host: ' + D.location,
+        '   /         \\     Shell: zsh + oh-my-zsh',
+        '  |  |     |  |    Uptime: since 2003',
+        '   \\_|_____|_/     Mascot: Smoky (Lv.140)',
+        `                   Status: ${D.status}`,
+      ]),
+      smoky: () => line([
+        '┌──[ SMOKY ]──────────────────────────┐',
+        `  Species     : ${D.character.partner.species}`,
+        `  Japanese    : ${D.character.partner.japanese}`,
+        `  Appearance  : ${D.character.partner.appearance}`,
+        `  Personality : ${D.character.partner.personality}`,
+        `  Power Level : ${D.character.partner.powerLevel}`,
+        `  Memento     : ${D.character.partner.memento}`,
+        '  Status      : napping on the dock (do not disturb)',
+        '└─────────────────────────────────────┘',
+        'hint: try `pet`',
+      ]),
+      pet: () => line([
+        '*pet pet*',
+        'Smoky: purrrrr... ♥♥♥',
+        '(affection +1 — but personality is Hot and Cold,',
+        ' tomorrow he might ignore you completely)',
       ]),
       'sudo hire-me': () => line([
         '[sudo] password for visitor: ********',
@@ -71,13 +91,14 @@
 
   const PROMPT = 'daffa@portfolio:~$';
   const BANNER = [
-    ' ____    _    _____ _____ _',
-    '|  _ \\  / \\  |  ___|  ___/ \\',
-    '| | | |/ _ \\ | |_  | |_ / _ \\',
-    '| |_| / ___ \\|  _| |  _/ ___ \\',
-    '|____/_/   \\_\\_|   |_|/_/   \\_\\',
+    '██████╗  █████╗ ███████╗███████╗ █████╗',
+    '██╔══██╗██╔══██╗██╔════╝██╔════╝██╔══██╗',
+    '██║  ██║███████║█████╗  █████╗  ███████║',
+    '██║  ██║██╔══██║██╔══╝  ██╔══╝  ██╔══██║',
+    '██████╔╝██║  ██║██║     ██║     ██║  ██║',
+    '╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝     ╚═╝  ╚═╝',
     '',
-    '[SYSTEM READY] daffaOS terminal v2.0',
+    '✻ daffaOS terminal v2.1 — guarded by Smoky the cat',
     'Welcome! Type help to see available commands.',
   ].join('\n');
 

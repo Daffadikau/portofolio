@@ -6,6 +6,22 @@ window.PORTFOLIO_DATA = {
   status: 'Open to opportunities',
   availability: 'Open to internships, freelance, and collaboration.',
   replyNote: 'I usually reply within 24-48 hours.',
+  character: {
+    class: 'Fullstack Adventurer',
+    level: 6,
+    levelLabel: 'semester',
+    hearts: 4,
+    interests: ['Tomodachi Life', 'Tamagotchi', 'Neko Atsume'],
+    partner: {
+      name: 'Smoky',
+      species: 'Neko Atsume regular cat',
+      japanese: 'くろねこさん "Black Cat"',
+      appearance: 'Solid Black',
+      personality: 'Hot and Cold',
+      powerLevel: 140,
+      memento: 'Soft Brush',
+    },
+  },
   bio: 'Computer Engineering student at Universitas Pendidikan Indonesia (UPI) focused on bridging advanced technology and social impact. I build fullstack web apps, mobile apps, and IoT systems.',
   education: { school: 'Universitas Pendidikan Indonesia (UPI)', program: 'Computer Engineering', detail: '3rd year (6th semester)' },
   socials: {
