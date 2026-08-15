@@ -32,6 +32,8 @@ a, button { cursor: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+@keyframes catbob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+.boot-cat svg, .hero-art svg { animation: catbob 1.2s steps(2) infinite; }
 #boot { position: fixed; inset: 0; z-index: 50; background: #141414; display: grid; place-items: center; }
 #boot[hidden] { display: none; }
 .boot-inner { text-align: center; }
