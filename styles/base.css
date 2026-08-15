@@ -24,6 +24,9 @@ body {
   align-items: center; justify-content: center;
   gap: 18px; padding: 24px 16px;
 }
+@media (max-width: 640px) {
+  #scene { padding: 12px 8px; gap: 12px; }
+}
 a, button { cursor: inherit; }
 :focus-visible { outline: 3px solid var(--ink); outline-offset: 1px; }
 @media (prefers-reduced-motion: reduce) {
