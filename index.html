@@ -3,246 +3,33 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Portfolio | Daffa Dikau</title>
-    <meta name="description" content="Portfolio website showcasing projects, experience, and skills." />
-    <link rel="stylesheet" href="styles.css" />
+    <title>Daffa Adika — Portfolio</title>
+    <meta name="description" content="Pixel macOS portfolio of Daffa Adika — Computer Engineering student & fullstack developer." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=VT323&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/window.css" />
+    <link rel="stylesheet" href="styles/sections.css" />
+    <link rel="stylesheet" href="styles/terminal.css" />
+    <link rel="stylesheet" href="styles/dock.css" />
   </head>
   <body>
-    <header class="header">
-      <nav class="nav">
-        <a class="logo" href="#top">Portofolio</a>
-        <div class="nav-links">
-          <a href="#projects">Projects</a>
-          <a href="#experience">Experience</a>
-          <a href="#skills">Skills</a>
-          <a href="#contact">Contact</a>
-        </div>
-        <button class="menu-button" aria-label="Open menu" aria-expanded="false">
-          ☰
-        </button>
-      </nav>
-    </header>
-
-    <main id="top">
-      <section class="hero">
-        <div class="hero-content">
-          <p class="eyebrow">Hi, I’m</p>
-          <h1>Daffa Adika</h1>
-          <p class="subtitle">Undergraduate Student · Computer Engineer and Fullstack Developer</p>
-          <p class="summary">
-            I am a dedicated Computer Engineering student at Universitas Pendidikan Indonesia (UPI) with a focus on bridging the gap between advanced technology and social impact.
-          </p>
-          <div class="hero-actions">
-            <a class="button primary" href="#projects">View Projects</a>
-            <a class="button" href="#contact">Get in Touch</a>
-          </div>
-          <div class="socials">
-            <a href="https://www.linkedin.com/in/daffadikau/" target="_blank" rel="noreferrer">
-              LinkedIn
-            </a>
-            <a href="https://github.com/Daffadikau" target="_blank" rel="noreferrer">
-              GitHub
-            </a>
-            <a href="mailto:daffadikau@gmail.com">Email</a>
-          </div>
-        </div>
-        <div class="hero-card">
-          <div class="stat">
-            <span class="stat-number">3rd Year (6th)</span>
-            <span class="stat-label">Current Education</span>
-          </div>
-          <div class="stat">
-            <span class="stat-number">15+</span>
-            <span class="stat-label">Licenses & Certificates</span>
-          </div>
-          <div class="stat">
-            <span class="stat-number">7</span>
-            <span class="stat-label">Awards</span>
-          </div>
-        </div>
-      </section>
-
-      <section id="projects" class="section">
-        <div class="section-header">
-          <h2>Projects</h2>
-          <p>Selected work showcasing my skills and impact.</p>
-        </div>
-        <div class="grid">
-          <article class="card">
-            <h3>Mentorly - Mobile Mentoring Platform</h3>
-            <p>
-              Cross-platform mobile application bridging mentors and students through secure digital learning. Features multi-layered security (2FA, RBAC, AES-256 encryption), real-time chat, payment integration, and mentor rating system. Published in Jurnal Informatika Teknologi dan Sains.
-            </p>
-            <div class="tags">
-              <span>Flutter</span>
-              <span>Firebase</span>
-              <span>PHP</span>
-              <span>Security</span>
-            </div>
-            <div class="card-actions">
-              <a href="https://github.com/Daffadikau" target="_blank" rel="noreferrer">GitHub</a>
-            </div>
-          </article>
-          <article class="card">
-            <h3>OMR Automated Grading System</h3>
-            <p>High-accuracy AI-powered grading system using YOLOv11 and YOLOv8 for answer sheet recognition. Achieved 99.2% accuracy with hybrid cloud-mobile architecture. Generates automated analytics reports in PDF and CSV formats for educational institutions.</p>
-            <div class="tags">
-              <span>Flutter</span>
-              <span>YOLO</span>
-              <span>Firebase</span>
-              <span>AI</span>
-            </div>
-            <div class="card-actions">
-              <a href="https://github.com/Daffadikau" target="_blank" rel="noreferrer">GitHub</a>
-            </div>
-          </article>
-          <article class="card">
-            <h3>IoT Shoe Drying Cabinet (Kuai DryVault)</h3>
-            <p>Automated shoe drying system with ESP32 microcontroller managing 14 DC fans and 8-channel relay module. Features Flutter mobile app with Firebase real-time monitoring, physical keypad control, and optimized power consumption (87.4W). Published in Jurnal Ilmiah Pendidikan.</p>
-            <div class="tags">
-              <span>ESP32</span>
-              <span>IoT</span>
-              <span>Flutter</span>
-              <span>Firebase</span>
-            </div>
-            <div class="card-actions">
-              <a href="https://github.com/Daffadikau" target="_blank" rel="noreferrer">GitHub</a>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section id="experience" class="section alt">
-        <div class="section-header">
-          <h2>Experience</h2>
-          <p>Roles and responsibilities that shaped my expertise.</p>
-        </div>
-        <div class="timeline">
-          <div class="timeline-item">
-            <div class="timeline-role">
-              <h3>Service to Society Department (P2M) Head of Staff · HIMA TEKKOM UPI</h3>
-              <span>Jan 2025 — Jan 2026</span>
-            </div>
-            <ul>
-              <li>Led community service initiatives for Computer Engineering student association at Universitas Pendidikan Indonesia.</li>
-              <li>Managed project planning and execution for social impact programs.</li>
-              <li>Skills: Organization, Project Management, Leadership.</li>
-            </ul>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-role">
-              <h3>Community Service Staff · Palang Merah Indonesia (Indonesian Red Cross)</h3>
-              <span>Sep 2024 — Jan 2026</span>
-            </div>
-            <ul>
-              <li>Volunteered with KSR PMI, the humanitarian corps at Universitas Pendidikan Indonesia.</li>
-              <li>Provided emergency medical support and community-based humanitarian services.</li>
-              <li>Skills: Emergency Medicine, Medic, Community Service.</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section id="skills" class="section">
-        <div class="section-header">
-          <h2>Skills</h2>
-          <p>Tools and technologies I use regularly.</p>
-        </div>
-        <div class="skills">
-          <div class="skill-group">
-            <h3>Frontend</h3>
-            <ul>
-              <li>HTML, CSS, JavaScript</li>
-              <li>React, Vue, or Angular</li>
-              <li>Accessibility & Performance</li>
-            </ul>
-          </div>
-          <div class="skill-group">
-            <h3>Backend</h3>
-            <ul>
-              <li>Node.js / Python / Java</li>
-              <li>REST & GraphQL APIs</li>
-              <li>SQL & NoSQL Databases</li>
-            </ul>
-          </div>
-          <div class="skill-group">
-            <h3>Tools</h3>
-            <ul>
-              <li>Git, CI/CD</li>
-              <li>Docker</li>
-              <li>Cloud (AWS/GCP/Azure)</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section id="awards" class="section alt">
-        <div class="section-header">
-          <h2>Honors & Awards</h2>
-          <p>Recognition and achievements throughout my journey.</p>
-        </div>
-        <div class="timeline">
-          <div class="timeline-item">
-            <div class="timeline-role">
-              <h3>Best Department of the Year 2025 · HIMA TEKKOM UPI</h3>
-              <span>Jan 2026</span>
-            </div>
-            <p>Awarded to the Service to Society Department (P2M) as the most outstanding department for excellence in managing community outreach programs and social initiatives.</p>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-role">
-              <h3>2nd Place (Silver Medal) · National Digital Learning Video Competition</h3>
-              <span>Dec 2025</span>
-            </div>
-            <p>Secured Silver Medal in LIDM 2025 organized by Ministry of Education. Developed innovative digital learning video "Catuk" focused on SDG 12 (Responsible Consumption and Production) for food waste management.</p>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-role">
-              <h3>2nd Place · Mobile App UI/UX Design Challenge</h3>
-              <span>Dec 2025</span>
-            </div>
-            <p>Achieved 2nd Place in UI/UX Design Workshop by HIMA TEKKOM UPI. Applied User Interface and User Experience principles to develop intuitive mobile application concept focused on navigation and visual hierarchy.</p>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-role">
-              <h3>Staff of the Month · KSR PMI UPI</h3>
-              <span>Jul 2025</span>
-            </div>
-            <p>Recognized for exceptional dedication and active contribution to community service programs and humanitarian initiatives within the Service Bureau at Indonesian Red Cross.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="contact" class="section alt">
-        <div class="section-header">
-          <h2>Contact</h2>
-          <p>Let’s build something together. I’m open to opportunities.</p>
-        </div>
-        <div class="contact-card">
-          <div>
-            <h3>Let’s connect</h3>
-            <p>Send me an email and I’ll reply within 24–48 hours.</p>
-          </div>
-          <div class="contact-actions">
-            <a class="button primary" href="mailto:daffadikau@gmail.com">Email Me</a>
-            <a class="button" href="https://www.linkedin.com/in/daffadikau/" target="_blank" rel="noreferrer">
-              LinkedIn
-            </a>
-          </div>
-        </div>
-      </section>
+    <div id="boot" hidden></div>
+    <main id="scene">
+      <section id="window" aria-label="Portfolio window"></section>
+      <nav id="dock" aria-label="Dock"></nav>
     </main>
-
-    <footer class="footer">
-      <p>© 2026 Daffa Adika. All rights reserved.</p>
-    </footer>
-
-    <script src="script.js"></script>
+    <noscript>
+      <p style="position:fixed;inset:0;background:#e8e8e8;padding:2rem;font-family:monospace">
+        This portfolio needs JavaScript. Reach me at
+        <a href="mailto:daffadikau@gmail.com">daffadikau@gmail.com</a> ·
+        <a href="https://github.com/Daffadikau">github.com/Daffadikau</a>
+      </p>
+    </noscript>
+    <script src="js/data.js"></script>
+    <script src="js/pixelart.js"></script>
+    <script src="js/terminal.js"></script>
+    <script src="js/app.js"></script>
   </body>
 </html>
