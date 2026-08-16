@@ -85,6 +85,8 @@
       { id: 'ushanka', label: 'Ushanka', map: 'wHatUshanka' },
       { id: 'crown', label: 'Crown', map: 'wHatCrown' },
       { id: 'beanie', label: 'Beanie', map: 'wHatBeanie' },
+      // terkunci sampai kode Konami dimasukkan — lihat easter egg di app.js
+      { id: 'party', label: 'Party Hat', map: 'wHatParty', secret: true },
     ],
     outfit: [
       { id: 'none', label: 'None', map: null },
@@ -116,8 +118,28 @@
       .map((slot) => (WARDROBE[slot].find((it) => it.id === worn[slot]) || {}).map)
       .filter(Boolean);
   }
+  // Barang rahasia baru bisa dipakai setelah dibuka. Daftarnya disimpan di
+  // localStorage supaya sekali terbuka tetap terbuka di kunjungan berikutnya.
+  let unlocked = [];
+  try {
+    const raw = JSON.parse(localStorage.getItem('smoky-unlocked') || '[]');
+    if (Array.isArray(raw)) unlocked = raw;
+  } catch (e) { unlocked = []; }
+  const unlockListeners = [];
+  function isUnlocked(id) { return unlocked.indexOf(id) !== -1; }
+  function unlock(id) {
+    if (isUnlocked(id)) return false;
+    unlocked = unlocked.concat(id);
+    try { localStorage.setItem('smoky-unlocked', JSON.stringify(unlocked)); } catch (e) { /* ignore */ }
+    unlockListeners.forEach((f) => f(unlocked));
+    return true;
+  }
   function wear(slot, id) {
-    if (!WARDROBE[slot] || !WARDROBE[slot].some((it) => it.id === id)) return;
+    const list = WARDROBE[slot];
+    if (!list) return;
+    const item = list.filter((it) => it.id === id)[0];
+    if (!item) return;
+    if (item.secret && !isUnlocked(id)) return;
     worn = Object.assign({}, worn, { [slot]: id });
     try { localStorage.setItem('smoky-outfit', JSON.stringify(worn)); } catch (e) { /* ignore */ }
     outfitListeners.forEach((f) => f(worn));
@@ -232,6 +254,9 @@
     WARDROBE,
     wear,
     getWorn: () => Object.assign({}, worn),
+    unlock,
+    isUnlocked,
+    onUnlock: (f) => unlockListeners.push(f),
     onOutfit: (f) => outfitListeners.push(f),
   };
 })();
