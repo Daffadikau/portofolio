@@ -5,6 +5,7 @@
     if (text != null) n.textContent = text;
     return n;
   };
+  const D0 = window.PORTFOLIO_DATA;
   (function boot() {
     const bootEl = document.getElementById('boot');
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -16,14 +17,29 @@
     const inner = el('div', 'boot-inner');
     const cat = el('div', 'boot-cat');
     cat.appendChild(window.PixelArt.render('cat', 5));
+    // POST ala BIOS: baris muncul satu per satu, seirama dengan progress bar
+    const post = el('pre', 'boot-post');
+    const POST = [
+      ['Detecting CPU', 'Intelligent Device'],
+      ['Detecting RAM', '3.65 GPA / 4.00'],
+      ['Detecting GPU', 'Pixel Art Engine'],
+      ['Mounting /projects', `${D0.projects.length} found`],
+      ['Mounting /skills', 'OK'],
+      ['Waking Smoky', 'mrrp'],
+    ];
     const bar = el('div', 'boot-bar');
-    for (let i = 0; i < 6; i += 1) bar.appendChild(el('i'));
-    inner.append(cat, el('p', 'boot-title', 'daffa.dev OS'), bar);
+    for (let i = 0; i < POST.length; i += 1) bar.appendChild(el('i'));
+    inner.append(cat, el('p', 'boot-title', 'daffa.dev OS'),
+      el('p', 'boot-sub', 'BIOS v2.1 · (c) 2026 Daffa Adika'), post, bar);
     bootEl.appendChild(inner);
     let step = 0;
     const t = setInterval(() => {
-      bar.children[step].className = 'on'; step += 1;
-      if (step === 6) { clearInterval(t); setTimeout(done, 220); }
+      const [label, val] = POST[step];
+      post.appendChild(document.createTextNode(
+        `${label} ${'.'.repeat(Math.max(2, 22 - label.length))} ${val}\n`));
+      bar.children[step].className = 'on';
+      step += 1;
+      if (step === POST.length) { clearInterval(t); setTimeout(done, 260); }
     }, 200);
     function done() { clearInterval(t); bootEl.remove(); }
     bootEl.addEventListener('click', done);
@@ -421,6 +437,34 @@
     t.classList.add('boing');
   });
 
+  // sapaan untuk siapa pun yang membuka DevTools
+  try {
+    console.log([
+      "    ██                    ██",
+      "  ██▓▓██                ██▓▓██",
+      "  ██▓▓▓▓██            ██▓▓▓▓██",
+      "  ██▓▓▓▓▓▓████████████▓▓▓▓▓▓██",
+      "██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██",
+      "██▓▓▓▓░░░░▓▓▓▓▓▓▓▓▓▓▓▓░░░░▓▓▓▓██",
+      "██▓▓▓▓░░░░▓▓▓▓▓▓▓▓▓▓▓▓░░░░▓▓▓▓██",
+      "██▓▓▓▓▓▓▓▓▓▓▓▓▓▓██▓▓▓▓▓▓▓▓▓▓▓▓██",
+      "  ██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██",
+      "  ██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██",
+      "██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██",
+      "██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██",
+      "██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██",
+      "██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██",
+      "  ██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██",
+      "    ████████████████████████",
+      "",
+      "  Hai, developer. Ketemu juga di sini.",
+      "  Buka Terminal di dock situs ini, lalu ketik:",
+      "  ascii · ascii smoky · smoky · sudo hire-me",
+      "",
+    ].join('\n'));
+    console.log('%c' + D.socials.email + ' \u00b7 ' + D.status,
+      'font-weight:bold;color:#1db954');
+  } catch (e) { /* konsol tidak tersedia */ }
   window.App = { showTab, TABS };
   fromHash();
 })();

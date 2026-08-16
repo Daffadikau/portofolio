@@ -410,13 +410,22 @@
     });
     const commits = el('div', 'gl-commits');
     commits.appendChild(el('h5', null, 'Recent commits'));
-    [['feat: alerting via telegram', '2 days ago'],
-      ['fix: timescaledb retention policy', '5 days ago'],
-      ['chore: bump fastapi', '1 week ago']].forEach(([m, t]) => {
-      const r = el('div', 'gl-commit');
-      r.append(el('span', null, m), el('i', null, t));
-      commits.appendChild(r);
+    // graph ASCII seperti `git log --graph`
+    const graph = el('pre', 'gl-graph');
+    [['*  ', '3f8a2c1', 'feat: alerting via telegram', '2 days ago'],
+      ['|\\ ', '', '', ''],
+      ['| *', '9d21e4f', 'fix: timescaledb retention policy', '5 days ago'],
+      ['|/ ', '', '', ''],
+      ['*  ', '1a77b03', 'chore: bump fastapi', '1 week ago'],
+      ['|  ', '', '', ''],
+      ['*  ', '5c0de91', 'feat: mqtt ingest for esp32', '2 weeks ago'],
+    ].forEach(([g, sha, msg, when]) => {
+      const row = el('div', 'gl-grow');
+      row.append(el('span', 'gl-gl', g), el('b', 'gl-sha', sha),
+        el('span', 'gl-msg', msg), el('i', 'gl-when', when));
+      graph.appendChild(row);
     });
+    commits.appendChild(graph);
     if (body._win) body._win._cleanup.push(() => timers.forEach(clearTimeout));
     body.append(head, bar, stages, commits);
   }
