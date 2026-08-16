@@ -20,7 +20,7 @@
   cursor: inherit; user-select: none; touch-action: none;
   color: #fff;
 }
-.appwin-bar svg { image-rendering: pixelated; width: 18px; height: 18px; }
+.appwin-bar svg, .appwin-bar img { image-rendering: pixelated; width: 18px; height: 18px; }
 .appwin-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .appwin-close {
   border: 2px solid currentColor; background: none; color: inherit;
@@ -194,7 +194,7 @@
   display: flex; align-items: center; gap: 6px; margin-top: 12px;
   font-size: 10px; color: #b3b3b3; text-decoration: none;
 }
-.sp-credit svg { image-rendering: pixelated; width: 14px; height: 14px; }
+.sp-credit svg, .sp-credit img { image-rendering: pixelated; width: 14px; height: 14px; }
 .sp-ctrls { display: flex; align-items: center; gap: 10px; margin: 10px 0 4px; }
 .sp-btn { border: 0; background: none; color: #e8e8e8; font-size: 15px; padding: 2px 4px; line-height: 1; }
 .sp-play { background: #1db954; color: #06210f; border: 2px solid #000; padding: 3px 12px; }
@@ -401,5 +401,5 @@
   box-shadow: 3px 3px 0 var(--ink);
 }
 .launch-btn:active { transform: translate(3px, 3px); box-shadow: none; }
-.launch-btn svg { image-rendering: pixelated; width: 22px; height: 22px; }
+.launch-btn svg, .launch-btn img { image-rendering: pixelated; width: 22px; height: 22px; }
 .launch-hint { font-size: 12px; opacity: 0.7; margin-top: 8px; }

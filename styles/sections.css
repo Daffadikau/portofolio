@@ -101,7 +101,7 @@
 .mesh-peers { justify-content: space-between; width: 100%; margin: 0; }
 /* tombol peer memakai warna brand masing-masing + ikon pixel-nya */
 .peer { display: inline-flex; align-items: center; gap: 8px; }
-.peer svg { image-rendering: pixelated; width: 20px; height: 20px; flex: 0 0 auto; }
+.peer svg, .peer img { image-rendering: pixelated; width: 20px; height: 20px; flex: 0 0 auto; }
 .peer-gmail { background: #fff; color: #c5221f; }
 .peer-github { background: #1a1a1a; color: #fff; }
 .peer-linkedin { background: #0a66c2; color: #fff; }

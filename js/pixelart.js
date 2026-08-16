@@ -252,29 +252,6 @@
       'kwwwwwwwwwwwwwwwwwwwwwwwwwwk',
       'kkkkkkkkkkkkkkkkkkkkkkkkkkkk',
     ],
-    // Spotify: tiga gelombang hitam di atas kotak hijau
-    spotify: [
-      'kkkkkkkkkkkkkkkkkkkk',
-      'kjjjjjjjjjjjjjjjjjjk',
-      'kjjjjjjjjjjjjjjjjjjk',
-      'kjjjjjjkkkkkkjjjjjjk',
-      'kjjjjjkkkkkkkkjjjjjk',
-      'kjjjjkkkkkkkkkkjjjjk',
-      'kjjjkkkkkkkkkkkkjjjk',
-      'kjjkkjjjjjjjjkkkkjjk',
-      'kjjkkkkkkkkkjjjkkjjk',
-      'kjjkkkjjjjjkkkkkkjjk',
-      'kjjkkkkkkkkjjjkkkjjk',
-      'kjjkkkkkjjkkkkkkkjjk',
-      'kjjkkkjkkkkjjkkkkjjk',
-      'kjjjkkkkkkkkkkkkjjjk',
-      'kjjjjkkkkkkkkkkjjjjk',
-      'kjjjjjkkkkkkkkjjjjjk',
-      'kjjjjjjkkkkkkjjjjjjk',
-      'kjjjjjjjjjjjjjjjjjjk',
-      'kjjjjjjjjjjjjjjjjjjk',
-      'kkkkkkkkkkkkkkkkkkkk',
-    ],
     // Xcode: palu putih di atas kotak biru
     xcode: [
       'kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk',
@@ -794,53 +771,24 @@
       '............',
       '............',
     ],
-    // app icon GitHub: siluet Octocat putih tebal di atas kotak hitam
-    github: [
-      'kkkkkkkkkkkkkkkkkkkk',
-      'kkkkkkkkkkkkkkkkkkkk',
-      'kkkkkkkkkkkkkkkkkkkk',
-      'kkkkkkkwwwwwwkkkkkkk',
-      'kkkkkkwwwwwwwwkkkkkk',
-      'kkkkkwwwwwwwwwwkkkkk',
-      'kkkkwwkkwwwwkkwwkkkk',
-      'kkkwwwkkkkkkkkwwwkkk',
-      'kkkwwwkkkkkkkkwwwkkk',
-      'kkkwwwkkkkkkkkwwwkkk',
-      'kkkwwwkkkkkkkkwwwkkk',
-      'kkkwwwkkkkkkkkwwwkkk',
-      'kkkwwwwkkkkkkwwwwkkk',
-      'kkkkwkwwkkkkwwwwkkkk',
-      'kkkkwwkkkkkkwwwwkkkk',
-      'kkkkkwwwkkkkwwwkkkkk',
-      'kkkkkkkwkkkkwkkkkkkk',
-      'kkkkkkkkkkkkkkkkkkkk',
-      'kkkkkkkkkkkkkkkkkkkk',
-      'kkkkkkkkkkkkkkkkkkkk',
-    ],
-    linkedin: [
-      'kkkkkkkkkkkkkkkkkkkk',
-      'kllllllllllllllllllk',
-      'kllllllllllllllllllk',
-      'kllwwwwwwwwwwwwwwllk',
-      'kllwwwwwwwwwwwwwwllk',
-      'kllwwllwwwwwwwwwwllk',
-      'kllwwllwwwwwwwwwwllk',
-      'kllwwwwwwwwwwwwwwllk',
-      'kllwwllwwlwlllwwwllk',
-      'kllwwllwlllllllwwllk',
-      'kllwwllwwllwwllwwllk',
-      'kllwwllwwlwwwllwwllk',
-      'kllwwllwwlwwwllwwllk',
-      'kllwwllwwllwwllwwllk',
-      'kllwwllwwlwwwllwwllk',
-      'kllwwwwwwwwwwwwwwllk',
-      'kllwwwwwwwwwwwwwwllk',
-      'kllllllllllllllllllk',
-      'kllllllllllllllllllk',
-      'kkkkkkkkkkkkkkkkkkkk',
-    ],
+  };
+  // ikon yang dibuat Dikau sendiri lewat pixelit — dipakai sebagai gambar,
+  // bukan peta pixel, karena hasilnya lebih bagus dari gambar tangan
+  const IMAGES = {
+    github: 'assets/icons/brand/github.png',
+    linkedin: 'assets/icons/brand/linkedin.png',
+    spotify: 'assets/icons/brand/spotify.png',
   };
   function render(name, scale = 1) {
+    if (IMAGES[name]) {
+      const img = document.createElement('img');
+      img.src = IMAGES[name];
+      img.alt = '';
+      img.className = 'px-img';
+      img.width = 16 * scale;
+      img.height = 16 * scale;
+      return img;
+    }
     const map = MAPS[name];
     const NS = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(NS, 'svg');
