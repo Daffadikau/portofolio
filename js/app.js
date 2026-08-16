@@ -46,6 +46,16 @@
     document.addEventListener('keydown', done, { once: true });
   })();
 
+  // Wallpaper mengikuti jam perangkat: gelap antara 20.00 dan 04.59.
+  // Dicek ulang tiap menit supaya tetap berubah kalau tab dibiarkan terbuka.
+  (function daylight() {
+    function apply() {
+      const h = new Date().getHours();
+      document.documentElement.classList.toggle('night', h >= 20 || h < 5);
+    }
+    apply();
+    setInterval(apply, 60000);
+  })();
   let restoreMainWindow = () => {};
   const TABS = ['about', 'projects', 'skills', 'contact'];
   const LABELS = { about: 'About', projects: 'Projects', skills: 'Skills', contact: 'Contact' };
@@ -334,8 +344,9 @@
         c.setAttribute('aria-pressed', String(n === i));
       });
       const a = list[i];
+      const MULT = { common: 1, uncommon: 2, rare: 4, legendary: 8 };
       infoName.textContent = a.title;
-      infoMeta.textContent = `${a.org} · ${a.when} · ${a.rarity}`;
+      infoMeta.textContent = `${a.org} · ${a.when} · ${a.rarity} · +${MULT[a.rarity] || 1} Mult`;
       infoBlurb.textContent = a.blurb || '';
       try { window.Smoky.sfx.play('play'); } catch (e) { /* audio opsional */ }
     }
@@ -349,13 +360,18 @@
       const spread = (i - (list.length - 1) / 2);
       c.style.setProperty('--fan', `${spread * 3.2}deg`);
       c.style.setProperty('--lift', `${Math.abs(spread) * 5}px`);
+      // nilai Mult mengikuti kelangkaan — meniru papan angka Balatro
+      const MULT = { common: 1, uncommon: 2, rare: 4, legendary: 8 };
+      const mult = MULT[a.rarity] || 1;
       const face = el('span', 'joker-face');
-      face.append(
-        el('span', 'joker-year', a.when),
-        (() => { const art = el('span', 'joker-art'); art.appendChild(window.PixelArt.render(a.icon || 'trophy', 3)); return art; })(),
-        el('span', 'joker-name', a.title),
-      );
+      const art = el('span', 'joker-art');
+      art.appendChild(window.PixelArt.render(a.icon || 'trophy', 3));
+      const tag = el('span', 'joker-mult');
+      tag.append(el('b', null, `+${mult}`), el('i', null, 'Mult'));
+      face.append(el('span', 'joker-year', a.when), art,
+        el('span', 'joker-name', a.title), tag);
       c.append(face, el('span', 'joker-rar', a.rarity || 'common'));
+      c.dataset.mult = String(mult);
       // tilt 3D mengikuti kursor — dilewati kalau user minta gerak minimal
       if (!reduced) {
         c.addEventListener('pointermove', (e) => {
@@ -374,9 +390,13 @@
       hand.appendChild(c);
     });
     const counter = el('div', 'joker-count');
+    const MULT_ALL = { common: 1, uncommon: 2, rare: 4, legendary: 8 };
+    const total = list.reduce((n, a) => n + (MULT_ALL[a.rarity] || 1), 0);
     counter.append(
       el('b', null, String(list.length)),
       el('span', null, 'jokers held'),
+      el('b', 'joker-total', `+${total}`),
+      el('span', null, 'Mult'),
       el('i', null, 'hover to tilt · click to inspect'),
     );
     wrap.append(hand, info, counter);
@@ -434,7 +454,7 @@
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const wrap = el('div', 'flat');
     const stage = el('div', 'flat-stage');
-    stage.appendChild(window.PixelArt.render('flatApartment', 6));
+    stage.appendChild(window.PixelArt.render('flatApartment', 1));
     const cat = el('button', 'flat-cat');
     cat.type = 'button';
     cat.setAttribute('aria-label', 'Poke Smoky');
@@ -815,6 +835,7 @@
       { map: 'mail', tab: 'contact', label: 'Contact' },
       { map: 'term', app: 'terminal', label: 'Terminal' },
       { map: 'spotify', app: 'spotify', label: 'Spotify' },
+      { map: 'iconChat', app: 'smokychat', label: 'Chat with Smoky' },
       { sep: true },
       { map: 'github', url: D.socials.github, label: 'GitHub' },
       { map: 'linkedin', url: D.socials.linkedin, label: 'LinkedIn' },

@@ -173,6 +173,44 @@ window.PORTFOLIO_DATA = {
     note: "If you're feeling nerdy, here's a much more detailed one.",
     label: 'Download CV (PDF)',
   },
+  // Isi aplikasi obrolan dengan Smoky. Ini murni pencocokan kata kunci —
+  // bukan model bahasa — jadi jawabannya ditulis semua di sini.
+  chat: {
+    intro: [
+      'mrrp. you found the chat app.',
+      "I'm a cat, not an AI. I know maybe eight things. Try a button below.",
+    ],
+    quick: ['projects', 'skills', 'hire him', 'cv', 'music', 'who are you'],
+    rules: [
+      { k: ['hi', 'hello', 'hey', 'halo', 'hai'], r: ['hello. you have two hands and neither is petting me.'] },
+      { k: ['project', 'work', 'build', 'portfolio'], r: [
+        'seven of them. the Projects tab opens little app windows — Excel, Notion, GitLab, the lot.',
+        'the CBRN drone platform is the big one. gas monitor is the one that beeps at 3am.'] },
+      { k: ['skill', 'stack', 'tech', 'language'], r: [
+        'Skills tab. he opens VS Code, IntelliJ, Xcode, Docker and Wireshark just to show off.'] },
+      { k: ['hire', 'job', 'work with', 'recruit', 'intern'], r: [
+        'finally. Contact tab, or just email daffadikau@gmail.com. he answers faster than he admits.',
+        'try the terminal too. type: sudo hire-me'] },
+      { k: ['cv', 'resume', 'pdf'], r: ['scroll to the bottom of About. yellow button. two pages.'] },
+      { k: ['music', 'song', 'spotify', 'listen'], r: [
+        'Spotify icon in the dock. he plays Frank Ocean while pretending to debug.'] },
+      { k: ['who', 'you', 'smoky', 'cat', 'name'], r: [
+        'Smoky. くろねこさん. I supervise commits and occupy the warm parts of the desk.',
+        'I live in the About tab. four rooms. I use all of them.'] },
+      { k: ['pet', 'poke', 'touch'], r: ['*purrs, then pretends that never happened*', 'again.'] },
+      { k: ['food', 'eat', 'hungry', 'fish'], r: ['always. bowl is in the kitchen, left side of my apartment.'] },
+      { k: ['sleep', 'tired', 'nap'], r: ['the box. always the box.'] },
+      { k: ['thank', 'thanks', 'makasih'], r: ['acceptable. pet me.'] },
+      { k: ['love', 'cute', 'lucu', 'keren'], r: ['obviously.'] },
+    ],
+    fallback: [
+      "I'm a cat. try: projects, skills, hire him, cv, music.",
+      'mrrp?',
+      '*stares at you until you rephrase*',
+      'that word is not in my eight words.',
+    ],
+    note: 'Smoky answers from a short list of keywords. No AI, no network.',
+  },
   // Zona di apartemen Smoky (tab About). pct = posisi Smoky dalam persen
   // lebar denah; act = yang dia lakukan begitu sampai di zona itu.
   flat: [

@@ -364,7 +364,9 @@
   position: relative; border: 3px solid var(--ink); overflow: hidden;
   line-height: 0; background: #efe0c8;
 }
-.flat-stage > svg { width: 100%; height: auto; display: block; image-rendering: pixelated; }
+.flat-stage > svg, .flat-stage > img {
+  width: 100%; height: auto; display: block; image-rendering: pixelated;
+}
 /* hotspot per zona: tidak terlihat sampai di-hover/di-fokus */
 .flat-spots { position: absolute; inset: 0; }
 .flat-spot { position: absolute; top: 0; bottom: 0; padding: 0; background: none; border: 0; }
@@ -474,3 +476,40 @@
   padding: 4px 6px;
 }
 .y2k-purr[hidden] { display: none; }
+/* ── Detail tambahan kartu Joker: bingkai dalam, jendela art, nilai Mult ── */
+.joker {
+  /* garis dalam tipis seperti kartu cetak beneran */
+  box-shadow: inset 0 0 0 2px #e6d9b8, 3px 3px 0 rgba(0, 0, 0, .45);
+}
+.joker:hover, .joker:focus-visible {
+  box-shadow: inset 0 0 0 2px #e6d9b8, 6px 10px 0 rgba(0, 0, 0, .5);
+}
+.joker.picked {
+  box-shadow: inset 0 0 0 2px #e6d9b8, 0 0 0 3px var(--tl-yellow), 6px 10px 0 rgba(0, 0, 0, .5);
+}
+/* ikonnya duduk di jendela art sendiri, seperti kartu Balatro */
+.joker-art {
+  border: 2px solid var(--ink); background: #efe4c6;
+  padding: 4px 10px; margin: 3px 0 5px;
+  box-shadow: inset 0 0 0 1px #fff8e4;
+}
+.joker-mult {
+  margin-top: auto; display: inline-flex; align-items: baseline; gap: 3px;
+  border: 2px solid var(--ink); background: #b8402f; color: #fff;
+  padding: 2px 5px; margin-bottom: 4px;
+}
+.joker-mult b { font-family: var(--font-pixel); font-size: 9px; }
+.joker-mult i { font-style: normal; font-size: 7px; opacity: .85; }
+.joker-total { color: #ff8f6b; }
+/* kilau foil pada kartu legendary — dither diagonal, bukan gradasi mulus */
+.rar-legendary .joker-face { position: relative; overflow: hidden; }
+.rar-legendary .joker-face::after {
+  content: ''; position: absolute; top: -60%; left: -120%;
+  width: 60%; height: 220%; pointer-events: none;
+  background: repeating-linear-gradient(70deg,
+    rgba(255, 255, 255, .55) 0 2px, transparent 2px 4px,
+    rgba(214, 168, 255, .45) 4px 6px, transparent 6px 8px);
+  animation: foil 3.4s steps(12) infinite;
+}
+@keyframes foil { 0% { left: -120%; } 100% { left: 160%; } }
+@media (prefers-reduced-motion: reduce) { .rar-legendary .joker-face::after { animation: none; opacity: .3; } }

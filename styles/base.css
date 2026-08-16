@@ -1,5 +1,6 @@
 :root {
   --bg-hi: #f5a46b; --bg-lo: #e8845a;
+  --dither-a: .06; --dither-b: .10;
   --win: #e8e8e8; --win-dark: #cfcfcf; --ink: #1a1a1a;
   --tl-red: #f0713d; --tl-yellow: #f5d93d; --tl-green: #9dc24c;
   --font-pixel: 'Silkscreen', monospace;
@@ -72,3 +73,17 @@ button:disabled, a:not([href]) { cursor: inherit; }
 .boot-bar { display: inline-flex; gap: 4px; border: 3px solid var(--win); padding: 4px; }
 .boot-bar i { display: inline-block; width: 16px; height: 12px; background: transparent; }
 .boot-bar i.on { background: var(--tl-green); }
+
+/* ── Tema malam: dipasang app.js antara pukul 20.00 dan 04.59 ─────── */
+:root.night {
+  --bg-hi: #2f2f52; --bg-lo: #14142a;
+  --dither-a: .18; --dither-b: .05;
+}
+:root.night body {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect x='0' y='0' width='1' height='1' fill='%23000' fill-opacity='.18'/%3E%3Crect x='4' y='2' width='1' height='1' fill='%23000' fill-opacity='.18'/%3E%3Crect x='2' y='5' width='1' height='1' fill='%23fff' fill-opacity='.05'/%3E%3Crect x='6' y='6' width='1' height='1' fill='%23000' fill-opacity='.18'/%3E%3C/svg%3E") repeat,
+    url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='128'%20height='112'><g%20fill='%23fff'%20fill-opacity='.13'><rect%20x='20'%20y='14'%20width='4'%20height='4'/><rect%20x='16'%20y='18'%20width='12'%20height='4'/><rect%20x='20'%20y='22'%20width='4'%20height='4'/><rect%20x='70'%20y='8'%20width='3'%20height='3'/><rect%20x='96'%20y='30'%20width='2'%20height='2'/><rect%20x='44'%20y='52'%20width='2'%20height='2'/><rect%20x='108'%20y='72'%20width='3'%20height='3'/><rect%20x='12'%20y='88'%20width='2'%20height='2'/></g><g%20fill='%23fff'%20fill-opacity='.07'><rect%20x='78'%20y='54'%20width='16'%20height='16'/><rect%20x='84'%20y='50'%20width='10'%20height='4'/><rect%20x='84'%20y='70'%20width='10'%20height='4'/><rect%20x='60'%20y='86'%20width='4'%20height='4'/><rect%20x='66'%20y='82'%20width='4'%20height='4'/><rect%20x='72'%20y='78'%20width='4'%20height='4'/><rect%20x='28'%20y='60'%20width='4'%20height='4'/><rect%20x='34'%20y='60'%20width='4'%20height='4'/><rect%20x='26'%20y='66'%20width='14'%20height='6'/><rect%20x='30'%20y='72'%20width='6'%20height='3'/></g><g%20fill='%230b0b1a'%20fill-opacity='.55'><rect%20x='88'%20y='54'%20width='10'%20height='16'/></g></svg>") repeat,
+    linear-gradient(180deg, var(--bg-hi) 0%, var(--bg-lo) 100%);
+}
+/* jendela tetap terang — layar menyala di ruangan gelap */
+:root.night #window { box-shadow: 10px 10px 0 rgba(0, 0, 0, .45); }

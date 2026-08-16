@@ -1008,6 +1008,89 @@
   }
 
   // ---- defs & groups ----
+  // Obrolan dengan Smoky, tampilannya meniru aplikasi pesan.
+  // Jawabannya murni pencocokan kata kunci dari data.js — tidak ada model
+  // bahasa dan tidak ada permintaan jaringan sama sekali.
+  function buildSmokyChat(body) {
+    const D2 = window.PORTFOLIO_DATA.chat;
+    const wrap = el('div', 'chat-wrap');
+    const head = el('div', 'chat-head');
+    const ava = el('span', 'chat-ava');
+    ava.appendChild(window.PixelArt.render('cat', 2));
+    const nm = el('div', 'chat-who');
+    nm.append(el('b', null, 'Smoky'), el('i', null, 'online · napping'));
+    head.append(ava, nm);
+    const log = el('div', 'chat-log');
+    log.setAttribute('role', 'log');
+    log.setAttribute('aria-live', 'polite');
+    function bubble(text, mine) {
+      const row = el('div', `chat-row${mine ? ' me' : ''}`);
+      row.appendChild(el('span', 'chat-bubble', text));
+      log.appendChild(row);
+      log.scrollTop = log.scrollHeight;
+      return row;
+    }
+    function typing() {
+      const row = el('div', 'chat-row');
+      const b = el('span', 'chat-bubble chat-typing');
+      for (let i = 0; i < 3; i += 1) b.appendChild(el('i'));
+      row.appendChild(b);
+      log.appendChild(row);
+      log.scrollTop = log.scrollHeight;
+      return row;
+    }
+    const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    // Kata pendek dicocokkan sebagai kata utuh. Tanpa ini 'hire him' kena
+    // aturan sapaan karena memuat potongan 'hi'.
+    function has(q, w) {
+      if (w.length > 3) return q.indexOf(w) !== -1;
+      return new RegExp(`(^|[^a-z])${w}([^a-z]|$)`).test(q);
+    }
+    function answer(text) {
+      const q = text.toLowerCase();
+      const hit = D2.rules.filter((r) => r.k.some((w) => has(q, w)))[0];
+      return pick(hit ? hit.r : D2.fallback);
+    }
+    let busy = false;
+    function send(text) {
+      const t = String(text || '').trim();
+      if (!t || busy) return;
+      busy = true;
+      bubble(t, true);
+      const dots = typing();
+      const wait = 420 + Math.min(900, t.length * 22);
+      setTimeout(() => {
+        dots.remove();
+        bubble(answer(t), false);
+        busy = false;
+      }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : wait);
+    }
+    D2.intro.forEach((line, i) => setTimeout(() => bubble(line, false), i * 260));
+    const chips = el('div', 'chat-chips');
+    D2.quick.forEach((q) => {
+      const c = el('button', 'chat-chip', q);
+      c.type = 'button';
+      c.addEventListener('click', () => send(q));
+      chips.appendChild(c);
+    });
+    const bar = el('form', 'chat-bar');
+    const input = el('input');
+    input.type = 'text';
+    input.placeholder = 'Say something to a cat…';
+    input.setAttribute('aria-label', 'Message Smoky');
+    input.autocomplete = 'off';
+    const go = el('button', 'chat-send', 'Send');
+    go.type = 'submit';
+    bar.append(input, go);
+    bar.addEventListener('submit', (e) => {
+      e.preventDefault();
+      send(input.value);
+      input.value = '';
+    });
+    wrap.append(head, log, chips, bar, el('p', 'chat-note', D2.note));
+    body.appendChild(wrap);
+    setTimeout(() => input.focus(), 80);
+  }
   const DEFS = {
     excel: { title: 'projects.xlsx — Excel', skin: 'excel', icon: 'excel', w: 470, fx: 0.05, fy: 90, build: buildExcel },
     word: { title: 'report.docx — Word', skin: 'word', icon: 'word', w: 400, fx: 0.56, fy: 140, build: buildWord },
@@ -1025,6 +1108,7 @@
     gmail: { title: 'Inbox (2) — Gmail', skin: 'gmail', icon: 'gmail', w: 480, fx: 0.26, fy: 400, build: buildGmail },
     idcard: { title: 'travel-license — Wallet', skin: 'idcard', icon: 'catBox', w: 720, fx: 0.13, fy: 90, center: true, build: buildIdcard },
     spotify: { title: 'Spotify', skin: 'spotify', icon: 'spotify', w: 340, fx: 0.6, fy: 110, build: buildSpotify },
+    smokychat: { title: 'Smoky — Messages', skin: 'chat', icon: 'iconChat', w: 380, fx: 0.34, fy: 120, build: buildSmokyChat },
   };
   const GROUPS = {
     projects: ['excel', 'word', 'notion', 'n8n', 'gitlab'],
