@@ -20,14 +20,22 @@
   cursor: inherit; user-select: none; touch-action: none;
   color: #fff;
 }
-.appwin-bar svg { image-rendering: pixelated; width: 18px; height: 18px; }
+.appwin-bar svg, .appwin-bar img { image-rendering: pixelated; width: 18px; height: 18px; }
 .appwin-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .appwin-close {
   border: 2px solid currentColor; background: none; color: inherit;
   font-family: var(--font-pixel); font-size: 13px; line-height: 1;
   width: 24px; height: 24px; padding: 0; flex: 0 0 auto;
 }
-.appwin :focus-visible { outline: 3px solid var(--tl-yellow); outline-offset: 1px; }
+.appwin :focus-visible { outline: 3px solid var(--ink); outline-offset: 1px; }
+/* di permukaan gelap, tinta hitam tak terlihat — pakai kuning terang */
+.vs-code :focus-visible, .ij-code :focus-visible, .vs-tree :focus-visible,
+.vs-results :focus-visible, .vs-scm :focus-visible, .vs-activity :focus-visible,
+.xc-main :focus-visible, .dk-logs :focus-visible, .gh-wrap :focus-visible,
+.skin-spotify .appwin-body :focus-visible, .skin-n8n .appwin-body :focus-visible,
+.terminal-host :focus-visible {
+  outline: 3px solid var(--tl-yellow); outline-offset: 1px;
+}
 .appwin-body { max-height: 46vh; overflow: auto; font-size: 12px; }
 
 /* skins — warna titlebar per aplikasi */
@@ -56,10 +64,99 @@
 .wd-page p { font-size: 12px; line-height: 1.55; }
 .wd-note { margin-top: 10px; opacity: 0.65; font-style: italic; }
 
+/* Excel — sel & sortir interaktif */
+.xl-ref { flex: 0 0 auto; border: 1px solid #b5b5b5; background: #fff; padding: 0 6px; font-style: normal; }
+.xl-val { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.xl-colbtn {
+  width: 100%; border: 0; background: none; font: inherit; font-size: 11px;
+  font-weight: 700; text-align: left; padding: 0; color: var(--ink);
+}
+.xl-cell {
+  width: 100%; border: 0; background: none; font: inherit; font-size: 11px;
+  text-align: left; padding: 0; color: var(--ink); white-space: nowrap;
+}
+.xl-cell.on { outline: 2px solid #217346; outline-offset: 1px; font-weight: 700; }
+.xl-rownum, .xl-corner { background: #d8e4d8; font-weight: 700; width: 22px; text-align: center; }
+.xl-status { border-top: 2px solid var(--ink); background: #f3f6f3; padding: 4px 8px; font-size: 10px; }
+
+/* Word — ribbon & format aktif */
+.wd-tabs { display: flex; gap: 2px; padding: 4px 6px 0; background: #2b579a; }
+.wd-tab { border: 0; background: none; color: #d7e2f5; font: inherit; font-size: 11px; padding: 3px 10px; }
+.wd-tab.on { background: #e8eefc; color: var(--ink); font-weight: 700; }
+.wd-group { display: flex; align-items: center; gap: 6px; }
+.wd-fmt {
+  border: 2px solid var(--ink); background: #fff; color: var(--ink);
+  font: inherit; font-size: 11px; width: 24px; height: 22px; padding: 0;
+}
+.wd-fmt.wide { width: auto; padding: 0 8px; }
+.wd-b { font-weight: 700; }
+.wd-i { font-style: italic; }
+.wd-u { text-decoration: underline; }
+.wd-fmt[aria-pressed="true"] { background: var(--tl-yellow); }
+.wd-sep { width: 2px; height: 18px; background: #c7d0e0; }
+.wd-dim { font-size: 10px; opacity: .7; }
+.wd-page.fmt-b { font-weight: 700; }
+.wd-page.fmt-i { font-style: italic; }
+.wd-page.fmt-u { text-decoration: underline; }
+.wd-status { border-top: 2px solid var(--ink); background: #e8eefc; padding: 4px 10px; font-size: 10px; }
+
+/* n8n */
+.skin-n8n .appwin-bar { background: #1a1a1a; color: #ff6d5a; }
+.skin-n8n .appwin-body { background: #1f1f22; color: #e8e8e8; }
+.n8-bar { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-bottom: 2px solid #000; background: #2a2a2e; }
+.n8-run { border: 2px solid #000; background: #ff6d5a; color: #1a1a1a; font: inherit; font-size: 11px; padding: 4px 10px; }
+.n8-st { font-size: 10px; color: #9a9a9a; }
+.n8-st.run { color: #f5d93d; }
+.n8-st.ok { color: #6fdc8c; }
+.n8-canvas { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 12px 10px; }
+.n8-nodewrap { display: flex; align-items: center; gap: 4px; }
+.n8-node {
+  display: grid; gap: 1px; border: 2px solid #000; background: #34343a;
+  padding: 5px 8px; min-width: 96px;
+}
+.n8-node b { font-size: 10px; }
+.n8-node span { font-size: 9px; color: #a8a8a8; }
+.n8-node.active { background: #4a4a52; outline: 2px solid #f5d93d; }
+.n8-node.done { background: #2f4636; outline: 2px solid #6fdc8c; }
+.n8-link { width: 14px; height: 3px; background: #6a6a72; }
+.n8-note { font-size: 10px; color: #9a9a9a; padding: 0 10px 10px; line-height: 1.5; }
+
+/* GitLab */
+.skin-gitlab .appwin-bar { background: #e24329; color: #1a1a1a; }
+.skin-gitlab .appwin-close { border-color: #1a1a1a; }
+.gl-head { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-bottom: 2px solid var(--ink); background: #fbf3f1; font-size: 11px; }
+.gl-branch { border: 1px solid #e24329; color: #e24329; padding: 0 6px; font-size: 10px; }
+.gl-bar { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-bottom: 1px solid #e0e0e0; }
+.gl-run { border: 2px solid var(--ink); background: #e24329; color: #fff; font: inherit; font-size: 11px; padding: 4px 10px; }
+.gl-badge { font-size: 10px; border: 1px solid #1e7e34; color: #1a6b2c; padding: 1px 8px; }
+.gl-badge.run { border-color: #8a6a0b; color: #7a5c08; }
+.gl-stages { display: flex; align-items: flex-start; gap: 6px; padding: 10px; }
+.gl-stage { flex: 1; display: grid; gap: 4px; }
+.gl-stage h5 { font-size: 10px; text-transform: uppercase; opacity: .6; }
+.gl-job { display: flex; align-items: center; gap: 6px; border: 1px solid #d0d0d0; padding: 3px 6px; font-size: 10px; background: #fafafa; }
+.gl-dot { width: 8px; height: 8px; border: 1px solid var(--ink); background: #c9c9c9; flex: 0 0 auto; }
+.gl-job.active { background: #fff8e0; }
+.gl-job.active .gl-dot { background: #d9a616; }
+.gl-job.done .gl-dot { background: #2e9e44; }
+.gl-arrow { align-self: center; color: #b0b0b0; }
+.gl-commits { border-top: 2px solid var(--ink); padding: 8px 10px; }
+.gl-commits h5 { font-size: 10px; text-transform: uppercase; opacity: .6; margin-bottom: 4px; }
+.gl-commit { display: flex; gap: 8px; font-size: 11px; padding: 2px 0; }
+.gl-commit i { margin-left: auto; font-style: normal; opacity: .55; font-size: 10px; flex: 0 0 auto; }
+
 /* Notion */
 .nt-wrap { display: flex; min-height: 180px; }
-.nt-side { width: 128px; flex: 0 0 auto; background: #f4f1ec; border-right: 2px solid var(--ink); padding: 8px 6px; font-size: 11px; display: grid; gap: 6px; align-content: start; }
-.nt-side .on { font-weight: 700; background: #e8e2d8; }
+.nt-side { width: 132px; flex: 0 0 auto; background: #f4f1ec; border-right: 2px solid var(--ink); padding: 8px 6px; font-size: 11px; display: grid; gap: 4px; align-content: start; }
+.nt-side .view-btn {
+  border: 0; background: none; font: inherit; font-size: 11px;
+  text-align: left; padding: 3px 6px; color: var(--ink);
+}
+.nt-side .view-btn.on { font-weight: 700; background: #e8e2d8; }
+.nt-todo { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 3px 0; }
+.nt-todo span.done { text-decoration: line-through; opacity: .55; }
+.nt-toggle { border-bottom: 1px solid #e6e1d8; padding: 4px 0; }
+.nt-tgbtn { border: 0; background: none; font: inherit; font-size: 12px; padding: 2px 0; text-align: left; width: 100%; color: var(--ink); }
+.nt-tgbody { font-size: 11px; opacity: .7; padding: 2px 0 4px 14px; }
 .nt-main { flex: 1; padding: 10px 12px; }
 .nt-main h3 { font-size: 14px; margin-bottom: 8px; }
 .nt-board { display: flex; gap: 10px; align-items: flex-start; }
@@ -160,16 +257,67 @@
 .ij-runline { font-size: 11px; color: #a9b7c6; padding: 1px 12px; white-space: pre; }
 .ij-runline:last-child { padding-bottom: 8px; }
 
+/* Spotify player */
+.skin-spotify .appwin-bar { background: #1db954; color: #06210f; }
+.skin-spotify .appwin-close { border-color: #06210f; }
+.skin-spotify .appwin-body { background: #121212; color: #e8e8e8; padding: 12px; max-height: min(72vh, 620px); }
+.sp-now { display: flex; gap: 12px; align-items: center; }
+.sp-cover { flex: 0 0 auto; border: 2px solid #000; line-height: 0; }
+.sp-cover img { image-rendering: pixelated; display: block; width: 84px; height: 84px; object-fit: cover; }
+.sp-meta { min-width: 0; display: grid; gap: 3px; }
+.sp-title { font-family: var(--font-pixel); font-size: 13px; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sp-artist { font-size: 11px; color: #b3b3b3; }
+.sp-eq { display: flex; gap: 2px; align-items: flex-end; height: 12px; margin-top: 2px; }
+.sp-eq i { width: 3px; height: 3px; background: #1db954; }
+@keyframes speq { 0%, 100% { height: 3px; } 50% { height: 12px; } }
+.sp-playing .sp-eq i { animation: speq .6s steps(3) infinite; }
+.sp-playing .sp-eq i:nth-child(2) { animation-delay: .15s; }
+.sp-playing .sp-eq i:nth-child(3) { animation-delay: .3s; }
+.sp-playing .sp-eq i:nth-child(4) { animation-delay: .45s; }
+.skin-spotify .appwin-body { position: relative; }
+/* embed Spotify tetap dirender (audio butuh itu) tapi tak terlihat —
+   UI pixel kita yang jadi antarmukanya; atribusi ada di .sp-credit */
+.sp-embed {
+  position: absolute; bottom: 0; left: 0;
+  width: 300px; height: 80px;
+  opacity: 0; pointer-events: none; z-index: -1;
+}
+.sp-embed iframe { display: block; border: 0; }
+.sp-bar { height: 6px; background: #4d4d4d; margin: 14px 0 4px; border: 1px solid #000; }
+.sp-bar i { display: block; height: 100%; width: 0; background: #1db954; }
+.sp-times { display: flex; justify-content: space-between; font-size: 10px; color: #b3b3b3; }
+.sp-note { font-size: 10px; color: #b3b3b3; line-height: 1.4; margin-top: 6px; }
+.sp-credit {
+  display: flex; align-items: center; gap: 6px; margin-top: 12px;
+  font-size: 10px; color: #b3b3b3; text-decoration: none;
+}
+.sp-credit svg, .sp-credit img { image-rendering: pixelated; width: 14px; height: 14px; }
+.sp-ctrls { display: flex; align-items: center; gap: 10px; margin: 10px 0 4px; }
+.sp-btn { border: 0; background: none; color: #e8e8e8; font-size: 15px; padding: 2px 4px; line-height: 1; }
+.sp-play { background: #1db954; color: #06210f; border: 2px solid #000; padding: 3px 12px; }
+.sp-open { margin-left: auto; font-size: 10px; color: #1db954; text-decoration: none; }
+.sp-head { font-family: var(--font-pixel); font-size: 10px; color: #b3b3b3; margin: 12px 0 6px; }
+.sp-list { display: grid; gap: 2px; }
+.sp-row {
+  display: flex; align-items: baseline; gap: 8px; width: 100%; text-align: left;
+  border: 0; background: none; color: #e8e8e8; font: inherit; font-size: 11px; padding: 4px 6px;
+}
+.sp-row[aria-pressed="true"] { background: #232323; }
+.sp-row[aria-pressed="true"] .sp-rt { color: #1db954; }
+.sp-num { font-style: normal; color: #b3b3b3; flex: 0 0 12px; }
+.sp-rt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sp-ra { margin-left: auto; color: #b3b3b3; flex: 0 0 auto; }
+
 /* Xcode */
 .skin-xcode .appwin-bar { background: #1d6fd0; }
 .xc-toolbar {
   display: flex; align-items: center; gap: 10px;
   padding: 5px 10px; background: #eceff3; border-bottom: 2px solid var(--ink); font-size: 11px;
 }
-.xc-run { color: #1a8f3c; }
+.xc-run { color: #146b2c; }
 .xc-stop { color: #8a8a8a; }
 .xc-scheme { border: 1px solid #c2c8d0; background: #fff; padding: 2px 8px; }
-.xc-ok { margin-left: auto; color: #1a8f3c; }
+.xc-ok { margin-left: auto; color: #146b2c; }
 .xc-wrap { display: flex; min-height: 180px; }
 .xc-nav {
   flex: 0 0 132px; background: #f2f4f7; border-right: 2px solid var(--ink);
@@ -341,6 +489,43 @@
 .id-sigline { width: 100%; border-bottom: 2px dotted #2b2620; }
 .id-sigcap { font-size: 10px; font-style: italic; justify-self: end; margin-top: 3px; }
 
+/* area Finder di panel Projects */
+.finder {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 12px; padding: 14px 12px;
+  border: 3px solid var(--ink); background: #fff;
+  box-shadow: inset 3px 3px 0 rgba(26,26,26,.08);
+}
+.file {
+  display: grid; justify-items: center; gap: 5px;
+  border: 2px solid transparent; background: none;
+  font: inherit; color: var(--ink); padding: 8px 4px;
+}
+.file:hover, .file:focus-visible { border-color: var(--ink); background: var(--win); }
+.file svg { image-rendering: pixelated; }
+.file-name { font-size: 11px; text-align: center; line-height: 1.3; }
+.file-tag {
+  font-style: normal; font-size: 9px; color: #fff;
+  border: 1px solid var(--ink); padding: 0 5px;
+}
+.finder-status {
+  border: 3px solid var(--ink); border-top: 0; background: var(--win-dark);
+  padding: 5px 10px; font-size: 11px;
+}
+/* Quick Look */
+.skin-ql .appwin-bar { background: #4a4a52; }
+.ql-band { display: grid; place-items: center; padding: 14px; border-bottom: 3px solid var(--ink); }
+.ql-band svg { image-rendering: pixelated; }
+.ql-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px 4px; flex-wrap: wrap; }
+.ql-head h3 { font-family: var(--font-pixel); font-size: 14px; }
+.ql-badge { font-size: 10px; border: 2px solid #d9a616; color: #7a5c08; padding: 0 6px; }
+.ql-badge.done { border-color: #2e9e44; color: #1a6b2c; }
+.ql-meta { display: flex; gap: 14px; padding: 0 12px 8px; font-size: 10px; opacity: .65; }
+.ql-desc { padding: 0 12px; font-size: 12px; line-height: 1.6; }
+.skin-ql .tags { padding: 10px 12px 0; }
+.ql-foot { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; }
+.ql-foot .pxbtn { margin: 0; border-width: 2px; box-shadow: 2px 2px 0 var(--ink); }
+
 /* launcher di panel */
 .launcher { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
 .launch-btn {
@@ -350,5 +535,17 @@
   box-shadow: 3px 3px 0 var(--ink);
 }
 .launch-btn:active { transform: translate(3px, 3px); box-shadow: none; }
-.launch-btn svg { image-rendering: pixelated; width: 22px; height: 22px; }
+.launch-btn svg, .launch-btn img { image-rendering: pixelated; width: 22px; height: 22px; }
 .launch-hint { font-size: 12px; opacity: 0.7; margin-top: 8px; }
+
+/* mobile: perbesar target sentuh di dalam jendela aplikasi (WCAG 2.5.8) */
+@media (max-width: 640px) {
+  .xl-cell, .xl-colbtn { min-height: 24px; padding: 4px 0; }
+  .wd-tab, .wd-fmt, .nt-side .view-btn, .dk-side .view-btn,
+  .vs-file, .sp-row, .ij-tabs button, .gl-run, .n8-run, .sp-btn, .wr-opt {
+    min-height: 26px;
+  }
+  .sp-btn { min-width: 32px; }
+  .nt-todo input { width: 20px; height: 20px; }
+  .appwin-body { max-height: 52vh; }
+}

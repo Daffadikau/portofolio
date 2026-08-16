@@ -21,6 +21,13 @@ window.PORTFOLIO_DATA = {
       memento: 'Soft Brush',
     },
   },
+  // sampul dibuat Dikau sendiri via giventofly.github.io/pixelit
+  musicPlaylist: 'https://sptfy.bio/dikau',
+  music: [
+    { title: 'Chanel', artist: 'Frank Ocean', cover: 'assets/covers/chanel.png', sid: '6Nle9hKrkL1wQpwNfEkxjh' },
+    { title: 'Going to Babble On', artist: 'The Strokes', cover: 'assets/covers/bable-on.png', sid: '2nxsLJwW4eFDwl36fUQJWe' },
+    { title: 'Juna', artist: 'Clairo', cover: 'assets/covers/juna.png', sid: '2mWfVxEo4xZYDaz0v7hYrN' },
+  ],
   education: {
     school: 'Universitas Pendidikan Indonesia (UPI)',
     program: 'Computer Engineering',

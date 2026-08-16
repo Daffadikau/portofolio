@@ -8,8 +8,10 @@
   (function boot() {
     const bootEl = document.getElementById('boot');
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced || sessionStorage.getItem('booted')) { bootEl.remove(); return; }
-    sessionStorage.setItem('booted', '1');
+    let booted = null;
+    try { booted = sessionStorage.getItem('booted'); } catch (e) { booted = '1'; }
+    if (reduced || booted) { bootEl.remove(); return; }
+    try { sessionStorage.setItem('booted', '1'); } catch (e) { /* abaikan */ }
     bootEl.hidden = false;
     const inner = el('div', 'boot-inner');
     const cat = el('div', 'boot-cat');
@@ -28,6 +30,7 @@
     document.addEventListener('keydown', done, { once: true });
   })();
 
+  let restoreMainWindow = () => {};
   const TABS = ['about', 'projects', 'skills', 'contact'];
   const LABELS = { about: 'About', projects: 'Projects', skills: 'Skills', contact: 'Contact' };
   const win = document.getElementById('window');
@@ -124,31 +127,20 @@
   document.addEventListener('keydown', (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    // jangan bajak angka saat fokus ada di dalam jendela aplikasi —
+    // pindah tab akan menutup jendela yang sedang dipakai
+    if (e.target.closest && e.target.closest('.appwin')) return;
     const n = Number(e.key);
     if (n >= 1 && n <= TABS.length) {
       const id = TABS[n - 1];
-      if ((location.hash.replace('#', '') || 'about') === id) showTab(id);
+      // tab yang sama: cukup pulihkan window utama kalau sedang di-minimize,
+      // JANGAN showTab() ulang karena itu memusnahkan semua jendela aplikasi
+      if ((location.hash.replace('#', '') || 'about') === id) restoreMainWindow();
       else location.hash = id;
     }
   });
 
   const D = window.PORTFOLIO_DATA;
-  function techTag(t) {
-    const s = el('span', 'tag');
-    if (t.icon) {
-      const img = el('img');
-      img.src = `assets/icons/tech/${t.icon}.svg`;
-      img.alt = ''; img.width = 16; img.height = 16;
-      s.appendChild(img);
-    }
-    s.appendChild(document.createTextNode(t.label));
-    return s;
-  }
-  function extLink(cls, label, url) {
-    const a = el('a', cls, label);
-    a.href = url; a.target = '_blank'; a.rel = 'noreferrer';
-    return a;
-  }
   function h2icon(map, text) {
     const h = el('h2', 'h2i');
     h.append(window.PixelArt.render(map, 2), document.createTextNode(text));
@@ -206,10 +198,30 @@
   }
   (function renderProjects() {
     const p = document.getElementById('panel-projects');
+    const COLORS = ['#e0662f', '#4a90d9', '#d9a616', '#7c5cc4', '#8fb83a', '#c94867', '#2fa392'];
     p.appendChild(h2icon('folder', 'Projects'));
     p.appendChild(el('p', 'bio', 'Opening the project suite — each app shows my work from a different angle.'));
     p.appendChild(launcherFor('projects'));
     p.appendChild(el('p', 'launch-hint', 'Tip: drag the windows around · click one to bring it to front · Esc or × closes it'));
+
+    // area Finder: tiap project sebagai berkas, klik untuk Quick Look
+    p.appendChild(h2icon('about', 'All files'));
+    const finder = el('div', 'finder');
+    D.projects.forEach((pr, i) => {
+      const f = el('button', 'file');
+      f.setAttribute('aria-label', `Quick Look: ${pr.title}`);
+      f.appendChild(window.PixelArt.render('fileDoc', 2));
+      f.appendChild(el('span', 'file-name', pr.title));
+      const tag = el('i', 'file-tag', i < 2 ? 'in progress' : 'shipped');
+      tag.style.background = COLORS[i % COLORS.length];
+      f.appendChild(tag);
+      f.addEventListener('click', () => window.AppWins.open(`ql:${i}`));
+      finder.appendChild(f);
+    });
+    p.appendChild(finder);
+    const shipped = D.projects.length - 2;
+    p.appendChild(el('div', 'finder-status',
+      `${D.projects.length} items · ${shipped} shipped · 2 in progress · click a file for Quick Look`));
   })();
   (function renderSkills() {
     const p = document.getElementById('panel-skills');
@@ -296,7 +308,7 @@
     // mesh ala Tailscale: Smoky sebagai relay node di atas, tiga peer di bawah
     const mesh = el('div', 'mesh');
     const guard = el('button', 'contact-smoky');
-    guard.setAttribute('aria-label', 'Smoky in his cardboard box — click him');
+    guard.setAttribute('aria-label', 'Smoky guards the inbox — click him');
     guard.title = 'psst... click Smoky';
     guard.appendChild(window.PixelArt.render('catBox', 4));
     guard.appendChild(el('span', 'char-partner', 'Smoky guards the inbox'));
@@ -334,6 +346,7 @@
       { map: 'chip', tab: 'skills', label: 'Skills' },
       { map: 'mail', tab: 'contact', label: 'Contact' },
       { map: 'term', app: 'terminal', label: 'Terminal' },
+      { map: 'spotify', app: 'spotify', label: 'Spotify' },
       { sep: true },
       { map: 'github', url: D.socials.github, label: 'GitHub' },
       { map: 'linkedin', url: D.socials.linkedin, label: 'LinkedIn' },
@@ -374,7 +387,7 @@
       if (d) d.focus();
     });
     win.querySelector('.tl-green').addEventListener('click', () => win.classList.toggle('maximized'));
-    function restore() {
+    restoreMainWindow = function restore() {
       const wasMin = win.classList.contains('minimized');
       win.classList.remove('minimized');
       document.getElementById('dock').classList.remove('holds-window');
@@ -382,10 +395,10 @@
         const tab = document.getElementById(`tab-${location.hash.replace('#', '') || 'about'}`);
         if (tab) tab.focus();
       }
-    }
-    document.addEventListener('tabshown', restore);
+    };
+    document.addEventListener('tabshown', restoreMainWindow);
     document.getElementById('dock').addEventListener('click', (e) => {
-      if (e.target.closest('[data-tab]')) restore();
+      if (e.target.closest('[data-tab]')) restoreMainWindow();
     });
   })();
 
@@ -393,7 +406,7 @@
   // Terminal independen dari tab — tetap terbuka sampai ditutup sendiri.
   document.addEventListener('tabshown', (e) => {
     if (!window.AppWins) return;
-    window.AppWins.closeAll(['terminal']);
+    window.AppWins.closeAll(['terminal', 'spotify']);
     if (e.detail.id === 'projects') window.AppWins.openGroup('projects');
     else if (e.detail.id === 'skills') window.AppWins.openGroup('skills');
     else if (e.detail.id === 'contact') window.AppWins.openGroup('contact');

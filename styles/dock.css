@@ -8,7 +8,7 @@
   width: 44px; height: 44px; border: 0; background: none; padding: 0;
 }
 /* samakan ukuran tampil walau grid peta berbeda (12x12 vs 16x16) */
-.dock-item svg { image-rendering: pixelated; width: 26px; height: 26px; }
+.dock-item svg, .dock-item img { image-rendering: pixelated; width: 26px; height: 26px; }
 @keyframes dockbounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 .dock-item:hover, .dock-item:focus-visible { animation: dockbounce .4s steps(3) 1; }
 .dock-item:active { animation: none; transform: translateY(3px); }
