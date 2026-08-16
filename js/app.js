@@ -173,7 +173,7 @@
     status.append(el('span', 'dot'), document.createTextNode(D.status));
     head.appendChild(status);
     const side = el('div', 'hero-side');
-    side.append(buildStatusScreen(D.stats));
+    side.append(buildStatusScreen(D.stats), buildCvLink(D.cv));
     hero.append(art, head, side);
     p.append(hero, el('p', 'bio', D.bio), buildDesk(D.desk),
       h2icon('cap', 'Education'),
@@ -454,6 +454,22 @@
     f.append(hits, badges, ring,
       el('p', 'y2k-sig', 'this page is under construction · always has been'));
     return f;
+  }
+  // Tombol unduh CV lengkap, duduk tepat di bawah panel status.
+  function buildCvLink(cv) {
+    const wrap = el('div', 'cv-drop');
+    if (!cv || !cv.file) return wrap;
+    wrap.appendChild(el('p', 'cv-note', cv.note));
+    const a = el('a', 'cv-btn');
+    a.href = cv.file;
+    // download same-origin: berkasnya tersimpan dengan nama yang rapi,
+    // bukan nama berkas di repo
+    a.setAttribute('download', cv.download || '');
+    a.setAttribute('type', 'application/pdf');
+    a.appendChild(window.PixelArt.render('fileDoc', 2));
+    a.appendChild(el('span', null, cv.label || 'Download CV (PDF)'));
+    wrap.appendChild(a);
+    return wrap;
   }
   function launcherFor(group) {
     const grid = el('div', 'launcher');

@@ -166,6 +166,13 @@ window.PORTFOLIO_DATA = {
       ],
     },
   ],
+  // CV lengkap yang bisa diunduh dari tab About
+  cv: {
+    file: 'assets/cv-daffa-adika-utama.pdf',
+    download: 'CV - Daffa Adika Utama.pdf',
+    note: "If you're feeling nerdy, here's a much more detailed one.",
+    label: 'Download CV (PDF)',
+  },
   // isi meja kerja di tab About. Tiap benda jadi hotspot yang mengeluarkan
   // satu kalimat waktu di-hover/di-fokus.
   desk: [
