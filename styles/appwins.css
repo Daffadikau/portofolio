@@ -160,6 +160,29 @@
 .ij-runline { font-size: 11px; color: #a9b7c6; padding: 1px 12px; white-space: pre; }
 .ij-runline:last-child { padding-bottom: 8px; }
 
+/* Xcode */
+.skin-xcode .appwin-bar { background: #1d6fd0; }
+.xc-toolbar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 5px 10px; background: #eceff3; border-bottom: 2px solid var(--ink); font-size: 11px;
+}
+.xc-run { color: #1a8f3c; }
+.xc-stop { color: #8a8a8a; }
+.xc-scheme { border: 1px solid #c2c8d0; background: #fff; padding: 2px 8px; }
+.xc-ok { margin-left: auto; color: #1a8f3c; }
+.xc-wrap { display: flex; min-height: 180px; }
+.xc-nav {
+  flex: 0 0 132px; background: #f2f4f7; border-right: 2px solid var(--ink);
+  padding: 8px 6px; font-size: 11px; display: grid; gap: 2px; align-content: start;
+}
+.xc-group { font-weight: 700; }
+.xc-file { padding-left: 12px; opacity: .8; }
+.xc-main { flex: 1; min-width: 0; background: #1f2430; padding: 10px 12px; display: grid; gap: 3px; align-content: start; }
+.xc-log { color: #9fe6a0; font-size: 11px; white-space: nowrap; }
+.xc-done { color: #cfd6e4; font-size: 11px; margin-top: 6px; border-top: 1px solid #3a4152; padding-top: 6px; }
+.xc-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.xc-chip { font-size: 10px; color: #1f2430; background: #cfd6e4; border: 1px solid #1f2430; padding: 1px 6px; }
+
 /* Docker: sidebar interaktif */
 .dk-wrap { display: flex; min-height: 190px; }
 .dk-side {

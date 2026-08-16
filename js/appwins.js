@@ -287,6 +287,37 @@
     show('skills_ai.py');
   }
 
+  // ---- builder: Xcode (build Flutter/iOS — Runner.xcworkspace) ----
+  function buildXcode(body) {
+    const bar = el('div', 'xc-toolbar');
+    bar.append(el('span', 'xc-run', '▶'), el('span', 'xc-stop', '■'),
+      el('span', 'xc-scheme', 'Runner  ›  iPhone 15 Pro'),
+      el('span', 'xc-ok', '✓ Build Succeeded'));
+    body.appendChild(bar);
+    const wrap = el('div', 'xc-wrap');
+    const nav = el('div', 'xc-nav');
+    [['▾ Runner', 1], ['AppDelegate.swift', 0], ['Info.plist', 0], ['Assets.xcassets', 0],
+      ['▾ Flutter', 1], ['Generated.xcconfig', 0], ['▾ Pods', 1], ['Podfile', 0]]
+      .forEach(([t, isGroup]) => nav.appendChild(el('div', isGroup ? 'xc-group' : 'xc-file', t)));
+    const main = el('div', 'xc-main');
+    ['✓  Compiling Dart sources for arm64',
+      '✓  Building Flutter engine (release)',
+      '✓  Linking Runner.app',
+      '✓  Code signing Runner.app',
+      '✓  Installing on iPhone 15 Pro Simulator',
+    ].forEach((l) => main.appendChild(el('div', 'xc-log', l)));
+    main.appendChild(el('div', 'xc-done', 'Build Succeeded  ·  12.4s  ·  0 warnings'));
+    const chips = el('div', 'xc-chips');
+    grp('Web & Mobile').items
+      .filter((s) => /flutter|dart/i.test(s.label))
+      .concat(grp('Languages').items.filter((s) => /dart/i.test(s.label)))
+      .filter((s, i, arr) => arr.findIndex((x) => x.label === s.label) === i)
+      .forEach((s) => chips.appendChild(el('span', 'xc-chip', `${s.label} ${lvBar(s.level)}`)));
+    main.appendChild(chips);
+    wrap.append(nav, main);
+    body.appendChild(wrap);
+  }
+
   // ---- builder: Docker (sidebar interaktif) ----
   function buildDocker(body) {
     const containersRender = (c) => {
@@ -507,7 +538,8 @@
     notion: { title: 'Project Tracker — Notion', skin: 'notion', icon: 'notion', w: 460, fx: 0.24, fy: 330, build: buildNotion },
     vscode: { title: 'languages.ts — VS Code', skin: 'vscode', icon: 'vscode', w: 470, fx: 0.04, fy: 80, build: buildVSCode },
     idea: { title: 'skills_ai.py — IntelliJ IDEA', skin: 'idea', icon: 'idea', w: 440, fx: 0.58, fy: 110, build: buildIdea },
-    docker: { title: 'Containers — Docker Desktop', skin: 'docker', icon: 'docker', w: 500, fx: 0.09, fy: 360, build: buildDocker },
+    xcode: { title: 'Runner.xcworkspace — Xcode', skin: 'xcode', icon: 'xcode', w: 470, fx: 0.3, fy: 250, build: buildXcode },
+    docker: { title: 'Containers — Docker Desktop', skin: 'docker', icon: 'docker', w: 500, fx: 0.05, fy: 400, build: buildDocker },
     wireshark: { title: 'capture.pcapng — Wireshark', skin: 'wireshark', icon: 'wireshark', w: 540, fx: 0.42, fy: 440, build: buildWireshark },
     terminal: { title: 'daffa@portfolio: ~ — Terminal', skin: 'terminal', icon: 'term', w: 600, fx: 0.2, fy: 150, build: buildTerminal },
     ghprofile: { title: 'Daffadikau — GitHub', skin: 'github', icon: 'github', w: 440, fx: 0.05, fy: 100, build: buildGithub },
@@ -517,7 +549,7 @@
   };
   const GROUPS = {
     projects: ['excel', 'word', 'notion'],
-    skills: ['vscode', 'idea', 'docker', 'wireshark'],
+    skills: ['vscode', 'idea', 'xcode', 'docker', 'wireshark'],
     contact: ['ghprofile', 'liprofile', 'gmail'],
   };
 
