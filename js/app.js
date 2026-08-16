@@ -172,7 +172,9 @@
     const status = el('p', 'status');
     status.append(el('span', 'dot'), document.createTextNode(D.status));
     head.appendChild(status);
-    hero.append(art, head, buildStatusScreen(D.stats));
+    const side = el('div', 'hero-side');
+    side.append(buildStatusScreen(D.stats));
+    hero.append(art, head, side);
     p.append(hero, el('p', 'bio', D.bio), buildDesk(D.desk),
       h2icon('cap', 'Education'),
       el('p', null, `${D.education.program} — ${D.education.school}, ${D.education.detail}`),
@@ -188,17 +190,16 @@
   function buildApartment(list) {
     // di dalam fungsi, bukan di scope modul: renderAbout jalan lebih dulu
     // dari deklarasi ini, jadi const di luar kena temporal dead zone.
-    // seragam disesuaikan dengan organisasinya masing-masing, bukan wardrobe
-    // umum — urutannya mengikuti urutan D.experience
+    // seragam + lokasi kerja masing-masing — urutannya mengikuti D.experience
     const TENANTS = [
-      // PT IROSTECH: kemeja biru bergaris + dasi + kacamata
-      { fit: 'wFitShirtTie', acc: 'wAccGlasses', hat: null, unit: '4A' },
-      // Rumah Prestasi UPI: blazer almamater merah
-      { fit: 'wFitBlazerUpi', acc: null, hat: null, unit: '3A' },
-      // HIMA TEKKOM P2M: kaus volunteer biru tua
-      { fit: 'wFitVolunteer', acc: null, hat: null, unit: '2A' },
-      // KSR PMI: seragam medis + rompi palang merah + hard hat putih
-      { fit: 'wFitPmi', acc: null, hat: 'wHatHardHat', unit: '1A' },
+      // PT IROSTECH: kemeja biru bergaris + dasi + kacamata, di bilik kantor
+      { fit: 'wFitShirtTie', acc: 'wAccGlasses', hat: null, unit: '4A', scene: 'office' },
+      // Rumah Prestasi UPI: blazer almamater merah, di panggung bersorot lampu
+      { fit: 'wFitBlazerUpi', acc: null, hat: null, unit: '3A', scene: 'stage' },
+      // HIMA TEKKOM P2M: kaus volunteer, di tempat penyaluran donasi
+      { fit: 'wFitVolunteer', acc: null, hat: null, unit: '2A', scene: 'volunteer' },
+      // KSR PMI: seragam medis + hard hat, di ruang rawat
+      { fit: 'wFitPmi', acc: null, hat: 'wHatHardHat', unit: '1A', scene: 'hospital' },
     ];
     const apt = el('section', 'apt');
     apt.setAttribute('aria-label', 'Experience, as an apartment building');
@@ -208,12 +209,32 @@
     list.forEach((x, i) => {
       const t = TENANTS[i % TENANTS.length];
       const floor = el('div', 'apt-floor');
-      const room = el('div', 'apt-room');
+      const room = el('div', `apt-room scene-${t.scene} asleep`);
+      // latar lokasi: tiga lapis prop yang diposisikan CSS per scene
+      const back = el('div', 'apt-back');
+      back.setAttribute('aria-hidden', 'true');
+      for (let n = 1; n <= 3; n += 1) back.appendChild(el('i', `b${n}`));
+      // prop yang cuma muncul waktu penghuninya masih tidur
+      const sleep = el('div', 'apt-sleep');
+      sleep.setAttribute('aria-hidden', 'true');
+      for (let n = 1; n <= 2; n += 1) sleep.appendChild(el('i', `s${n}`));
+      const zzz = el('div', 'apt-zzz');
+      zzz.setAttribute('aria-hidden', 'true');
+      for (let n = 0; n < 3; n += 1) {
+        const z = el('i', null, 'z');
+        z.style.animationDelay = `${(n * 0.5).toFixed(2)}s`;
+        zzz.appendChild(z);
+      }
       const tenant = el('div', 'apt-tenant');
+      // catSleep bentuknya identik dengan cat kecuali baris mata, jadi peta
+      // seragamnya tetap pas dipakai di kedua pose.
       // renderStack butuh urutan: base -> outfit -> aksesori -> topi
-      tenant.appendChild(window.PixelArt.renderStack(
-        ['cat', t.fit, t.acc, t.hat].filter(Boolean), 3));
-      room.append(el('i', 'apt-lamp'), tenant, el('i', 'apt-rug'));
+      function drawTenant(awake) {
+        tenant.replaceChildren(window.PixelArt.renderStack(
+          [awake ? 'cat' : 'catSleep', t.fit, t.acc, t.hat].filter(Boolean), 3));
+      }
+      drawTenant(false);
+      room.append(back, el('i', 'apt-lamp'), sleep, tenant, zzz, el('i', 'apt-dim'));
       const info = el('div', 'apt-info');
       const id = `apt-bubble-${i}`;
       const door = el('button', 'apt-door');
@@ -235,6 +256,8 @@
         door.setAttribute('aria-expanded', String(!open));
         bubble.hidden = open;
         floor.classList.toggle('lit', !open);
+        room.classList.toggle('asleep', open);
+        drawTenant(!open);
         try { window.Smoky.sfx.play(open ? 'wake' : 'happy'); } catch (e) { /* audio opsional */ }
       });
       info.append(door, bubble);
