@@ -185,13 +185,7 @@
       h2icon('case', 'Experience'));
     p.appendChild(buildApartment(D.experience));
     p.appendChild(h2icon('trophy', 'Honors & Awards'));
-    const ul = el('ul', 'awards');
-    D.awards.forEach((a) => {
-      const li = el('li');
-      li.append(el('b', null, a.title), document.createTextNode(` — ${a.org} `), el('span', 'period', a.when));
-      ul.appendChild(li);
-    });
-    p.appendChild(ul);
+    p.appendChild(buildJokers(D.awards));
   })();
   // Experience sebagai apartemen ala Tomodachi Life: tiap lantai satu peran,
   // penghuninya Smoky dengan setelan berbeda (pakai wardrobe yang sudah ada).
@@ -250,6 +244,75 @@
     ground.append(el('span', 'apt-mail', 'mailbox'), el('span', null, 'knock on a door to say hi'));
     apt.appendChild(ground);
     return apt;
+  }
+  // Awards sebagai tangan kartu Joker ala Balatro: kartu di-fan out, hover
+  // memiringkan kartu mengikuti kursor, klik mengangkat kartu dan menulis
+  // detailnya di panel bawah (mirip papan info run di Balatro).
+  function buildJokers(list) {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const wrap = el('section', 'jokers');
+    const hand = el('div', 'joker-hand');
+    hand.setAttribute('role', 'list');
+    const info = el('div', 'joker-info');
+    const infoName = el('b', 'joker-info-name');
+    const infoMeta = el('span', 'joker-info-meta');
+    const infoBlurb = el('i', 'joker-info-blurb');
+    info.append(infoName, infoMeta, infoBlurb);
+    const cards = [];
+    function select(i) {
+      cards.forEach((c, n) => {
+        c.classList.toggle('picked', n === i);
+        c.setAttribute('aria-pressed', String(n === i));
+      });
+      const a = list[i];
+      infoName.textContent = a.title;
+      infoMeta.textContent = `${a.org} · ${a.when} · ${a.rarity}`;
+      infoBlurb.textContent = a.blurb || '';
+      try { window.Smoky.sfx.play('play'); } catch (e) { /* audio opsional */ }
+    }
+    list.forEach((a, i) => {
+      const c = el('button', `joker rar-${a.rarity || 'common'}`);
+      c.type = 'button';
+      c.setAttribute('role', 'listitem');
+      c.setAttribute('aria-pressed', 'false');
+      c.setAttribute('aria-label', `${a.title}, ${a.org}, ${a.when}`);
+      // sudut kemiringan kipas: kartu tengah tegak, makin ke pinggir makin miring
+      const spread = (i - (list.length - 1) / 2);
+      c.style.setProperty('--fan', `${spread * 3.2}deg`);
+      c.style.setProperty('--lift', `${Math.abs(spread) * 5}px`);
+      const face = el('span', 'joker-face');
+      face.append(
+        el('span', 'joker-year', a.when),
+        (() => { const art = el('span', 'joker-art'); art.appendChild(window.PixelArt.render(a.icon || 'trophy', 3)); return art; })(),
+        el('span', 'joker-name', a.title),
+      );
+      c.append(face, el('span', 'joker-rar', a.rarity || 'common'));
+      // tilt 3D mengikuti kursor — dilewati kalau user minta gerak minimal
+      if (!reduced) {
+        c.addEventListener('pointermove', (e) => {
+          const r = c.getBoundingClientRect();
+          const dx = (e.clientX - r.left) / r.width - 0.5;
+          const dy = (e.clientY - r.top) / r.height - 0.5;
+          c.style.setProperty('--rx', `${(-dy * 16).toFixed(2)}deg`);
+          c.style.setProperty('--ry', `${(dx * 18).toFixed(2)}deg`);
+        });
+        const reset = () => { c.style.setProperty('--rx', '0deg'); c.style.setProperty('--ry', '0deg'); };
+        c.addEventListener('pointerleave', reset);
+        c.addEventListener('blur', reset);
+      }
+      c.addEventListener('click', () => select(i));
+      cards.push(c);
+      hand.appendChild(c);
+    });
+    const counter = el('div', 'joker-count');
+    counter.append(
+      el('b', null, String(list.length)),
+      el('span', null, 'jokers held'),
+      el('i', null, 'hover to tilt · click to inspect'),
+    );
+    wrap.append(hand, info, counter);
+    if (list.length) select(0);
+    return wrap;
   }
   function launcherFor(group) {
     const grid = el('div', 'launcher');

@@ -164,13 +164,37 @@ window.PORTFOLIO_DATA = {
       ],
     },
   ],
+  // icon + rarity dipakai kartu Joker di tab About (rarity menentukan warna
+  // pita bawah kartu, meniru sistem kelangkaan Balatro)
   awards: [
-    { title: 'Best Department of the Year (P2M)', org: 'HIMA TEKKOM UPI', when: '2026' },
-    { title: '2nd Place (Silver Medal), National Digital Learning Video Competition (LIDM)', org: 'Ministry of Education', when: '2025' },
-    { title: 'Best Biro of the Year (Pengabdian)', org: 'KSR PMI Unit UPI Kampus Cibiru', when: '2026' },
-    { title: '2nd Place Winner, Best UI/UX Front-End Design', org: 'HIMA UPI', when: '2025' },
-    { title: 'Staff of the Month (July)', org: 'KSR PMI Unit UPI Kampus Cibiru', when: '2025' },
-    { title: 'Biro of the Month (September)', org: 'KSR PMI Unit UPI Kampus Cibiru', when: '2025' },
-    { title: 'Best Robotics and IT Student Program', org: 'SMAI PB Soedirman Bekasi', when: '2022' },
+    {
+      title: 'Best Department of the Year (P2M)', org: 'HIMA TEKKOM UPI', when: '2026',
+      icon: 'trophy', rarity: 'rare', blurb: 'Ran the department that shipped the most.',
+    },
+    {
+      title: '2nd Place (Silver Medal), National Digital Learning Video Competition (LIDM)',
+      org: 'Ministry of Education', when: '2025',
+      icon: 'brush', rarity: 'legendary', blurb: 'National stage. Silver, out of the whole country.',
+    },
+    {
+      title: 'Best Biro of the Year (Pengabdian)', org: 'KSR PMI Unit UPI Kampus Cibiru', when: '2026',
+      icon: 'trophy', rarity: 'rare', blurb: 'Community service, done properly for a full year.',
+    },
+    {
+      title: '2nd Place Winner, Best UI/UX Front-End Design', org: 'HIMA UPI', when: '2025',
+      icon: 'brush', rarity: 'rare', blurb: 'Design and front-end, judged together.',
+    },
+    {
+      title: 'Staff of the Month (July)', org: 'KSR PMI Unit UPI Kampus Cibiru', when: '2025',
+      icon: 'cap', rarity: 'common', blurb: 'Showed up, every single time.',
+    },
+    {
+      title: 'Biro of the Month (September)', org: 'KSR PMI Unit UPI Kampus Cibiru', when: '2025',
+      icon: 'cap', rarity: 'common', blurb: 'Same energy, one month later.',
+    },
+    {
+      title: 'Best Robotics and IT Student Program', org: 'SMAI PB Soedirman Bekasi', when: '2022',
+      icon: 'chip', rarity: 'uncommon', blurb: 'Where the whole thing started.',
+    },
   ],
 };

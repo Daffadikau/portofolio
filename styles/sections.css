@@ -202,3 +202,77 @@
   .apt-bubble { margin-left: 12px; }
   .apt-bubble::before, .apt-bubble::after { display: none; }
 }
+/* ── Awards sebagai tangan kartu Joker (Balatro core) ───────────────── */
+.jokers {
+  border: 3px solid var(--ink); margin: 22px 0 18px;
+  background: #35654d;                       /* felt meja kartu */
+  background-image:
+    repeating-linear-gradient(45deg, rgba(0,0,0,.06) 0 3px, transparent 3px 6px);
+  padding: 22px 12px 12px;
+}
+.joker-hand {
+  display: flex; justify-content: center; align-items: flex-end;
+  flex-wrap: wrap; gap: 6px;
+  /* kartu pinggir turun + miring, jadi butuh ruang ekstra di bawah
+     supaya sudutnya tidak ketiban papan info */
+  padding: 0 0 28px;
+  perspective: 700px;
+}
+.joker {
+  --rx: 0deg; --ry: 0deg; --fan: 0deg; --lift: 0px;
+  position: relative; flex: 0 0 104px; width: 104px; min-height: 152px;
+  border: 3px solid var(--ink); background: #fdf6e3; color: var(--ink);
+  padding: 0; display: flex; flex-direction: column;
+  font-family: var(--font-mono); text-align: center;
+  transform: rotate(var(--fan)) translateY(var(--lift));
+  transform-style: preserve-3d;
+  transition: transform .12s ease-out, box-shadow .12s ease-out;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, .45);
+}
+.joker:hover, .joker:focus-visible {
+  transform: rotate(0deg) translateY(-10px) scale(1.06)
+             rotateX(var(--rx)) rotateY(var(--ry));
+  box-shadow: 6px 10px 0 rgba(0, 0, 0, .5);
+  z-index: 2;
+}
+.joker.picked {
+  transform: rotate(0deg) translateY(-16px) scale(1.04);
+  box-shadow: 0 0 0 3px var(--tl-yellow), 6px 10px 0 rgba(0, 0, 0, .5);
+  z-index: 3;
+}
+.joker-face {
+  flex: 1 1 auto; display: flex; flex-direction: column;
+  align-items: center; gap: 4px; padding: 6px 6px 4px;
+}
+.joker-year { font-family: var(--font-pixel); font-size: 9px; opacity: .55; align-self: flex-start; }
+.joker-art { margin: 2px 0 4px; }
+.joker-art svg, .joker-art img { image-rendering: pixelated; display: block; }
+.joker-name { font-size: 9.5px; line-height: 1.3; }
+/* pita kelangkaan di kaki kartu */
+.joker-rar {
+  font-family: var(--font-pixel); font-size: 8px; letter-spacing: .5px;
+  text-transform: uppercase; padding: 3px 0; border-top: 3px solid var(--ink);
+  color: #fff;
+}
+.rar-common .joker-rar { background: #6b7280; }
+.rar-uncommon .joker-rar { background: #2f7d4f; }
+.rar-rare .joker-rar { background: #2f6fb8; }
+.rar-legendary .joker-rar { background: #8b3fbf; }
+/* papan info ala "run info" Balatro */
+.joker-info {
+  border: 3px solid var(--ink); background: #1f1f24; color: #f4f1e6;
+  padding: 10px 12px; display: flex; flex-direction: column; gap: 3px;
+}
+.joker-info-name { font-size: 13px; }
+.joker-info-meta { font-size: 11px; opacity: .65; }
+.joker-info-blurb { font-style: normal; font-size: 11px; color: var(--tl-yellow); }
+.joker-count {
+  display: flex; align-items: baseline; gap: 6px; padding-top: 8px;
+  color: #dfe9df; font-size: 11px;
+}
+.joker-count b { font-family: var(--font-pixel); font-size: 14px; color: var(--tl-yellow); }
+.joker-count i { font-style: normal; margin-left: auto; opacity: .6; font-size: 10px; }
+@media (max-width: 640px) {
+  .joker { flex-basis: 88px; width: 88px; min-height: 136px; }
+  .joker-count i { display: none; }
+}
