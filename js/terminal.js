@@ -102,14 +102,19 @@
     'Welcome! Type help to see available commands.',
   ].join('\n');
 
-  let built = false;
-  document.addEventListener('tabshown', (e) => {
-    if (e.detail.id !== 'terminal') return;
-    const panel = document.getElementById('panel-terminal');
-    if (!built) { build(panel); built = true; }
-    const input = panel.querySelector('input');
-    if (input) input.focus();
-  });
+  // Terminal sekarang hidup sebagai app window: mount(container) membangun
+  // sekali lalu dipakai ulang, jadi riwayat command awet walau window ditutup.
+  let termRoot = null;
+  window.TerminalEngine.mount = function mount(container) {
+    if (!termRoot) {
+      termRoot = document.createElement('div');
+      termRoot.className = 'terminal-host';
+      build(termRoot);
+    }
+    container.appendChild(termRoot);
+    const input = termRoot.querySelector('input');
+    if (input) setTimeout(() => input.focus(), 60);
+  };
 
   function build(panel) {
     const commands = createCommands(window.PORTFOLIO_DATA);

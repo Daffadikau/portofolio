@@ -1,14 +1,14 @@
-#panel-terminal { background: #141414; color: #33ff66; font-family: var(--font-term); font-size: 18px; line-height: 1.35; min-height: 100%; }
-#panel-terminal a { color: #7ddc9a; }
-#panel-terminal .prompt { color: #f5d93d; margin-right: 8px; white-space: nowrap; }
-#panel-terminal .entry-output { white-space: pre-wrap; font-family: inherit; margin: 2px 0 10px; }
-#panel-terminal .current-input { display: flex; align-items: baseline; }
-#panel-terminal input {
+.terminal-host { background: #141414; color: #33ff66; font-family: var(--font-term); font-size: 18px; line-height: 1.35; min-height: 100%; padding: 12px 14px; }
+.terminal-host a { color: #7ddc9a; }
+.terminal-host .prompt { color: #f5d93d; margin-right: 8px; white-space: nowrap; }
+.terminal-host .entry-output { white-space: pre-wrap; font-family: inherit; margin: 2px 0 10px; }
+.terminal-host .current-input { display: flex; align-items: baseline; }
+.terminal-host input {
   flex: 1; background: transparent; border: 0; outline: none;
   color: inherit; font: inherit; caret-color: #33ff66;
 }
-#panel-terminal :focus-visible { outline: 3px solid #33ff66; outline-offset: 1px; }
-#panel-terminal .sr-only {
+.terminal-host :focus-visible { outline: 3px solid #33ff66; outline-offset: 1px; }
+.terminal-host .sr-only {
   position: absolute; width: 1px; height: 1px; overflow: hidden;
   clip: rect(0 0 0 0); white-space: nowrap;
 }

@@ -63,11 +63,32 @@
 .contact-smoky svg { image-rendering: pixelated; }
 .h2i { display: flex; align-items: center; gap: 8px; }
 .h2i svg { image-rendering: pixelated; flex: 0 0 auto; }
-.dialog { max-width: 460px; }
-.dialog-msg { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
-.dialog-msg svg { image-rendering: pixelated; flex: 0 0 auto; }
-.dialog-msg p { font-size: 13px; line-height: 1.5; }
-.dialog .contact-btns { margin: 0; }
+/* Contact — mesh ala Tailscale */
+.contact-center { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.contact-center .bio { margin-left: auto; margin-right: auto; }
+.mesh { display: flex; flex-direction: column; align-items: center; width: min(460px, 100%); }
+@keyframes dashflowy { from { background-position: 0 0; } to { background-position: 0 12px; } }
+@keyframes dashflowx { from { background-position: 0 0; } to { background-position: 12px 0; } }
+.mesh-stem {
+  width: 4px; height: 24px;
+  background: repeating-linear-gradient(180deg, var(--ink) 0 6px, transparent 6px 12px);
+  animation: dashflowy 0.6s steps(2) infinite;
+}
+.mesh-rail {
+  width: 78%; height: 4px;
+  background: repeating-linear-gradient(90deg, var(--ink) 0 6px, transparent 6px 12px);
+  animation: dashflowx 0.6s steps(2) infinite;
+}
+.mesh-drops { display: flex; justify-content: space-between; width: 78%; }
+.mesh-drops i {
+  width: 4px; height: 18px;
+  background: repeating-linear-gradient(180deg, var(--ink) 0 6px, transparent 6px 12px);
+  animation: dashflowy 0.6s steps(2) infinite;
+}
+.mesh-peers { justify-content: space-between; width: 100%; margin: 0; }
+.peer { display: inline-flex; align-items: center; gap: 7px; }
+.peer-dot { width: 8px; height: 8px; background: #2e9e44; border: 2px solid var(--ink); }
+.mesh-status { font-family: var(--font-pixel); font-size: 11px; margin-top: 16px; color: #2e6e3a; }
 @keyframes pressboing { 0% { transform: scale(.9); } 60% { transform: scale(1.05); } 100% { transform: scale(1); } }
 .boing { animation: pressboing .18s steps(3); }
 @keyframes panelpop { from { transform: translateY(4px); } to { transform: translateY(0); } }

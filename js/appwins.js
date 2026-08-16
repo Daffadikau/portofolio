@@ -1,6 +1,7 @@
-// AppWins — window manager mini: tab Projects/Skills memunculkan jendela
-// "aplikasi" pixel (Excel, Word, Notion, VS Code, IntelliJ, Docker, Wireshark)
-// yang overlay di atas window utama. Draggable, closable, klik = ke depan.
+// AppWins — window manager mini: jendela "aplikasi" pixel yang overlay
+// window utama. Draggable, closable, klik = ke depan. Terminal juga
+// hidup di sini (dibuka dari dock). Beberapa app punya panel interaktif:
+// VS Code (activity bar), Docker (sidebar), IntelliJ (tab file + Run).
 (function () {
   const el = (tag, cls, text) => {
     const n = document.createElement(tag);
@@ -29,9 +30,46 @@
     parts.forEach(([cls, text]) => line.appendChild(el('span', cls, text)));
     return line;
   }
+  function codeLineIcon(iconName, parts) {
+    const line = codeLine(parts);
+    if (iconName) {
+      const img = el('img');
+      img.src = `assets/icons/tech/${iconName}.svg`;
+      img.alt = ''; img.width = 13; img.height = 13;
+      img.className = 'code-ico';
+      line.insertBefore(img, line.children[1] || null);
+    }
+    return line;
+  }
   const lvBar = (lv) => '█'.repeat(lv) + '░'.repeat(5 - lv);
+  const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '_');
 
-  // ---- builders ----
+  // switcher generik: strip tombol + area konten yang berganti
+  function makeViews(navClass, items, defaultKey) {
+    const nav = el('div', navClass);
+    const content = el('div', 'view-content');
+    const btns = new Map();
+    function show(key) {
+      const it = items.find((x) => x.key === key) || items[0];
+      content.replaceChildren();
+      it.render(content);
+      btns.forEach((b, k) => b.classList.toggle('on', k === it.key));
+    }
+    items.forEach((it) => {
+      const b = el('button', 'view-btn');
+      if (it.glyph) b.appendChild(window.PixelArt.render(it.glyph, 2));
+      if (it.label != null) b.appendChild(el('span', null, it.label));
+      b.title = it.title || it.label || it.key;
+      b.setAttribute('aria-label', it.title || it.label || it.key);
+      b.addEventListener('click', () => show(it.key));
+      btns.set(it.key, b);
+      nav.appendChild(b);
+    });
+    show(defaultKey || items[0].key);
+    return { nav, content };
+  }
+
+  // ---- builders: Projects ----
   function buildExcel(body) {
     const fx = el('div', 'xl-formula');
     fx.append(el('b', null, 'fx'), el('span', null, '=PORTFOLIO(A1:C8)'));
@@ -83,48 +121,207 @@
     wrap.append(side, main);
     body.appendChild(wrap);
   }
+
+  // ---- builder: VS Code (activity bar interaktif) ----
+  function vsEditor(file) {
+    return (c) => {
+      const strip = el('div', 'vs-tabs');
+      strip.append(el('span', file === 'languages.ts' ? 'on' : null, 'languages.ts'),
+        el('span', file === 'smoky.ts' ? 'on' : null, 'smoky.ts'));
+      c.appendChild(strip);
+      const code = el('div', 'vs-code');
+      if (file === 'smoky.ts') {
+        code.appendChild(codeLine([['tok-kw', 'export const'], ['tok-var', ' smoky'], ['tok-p', ' = {']]));
+        code.appendChild(codeLine([['tok-key', '  species'], ['tok-p', ': '], ['tok-str', "'neko_atsume_regular'"], ['tok-p', ',']]));
+        code.appendChild(codeLine([['tok-key', '  mood'], ['tok-p', ': '], ['tok-str', "'hot_and_cold'"], ['tok-p', ',']]));
+        code.appendChild(codeLine([['tok-key', '  powerLevel'], ['tok-p', ': '], ['tok-num', '140'], ['tok-p', ',']]));
+        code.appendChild(codeLine([['tok-key', '  memento'], ['tok-p', ': '], ['tok-str', "'soft_brush'"], ['tok-p', ',']]));
+        code.appendChild(codeLine([['tok-p', '};'], ['tok-cm', '  // do not deploy on Mondays']]));
+      } else {
+        code.appendChild(codeLine([['tok-kw', 'export const'], ['tok-var', ' languages'], ['tok-p', ' = {']]));
+        D.skills[0].items.forEach((s) => {
+          code.appendChild(codeLineIcon(s.icon, [
+            ['tok-key', `  ${slug(s.label)}`],
+            ['tok-p', ': '], ['tok-str', `'${lvBar(s.level)}'`], ['tok-p', ','],
+          ]));
+        });
+        code.appendChild(codeLine([['tok-p', '};'], ['tok-cm', '  // fluency, 5 = daily driver']]));
+      }
+      c.appendChild(code);
+    };
+  }
   function buildVSCode(body) {
-    const strip = el('div', 'vs-tabs');
-    strip.append(el('span', 'on', 'languages.ts'), el('span', null, 'smoky.ts'));
-    body.appendChild(strip);
-    const code = el('div', 'vs-code');
-    code.appendChild(codeLine([['tok-kw', 'export const'], ['tok-var', ' languages'], ['tok-p', ' = {']]));
-    D.skills[0].items.forEach((s) => {
-      code.appendChild(codeLine([
-        ['tok-key', `  ${s.label.toLowerCase().replace(/[^a-z0-9]+/g, '_')}`],
-        ['tok-p', ': '], ['tok-str', `'${lvBar(s.level)}'`], ['tok-p', ','],
-      ]));
-    });
-    code.appendChild(codeLine([['tok-p', '};'], ['tok-cm', '  // fluency, 5 = daily driver']]));
-    body.appendChild(code);
+    let views;
+    const explorerRender = (c) => {
+      const tree = el('div', 'vs-tree');
+      tree.appendChild(el('div', 'vs-dir', '▾ DAFFA.DEV'));
+      [['languages.ts', 'ts'], ['smoky.ts', 'ts'], ['app.js', 'js'], ['pixelart.js', 'js'], ['README.md', null]].forEach(([f, ico]) => {
+        const row = el('button', 'vs-file');
+        if (ico) {
+          const img = el('img');
+          img.src = `assets/icons/tech/${ico}.svg`; img.alt = ''; img.width = 13; img.height = 13;
+          row.appendChild(img);
+        }
+        row.appendChild(el('span', null, f));
+        if (f === 'languages.ts' || f === 'smoky.ts') {
+          row.addEventListener('click', () => views.showEditor(f));
+        } else { row.disabled = true; }
+        tree.appendChild(row);
+      });
+      c.appendChild(tree);
+    };
+    const searchRender = (c) => {
+      const box = el('div', 'vs-search');
+      const inp = el('input');
+      inp.value = 'hire me'; inp.readOnly = true;
+      inp.setAttribute('aria-label', 'Search');
+      box.appendChild(inp);
+      c.appendChild(box);
+      const res = el('div', 'vs-results');
+      res.appendChild(el('div', 'vs-dir', '3 results in 2 files'));
+      [['contact.ts', `daffadikau@gmail.com — replies in 24-48h`],
+        ['contact.ts', 'status: open_to_opportunities = true'],
+        ['smoky.ts', `approvedByTheCat = 'probably'`]].forEach(([f, line]) => {
+        const r = el('div', 'vs-result');
+        r.append(el('b', null, f), el('span', null, line));
+        res.appendChild(r);
+      });
+      c.appendChild(res);
+    };
+    const scmRender = (c) => {
+      const scm = el('div', 'vs-scm');
+      const msg = el('input');
+      msg.value = 'feat: hire daffa 🚀'; msg.readOnly = true;
+      msg.setAttribute('aria-label', 'Commit message');
+      scm.appendChild(msg);
+      scm.appendChild(el('button', 'vs-commit', '✓ Commit'));
+      const list = el('div', 'vs-results');
+      list.appendChild(el('div', 'vs-dir', 'Changes · 3'));
+      [['M', 'career/experience.ts'], ['A', 'skills/ai_engineering.py'], ['M', 'smoky/affection.ts']].forEach(([st, f]) => {
+        const r = el('div', 'vs-result');
+        r.append(el('b', `vs-st vs-st-${st}`, st), el('span', null, f));
+        list.appendChild(r);
+      });
+      scm.appendChild(list);
+      c.appendChild(scm);
+    };
+    const extRender = (c) => {
+      const list = el('div', 'vs-results vs-ext');
+      [['Smoky Theme', 'the only theme approved by the cat', '★5.0'],
+        ["Jerry's Pixel Icons", 'pixel icons everywhere', '★5.0'],
+        ['GitLens', 'who wrote this? (it was me)', '★4.8'],
+        ['Prettier', 'makes the mess consistent', '★4.9']].forEach(([name, desc, star]) => {
+        const r = el('div', 'vs-result');
+        r.append(el('b', null, name), el('span', null, desc), el('i', null, star));
+        list.appendChild(r);
+      });
+      c.appendChild(list);
+    };
+    const v = makeViews('vs-activity', [
+      { key: 'editor', glyph: 'gFiles', title: 'Explorer', render: explorerRender },
+      { key: 'search', glyph: 'gSearch', title: 'Search', render: searchRender },
+      { key: 'scm', glyph: 'gScm', title: 'Source Control', render: scmRender },
+      { key: 'ext', glyph: 'gExt', title: 'Extensions', render: extRender },
+    ], null);
+    // default: langsung editor languages.ts; Explorer glyph menampilkan tree
+    views = v;
+    v.showEditor = (file) => { v.content.replaceChildren(); vsEditor(file)(v.content); };
+    const wrap = el('div', 'vs-wrap');
+    wrap.append(v.nav, v.content);
+    body.appendChild(wrap);
+    v.showEditor('languages.ts');
   }
+
+  // ---- builder: IntelliJ (tab file + panel Run) ----
   function buildIdea(body) {
+    const files = {
+      'skills_ai.py': (code) => {
+        code.appendChild(codeLine([['tok-var', 'AI_SKILLS'], ['tok-p', ' = {']]));
+        D.skills[2].items.forEach((s) => {
+          code.appendChild(codeLine([
+            ['tok-str', `  "${slug(s.label)}"`],
+            ['tok-p', ': '], ['tok-num', String(s.level)], ['tok-p', ',  '], ['tok-cm', `# ${lvBar(s.level)}`],
+          ]));
+        });
+        code.appendChild(codeLine([['tok-p', '}']]));
+        code.appendChild(codeLine([['tok-cm', '# OMR grading model — accuracy 99.7%']]));
+      },
+      'train.py': (code) => {
+        code.appendChild(codeLine([['tok-kw', 'for'], ['tok-p', ' epoch '], ['tok-kw', 'in'], ['tok-var', ' range'], ['tok-p', '(10):']]));
+        code.appendChild(codeLine([['tok-p', '    model.fit(x_train, y_train)']]));
+        code.appendChild(codeLine([['tok-p', '    log(epoch, acc)  '], ['tok-cm', '# YOLOv11 fine-tune']]));
+      },
+    };
     const strip = el('div', 'ij-tabs');
-    strip.append(el('span', 'on', 'skills_ai.py'), el('span', null, 'train.py'));
-    body.appendChild(strip);
-    const code = el('div', 'ij-code');
-    code.appendChild(codeLine([['tok-var', 'AI_SKILLS'], ['tok-p', ' = {']]));
-    D.skills[2].items.forEach((s) => {
-      code.appendChild(codeLine([
-        ['tok-str', `  "${s.label.toLowerCase().replace(/[^a-z0-9]+/g, '_')}"`],
-        ['tok-p', ': '], ['tok-num', String(s.level)], ['tok-p', ',  '], ['tok-cm', `# ${lvBar(s.level)}`],
-      ]));
+    const codeArea = el('div', 'ij-code');
+    const run = el('div', 'ij-run');
+    function showRun(file) {
+      run.replaceChildren();
+      run.appendChild(el('div', 'ij-runbar', '▶ Run: ' + file));
+      const lines = file === 'train.py'
+        ? ['Epoch 1/10 … acc 0.71', 'Epoch 5/10 … acc 0.93', 'Epoch 10/10 … acc 0.997 ✓', '', 'Process finished with exit code 0']
+        : ['loaded 4 AI skills · avg level 3.8', 'Process finished with exit code 0'];
+      lines.forEach((l) => run.appendChild(el('div', 'ij-runline', l)));
+    }
+    function show(file) {
+      codeArea.replaceChildren();
+      files[file](codeArea);
+      showRun(file);
+      [...strip.children].forEach((s) => s.classList.toggle('on', s.textContent === file));
+    }
+    Object.keys(files).forEach((f) => {
+      const t = el('button', null, f);
+      t.addEventListener('click', () => show(f));
+      strip.appendChild(t);
     });
-    code.appendChild(codeLine([['tok-p', '}']]));
-    code.appendChild(codeLine([['tok-cm', '# OMR grading model — accuracy 99.7%']]));
-    body.appendChild(code);
+    body.append(strip, codeArea, run);
+    show('skills_ai.py');
   }
+
+  // ---- builder: Docker (sidebar interaktif) ----
   function buildDocker(body) {
-    const cpus = ['0.4%', '1.2%', '0.8%', '0.6%', '2.1%', '0.3%'];
-    const rows = D.skills[3].items.map((s, i) => {
-      const name = s.label.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      const st = el('span', 'dk-status');
-      st.append(el('i'), document.createTextNode(' Running'));
-      return [name, `${name}:latest`, st, cpus[i % cpus.length]];
-    });
-    body.appendChild(table('dk-grid', ['NAME', 'IMAGE', 'STATUS', 'CPU'], rows));
-    body.appendChild(el('p', 'dk-note', '6 containers running · 0 stopped · uptime: since 2023'));
+    const containersRender = (c) => {
+      const cpus = ['0.4%', '1.2%', '0.8%', '0.6%', '2.1%', '0.3%'];
+      const rows = D.skills[3].items.map((s, i) => {
+        const name = s.label.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        const st = el('span', 'dk-status');
+        st.append(el('i'), document.createTextNode(' Running'));
+        return [name, `${name}:latest`, st, cpus[i % cpus.length]];
+      });
+      c.appendChild(table('dk-grid', ['NAME', 'IMAGE', 'STATUS', 'CPU'], rows));
+      c.appendChild(el('p', 'dk-note', '6 containers running · 0 stopped · uptime: since 2023'));
+    };
+    const imagesRender = (c) => {
+      c.appendChild(table('dk-grid', ['REPOSITORY', 'TAG', 'SIZE'], [
+        ['daffadev/portfolio', 'pixel', '1.2MB'],
+        ['testkit/gas-monitor', 'prod', '212MB'],
+        ['bengkelbot/gemini', 'latest', '148MB'],
+        ['smoky/cat', 'latest', '14MB'],
+        ['smoky/cat', 'sleepy', '14MB'],
+      ]));
+      c.appendChild(el('p', 'dk-note', 'smoky/cat pulled 1,000,000+ times (by Smoky)'));
+    };
+    const logsRender = (c) => {
+      const log = el('div', 'dk-logs');
+      ['[gas-monitor]  INFO  sensor mq-2 ok · reading nominal',
+        '[gas-monitor]  INFO  timescaledb write 12ms',
+        '[bengkelbot]   INFO  gemini reply in 420ms',
+        '[smoky]        WARN  nap interrupted by deploy',
+        '[smoky]        INFO  resumed napping (uptime 99.9%)',
+        '[portfolio]    INFO  visitor detected · say hi!'].forEach((l) => log.appendChild(el('div', null, l)));
+      c.appendChild(log);
+    };
+    const v = makeViews('dk-side', [
+      { key: 'containers', label: 'Containers', render: containersRender },
+      { key: 'images', label: 'Images', render: imagesRender },
+      { key: 'logs', label: 'Logs', render: logsRender },
+    ], 'containers');
+    const wrap = el('div', 'dk-wrap');
+    wrap.append(v.nav, v.content);
+    body.appendChild(wrap);
   }
+
+  // ---- builder: Wireshark ----
   function buildWireshark(body) {
     const filter = el('div', 'ws-filter');
     filter.append(el('b', null, '⩓'), el('span', null, 'http || mqtt || icmp'));
@@ -144,15 +341,21 @@
     body.appendChild(t);
   }
 
+  // ---- builder: Terminal ----
+  function buildTerminal(body) {
+    window.TerminalEngine.mount(body);
+  }
+
   // ---- defs & groups ----
   const DEFS = {
     excel: { title: 'projects.xlsx — Excel', skin: 'excel', icon: 'excel', w: 470, fx: 0.05, fy: 90, build: buildExcel },
     word: { title: 'report.docx — Word', skin: 'word', icon: 'word', w: 400, fx: 0.56, fy: 140, build: buildWord },
     notion: { title: 'Project Tracker — Notion', skin: 'notion', icon: 'notion', w: 460, fx: 0.24, fy: 330, build: buildNotion },
-    vscode: { title: 'languages.ts — VS Code', skin: 'vscode', icon: 'vscode', w: 440, fx: 0.04, fy: 80, build: buildVSCode },
-    idea: { title: 'skills_ai.py — IntelliJ IDEA', skin: 'idea', icon: 'idea', w: 430, fx: 0.58, fy: 120, build: buildIdea },
-    docker: { title: 'Containers — Docker Desktop', skin: 'docker', icon: 'docker', w: 470, fx: 0.1, fy: 360, build: buildDocker },
-    wireshark: { title: 'capture.pcapng — Wireshark', skin: 'wireshark', icon: 'wireshark', w: 540, fx: 0.42, fy: 430, build: buildWireshark },
+    vscode: { title: 'languages.ts — VS Code', skin: 'vscode', icon: 'vscode', w: 470, fx: 0.04, fy: 80, build: buildVSCode },
+    idea: { title: 'skills_ai.py — IntelliJ IDEA', skin: 'idea', icon: 'idea', w: 440, fx: 0.58, fy: 110, build: buildIdea },
+    docker: { title: 'Containers — Docker Desktop', skin: 'docker', icon: 'docker', w: 500, fx: 0.09, fy: 360, build: buildDocker },
+    wireshark: { title: 'capture.pcapng — Wireshark', skin: 'wireshark', icon: 'wireshark', w: 540, fx: 0.42, fy: 440, build: buildWireshark },
+    terminal: { title: 'daffa@portfolio: ~ — Terminal', skin: 'terminal', icon: 'term', w: 600, fx: 0.2, fy: 150, build: buildTerminal },
   };
   const GROUPS = {
     projects: ['excel', 'word', 'notion'],
@@ -220,6 +423,10 @@
     document.body.appendChild(w);
     toFront(w);
     w.classList.add('spawn');
+    if (id === 'terminal') {
+      const input = w.querySelector('input');
+      if (input) setTimeout(() => input.focus(), 80);
+    }
   }
   function openGroup(name) {
     (GROUPS[name] || []).forEach((id, i) => {
@@ -227,11 +434,10 @@
       else timers.push(setTimeout(() => open(id, i), i * 140));
     });
   }
-  function closeAll() {
+  function closeAll(except = []) {
     timers.forEach(clearTimeout);
     timers.length = 0;
-    wins.forEach((w) => w.remove());
-    wins.clear();
+    [...wins.keys()].forEach((id) => { if (!except.includes(id)) close(id); });
   }
 
   window.AppWins = { open, openGroup, closeAll, GROUPS, DEFS };

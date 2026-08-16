@@ -103,6 +103,77 @@
 .ws-mqtt td { background: #e8ecf8; }
 .ws-icmp td { background: #fbe9ef; }
 
+/* Terminal sebagai app window */
+.skin-terminal .appwin-bar { background: #141414; color: #33ff66; }
+.skin-terminal .appwin-body { max-height: 54vh; min-height: 260px; background: #141414; }
+
+/* VS Code interaktif: activity bar + views */
+.vs-wrap { display: flex; min-height: 210px; }
+.vs-activity {
+  display: flex; flex-direction: column; gap: 4px;
+  background: #333333; padding: 6px 4px; border-right: 2px solid #000;
+  flex: 0 0 auto;
+}
+.vs-activity .view-btn {
+  border: 0; background: none; padding: 5px; opacity: .6;
+}
+.vs-activity .view-btn.on { opacity: 1; border-left: 3px solid #fff; padding-left: 2px; }
+.vs-activity .view-btn svg { image-rendering: pixelated; display: block; }
+.vs-activity .view-btn span { display: none; }
+.vs-wrap .view-content { flex: 1; background: #1e1e1e; min-width: 0; }
+.code-ico { image-rendering: pixelated; margin-right: 6px; vertical-align: -2px; }
+.vs-tree { padding: 8px 10px; font-size: 12px; color: #cccccc; }
+.vs-dir { font-family: var(--font-pixel); font-size: 10px; color: #9a9a9a; margin-bottom: 6px; }
+.vs-file {
+  display: flex; align-items: center; gap: 6px; width: 100%;
+  border: 0; background: none; color: #cccccc; text-align: left;
+  font: inherit; padding: 3px 6px;
+}
+.vs-file:hover:not(:disabled) { background: #2a2d2e; }
+.vs-file:disabled { opacity: .45; }
+.vs-file img { image-rendering: pixelated; }
+.vs-search { padding: 8px 10px; }
+.vs-search input, .vs-scm input {
+  width: 100%; background: #3c3c3c; border: 1px solid #565656; color: #eee;
+  font: inherit; font-size: 12px; padding: 4px 8px;
+}
+.vs-results { padding: 6px 10px; font-size: 12px; color: #cccccc; display: grid; gap: 4px; }
+.vs-result { display: flex; gap: 8px; align-items: baseline; }
+.vs-result b { color: #9cdcfe; font-weight: 400; flex: 0 0 auto; }
+.vs-result span { opacity: .85; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vs-result i { margin-left: auto; color: #d9a616; font-style: normal; }
+.vs-scm { padding: 8px 10px; display: grid; gap: 8px; }
+.vs-commit {
+  justify-self: start; border: 0; background: #0e639c; color: #fff;
+  font: inherit; font-size: 12px; padding: 4px 12px;
+}
+.vs-st { width: 14px; text-align: center; font-weight: 700; }
+.vs-st-M { color: #d9a616; }
+.vs-st-A { color: #8fb83a; }
+
+/* IntelliJ: tab file klik-able + panel Run */
+.ij-tabs button { border: 0; background: none; color: #9a9a9a; font: inherit; font-size: 11px; padding: 3px 10px; }
+.ij-tabs button.on { background: #2b2b2b; color: #fff; }
+.ij-run { background: #1f1f1f; border-top: 2px solid #000; }
+.ij-runbar { font-family: var(--font-pixel); font-size: 10px; color: #8fb83a; padding: 5px 10px; border-bottom: 1px solid #3a3a3a; }
+.ij-runline { font-size: 11px; color: #a9b7c6; padding: 1px 12px; white-space: pre; }
+.ij-runline:last-child { padding-bottom: 8px; }
+
+/* Docker: sidebar interaktif */
+.dk-wrap { display: flex; min-height: 190px; }
+.dk-side {
+  display: flex; flex-direction: column; gap: 2px;
+  background: #eef3fb; border-right: 2px solid var(--ink);
+  padding: 8px 6px; flex: 0 0 auto;
+}
+.dk-side .view-btn {
+  border: 0; background: none; font: inherit; font-size: 12px;
+  text-align: left; padding: 5px 10px; color: var(--ink);
+}
+.dk-side .view-btn.on { background: #1d63ed; color: #fff; font-weight: 700; }
+.dk-wrap .view-content { flex: 1; min-width: 0; overflow-x: auto; }
+.dk-logs { background: #141414; color: #b8e6b8; font-size: 11px; padding: 10px 12px; display: grid; gap: 3px; min-height: 170px; white-space: pre; }
+
 /* launcher di panel */
 .launcher { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
 .launch-btn {

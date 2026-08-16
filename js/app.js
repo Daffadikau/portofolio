@@ -28,8 +28,8 @@
     document.addEventListener('keydown', done, { once: true });
   })();
 
-  const TABS = ['about', 'projects', 'skills', 'contact', 'terminal'];
-  const LABELS = { about: 'About', projects: 'Projects', skills: 'Skills', contact: 'Contact', terminal: '>_ Terminal' };
+  const TABS = ['about', 'projects', 'skills', 'contact'];
+  const LABELS = { about: 'About', projects: 'Projects', skills: 'Skills', contact: 'Contact' };
   const win = document.getElementById('window');
 
   const titlebar = el('div', 'titlebar');
@@ -76,7 +76,12 @@
     });
     document.dispatchEvent(new CustomEvent('tabshown', { detail: { id } }));
   }
-  function fromHash() { showTab(location.hash.replace('#', '') || 'about'); }
+  function fromHash() {
+    const id = location.hash.replace('#', '') || 'about';
+    showTab(id);
+    // kompat link lama #terminal: terminal kini app window, bukan tab
+    if (id === 'terminal' && window.AppWins) window.AppWins.open('terminal');
+  }
   window.addEventListener('hashchange', fromHash);
 
   tabbar.addEventListener('keydown', (e) => {
@@ -223,37 +228,30 @@
   })();
   (function renderContact() {
     const p = document.getElementById('panel-contact');
+    p.classList.add('contact-center');
     const h = el('h1', 'display h2i', "LET'S CONNECT");
     h.style.fontSize = '28px';
     h.prepend(window.PixelArt.render('mail', 2));
-    // dialog ala Win98: warning box dengan dua tombol yang sama-sama setuju
-    const dlg = el('div', 'miniwin dialog');
-    const bar = el('div', 'miniwin-bar');
-    const dots = el('span', 'mw-dots');
-    dots.append(el('i'), el('i'), el('i'));
-    bar.append(dots, el('span', null, 'hire-daffa.exe'));
-    const body = el('div', 'miniwin-body dialog-body');
-    const msg = el('div', 'dialog-msg');
-    msg.append(window.PixelArt.render('warn', 3),
-      el('p', null, 'Daffa is open to internships, freelance, and collaboration. Proceed to hire?'));
-    const choice = el('div', 'contact-btns');
-    const yes = el('a', 'pxbtn big', 'Yes');
-    yes.href = `mailto:${D.socials.email}`;
-    const abs = el('a', 'pxbtn big', 'Absolutely');
-    abs.href = `mailto:${D.socials.email}?subject=${encodeURIComponent('Hiring Daffa — absolutely')}`;
-    choice.append(yes, abs);
-    body.append(msg, choice);
-    dlg.append(bar, body);
-    const btns = el('div', 'contact-btns');
-    btns.append(
-      extLink('pxbtn big', 'GitHub', D.socials.github),
-      extLink('pxbtn big', 'LinkedIn', D.socials.linkedin));
+    // mesh ala Tailscale: Smoky sebagai relay node di atas, tiga peer di bawah
+    const mesh = el('div', 'mesh');
     const guard = el('div', 'contact-smoky');
     guard.appendChild(window.PixelArt.render('catBox', 4));
     guard.appendChild(el('span', 'char-partner', 'Smoky guards the inbox'));
+    const stem = el('div', 'mesh-stem');
+    const rail = el('div', 'mesh-rail');
+    const drops = el('div', 'mesh-drops');
+    drops.append(el('i'), el('i'), el('i'));
+    const btns = el('div', 'contact-btns mesh-peers');
+    const mail = el('a', 'pxbtn big peer', '✉ Email');
+    mail.href = `mailto:${D.socials.email}`;
+    [mail, extLink('pxbtn big peer', 'GitHub', D.socials.github),
+      extLink('pxbtn big peer', 'LinkedIn', D.socials.linkedin)]
+      .forEach((b) => { b.prepend(el('span', 'peer-dot')); btns.appendChild(b); });
+    mesh.append(guard, stem, rail, drops, btns);
     p.append(h,
-      el('p', 'bio', D.replyNote),
-      dlg, btns, guard,
+      el('p', 'bio', `${D.availability} ${D.replyNote}`),
+      mesh,
+      el('p', 'mesh-status', '● 3 peers connected · 0 offline · relay: smoky.local · last handshake: just now'),
       el('p', 'fineprint', "© 2026 Daffa Adika · tech icons: Jerry's Pixel Icons (MIT)"));
   })();
 
@@ -264,7 +262,7 @@
       { map: 'folder', tab: 'projects', label: 'Projects' },
       { map: 'chip', tab: 'skills', label: 'Skills' },
       { map: 'mail', tab: 'contact', label: 'Contact' },
-      { map: 'term', tab: 'terminal', label: 'Terminal' },
+      { map: 'term', app: 'terminal', label: 'Terminal' },
       { sep: true },
       { map: 'github', url: D.socials.github, label: 'GitHub' },
       { map: 'linkedin', url: D.socials.linkedin, label: 'LinkedIn' },
@@ -275,6 +273,7 @@
       btn.setAttribute('aria-label', it.label);
       btn.title = it.label;
       if (it.url) { btn.href = it.url; btn.target = '_blank'; btn.rel = 'noreferrer'; }
+      else if (it.app) { btn.addEventListener('click', () => window.AppWins.open(it.app)); }
       else { btn.dataset.tab = it.tab; btn.addEventListener('click', () => { location.hash = it.tab; }); }
       btn.appendChild(window.PixelArt.render(it.map, 2));
       dock.appendChild(btn);
@@ -319,10 +318,11 @@
     });
   })();
 
-  // tab Projects/Skills membuka jendela "aplikasi"; tab lain menutup semuanya
+  // tab Projects/Skills membuka jendela "aplikasi"; tab lain menutupnya.
+  // Terminal independen dari tab — tetap terbuka sampai ditutup sendiri.
   document.addEventListener('tabshown', (e) => {
     if (!window.AppWins) return;
-    window.AppWins.closeAll();
+    window.AppWins.closeAll(['terminal']);
     if (e.detail.id === 'projects') window.AppWins.openGroup('projects');
     else if (e.detail.id === 'skills') window.AppWins.openGroup('skills');
   });
