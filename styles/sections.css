@@ -1,5 +1,9 @@
 .display { font-family: var(--font-pixel); font-weight: 700; font-size: clamp(28px, 5vw, 44px); letter-spacing: 1px; }
-.hero { display: flex; gap: 20px; align-items: center; margin-bottom: 14px; }
+.hero { display: flex; gap: 18px; align-items: center; margin-bottom: 14px; }
+/* blok nama boleh menyusut (teks perannya ikut wrap) supaya panel status
+   tetap muat sebaris dengan Smoky di lebar window yang ada */
+.hero > div:not(.tama) { flex: 1 1 auto; min-width: 0; }
+.hero .tama { flex: 0 0 auto; margin: 0 0 0 auto; }
 .hero-art svg { image-rendering: pixelated; }
 .role { font-size: 14px; margin-top: 4px; }
 .status { font-family: var(--font-pixel); font-size: 12px; margin-top: 6px; }
@@ -291,7 +295,7 @@
 }
 .tama-lcd {
   background: #9bbc0f; border: 3px solid #2f3a13;
-  padding: 8px 10px; min-width: 300px;
+  padding: 7px 9px; min-width: 246px;
   display: flex; flex-direction: column; gap: 5px;
   font-family: var(--font-pixel); color: #21300b;
 }
@@ -319,6 +323,8 @@
   border: 3px solid var(--ink); background: #b8b0a0;
 }
 @media (max-width: 640px) {
+  .hero { flex-wrap: wrap; }
+  .hero .tama { margin: 0; width: 100%; }
   .tama { display: flex; }
   .tama-lcd { min-width: 0; }
 }

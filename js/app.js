@@ -172,9 +172,8 @@
     const status = el('p', 'status');
     status.append(el('span', 'dot'), document.createTextNode(D.status));
     head.appendChild(status);
-    hero.append(art, head);
-    const stats = buildStatusScreen(D.stats);
-    p.append(hero, el('p', 'bio', D.bio), buildDesk(D.desk), stats,
+    hero.append(art, head, buildStatusScreen(D.stats));
+    p.append(hero, el('p', 'bio', D.bio), buildDesk(D.desk),
       h2icon('cap', 'Education'),
       el('p', null, `${D.education.program} — ${D.education.school}, ${D.education.detail}`),
       h2icon('case', 'Experience'));
