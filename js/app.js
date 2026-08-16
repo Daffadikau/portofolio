@@ -173,33 +173,260 @@
     status.append(el('span', 'dot'), document.createTextNode(D.status));
     head.appendChild(status);
     hero.append(art, head);
-    const stats = el('div', 'stats');
-    D.stats.forEach((s) => {
-      const d = el('div', 'stat');
-      d.append(el('b', null, s.number), el('span', null, s.label));
-      stats.appendChild(d);
-    });
-    p.append(hero, el('p', 'bio', D.bio), stats,
+    const stats = buildStatusScreen(D.stats);
+    p.append(hero, el('p', 'bio', D.bio), buildDesk(D.desk), stats,
       h2icon('cap', 'Education'),
       el('p', null, `${D.education.program} — ${D.education.school}, ${D.education.detail}`),
       h2icon('case', 'Experience'));
-    D.experience.forEach((x) => {
-      const d = el('div', 'xp');
-      d.append(el('h3', null, `${x.role} · ${x.org}`), el('span', 'period', x.period));
+    p.appendChild(buildApartment(D.experience));
+    p.appendChild(h2icon('trophy', 'Honors & Awards'));
+    p.appendChild(buildJokers(D.awards));
+    p.appendChild(buildY2kFooter());
+  })();
+  // Experience sebagai apartemen ala Tomodachi Life: tiap lantai satu peran,
+  // penghuninya Smoky dengan setelan berbeda (pakai wardrobe yang sudah ada).
+  // Klik pintu -> lampu kamar nyala + speech bubble berisi poin pekerjaannya.
+  function buildApartment(list) {
+    // di dalam fungsi, bukan di scope modul: renderAbout jalan lebih dulu
+    // dari deklarasi ini, jadi const di luar kena temporal dead zone.
+    const TENANTS = [
+      { fit: 'wFitSuit', acc: 'wAccGlasses', hat: null, unit: '4A' },
+      { fit: 'wFitHoodie', acc: 'wAccHeadphones', hat: null, unit: '3A' },
+      { fit: 'wFitScarf', acc: null, hat: 'wHatBeanie', unit: '2A' },
+      { fit: 'wFitScarf', acc: 'wAccBowtie', hat: 'wHatCap', unit: '1A' },
+    ];
+    const apt = el('section', 'apt');
+    apt.setAttribute('aria-label', 'Experience, as an apartment building');
+    const roof = el('div', 'apt-roof');
+    roof.append(el('i', 'apt-antenna'), el('span', 'apt-sign', 'DAFFA APARTMENTS'));
+    apt.appendChild(roof);
+    list.forEach((x, i) => {
+      const t = TENANTS[i % TENANTS.length];
+      const floor = el('div', 'apt-floor');
+      const room = el('div', 'apt-room');
+      const tenant = el('div', 'apt-tenant');
+      // renderStack butuh urutan: base -> outfit -> aksesori -> topi
+      tenant.appendChild(window.PixelArt.renderStack(
+        ['cat', t.fit, t.acc, t.hat].filter(Boolean), 3));
+      room.append(el('i', 'apt-lamp'), tenant, el('i', 'apt-rug'));
+      const info = el('div', 'apt-info');
+      const id = `apt-bubble-${i}`;
+      const door = el('button', 'apt-door');
+      door.type = 'button';
+      door.setAttribute('aria-expanded', 'false');
+      door.setAttribute('aria-controls', id);
+      const plate = el('span', 'apt-unit', t.unit);
+      const who = el('span', 'apt-who');
+      who.append(el('b', null, x.role), el('i', null, x.org));
+      door.append(plate, who, el('span', 'apt-period', x.period), el('span', 'apt-knock', 'knock'));
+      const bubble = el('div', 'apt-bubble');
+      bubble.id = id;
+      bubble.hidden = true;
       const ul = el('ul');
       x.points.forEach((pt) => ul.appendChild(el('li', null, pt)));
-      d.appendChild(ul);
-      p.appendChild(d);
+      bubble.appendChild(ul);
+      door.addEventListener('click', () => {
+        const open = door.getAttribute('aria-expanded') === 'true';
+        door.setAttribute('aria-expanded', String(!open));
+        bubble.hidden = open;
+        floor.classList.toggle('lit', !open);
+        try { window.Smoky.sfx.play(open ? 'wake' : 'happy'); } catch (e) { /* audio opsional */ }
+      });
+      info.append(door, bubble);
+      floor.append(room, info);
+      apt.appendChild(floor);
     });
-    p.appendChild(h2icon('trophy', 'Honors & Awards'));
-    const ul = el('ul', 'awards');
-    D.awards.forEach((a) => {
-      const li = el('li');
-      li.append(el('b', null, a.title), document.createTextNode(` — ${a.org} `), el('span', 'period', a.when));
-      ul.appendChild(li);
+    const ground = el('div', 'apt-ground');
+    ground.append(el('span', 'apt-mail', 'mailbox'), el('span', null, 'knock on a door to say hi'));
+    apt.appendChild(ground);
+    return apt;
+  }
+  // Awards sebagai tangan kartu Joker ala Balatro: kartu di-fan out, hover
+  // memiringkan kartu mengikuti kursor, klik mengangkat kartu dan menulis
+  // detailnya di panel bawah (mirip papan info run di Balatro).
+  function buildJokers(list) {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const wrap = el('section', 'jokers');
+    const hand = el('div', 'joker-hand');
+    hand.setAttribute('role', 'list');
+    const info = el('div', 'joker-info');
+    const infoName = el('b', 'joker-info-name');
+    const infoMeta = el('span', 'joker-info-meta');
+    const infoBlurb = el('i', 'joker-info-blurb');
+    info.append(infoName, infoMeta, infoBlurb);
+    const cards = [];
+    function select(i) {
+      cards.forEach((c, n) => {
+        c.classList.toggle('picked', n === i);
+        c.setAttribute('aria-pressed', String(n === i));
+      });
+      const a = list[i];
+      infoName.textContent = a.title;
+      infoMeta.textContent = `${a.org} · ${a.when} · ${a.rarity}`;
+      infoBlurb.textContent = a.blurb || '';
+      try { window.Smoky.sfx.play('play'); } catch (e) { /* audio opsional */ }
+    }
+    list.forEach((a, i) => {
+      const c = el('button', `joker rar-${a.rarity || 'common'}`);
+      c.type = 'button';
+      c.setAttribute('role', 'listitem');
+      c.setAttribute('aria-pressed', 'false');
+      c.setAttribute('aria-label', `${a.title}, ${a.org}, ${a.when}`);
+      // sudut kemiringan kipas: kartu tengah tegak, makin ke pinggir makin miring
+      const spread = (i - (list.length - 1) / 2);
+      c.style.setProperty('--fan', `${spread * 3.2}deg`);
+      c.style.setProperty('--lift', `${Math.abs(spread) * 5}px`);
+      const face = el('span', 'joker-face');
+      face.append(
+        el('span', 'joker-year', a.when),
+        (() => { const art = el('span', 'joker-art'); art.appendChild(window.PixelArt.render(a.icon || 'trophy', 3)); return art; })(),
+        el('span', 'joker-name', a.title),
+      );
+      c.append(face, el('span', 'joker-rar', a.rarity || 'common'));
+      // tilt 3D mengikuti kursor — dilewati kalau user minta gerak minimal
+      if (!reduced) {
+        c.addEventListener('pointermove', (e) => {
+          const r = c.getBoundingClientRect();
+          const dx = (e.clientX - r.left) / r.width - 0.5;
+          const dy = (e.clientY - r.top) / r.height - 0.5;
+          c.style.setProperty('--rx', `${(-dy * 16).toFixed(2)}deg`);
+          c.style.setProperty('--ry', `${(dx * 18).toFixed(2)}deg`);
+        });
+        const reset = () => { c.style.setProperty('--rx', '0deg'); c.style.setProperty('--ry', '0deg'); };
+        c.addEventListener('pointerleave', reset);
+        c.addEventListener('blur', reset);
+      }
+      c.addEventListener('click', () => select(i));
+      cards.push(c);
+      hand.appendChild(c);
     });
-    p.appendChild(ul);
-  })();
+    const counter = el('div', 'joker-count');
+    counter.append(
+      el('b', null, String(list.length)),
+      el('span', null, 'jokers held'),
+      el('i', null, 'hover to tilt · click to inspect'),
+    );
+    wrap.append(hand, info, counter);
+    if (list.length) select(0);
+    return wrap;
+  }
+  // Stats sebagai layar status Tamagotchi: LCD hijau, bar tersegmentasi,
+  // plus baris kondisi Smoky yang ikut berubah kalau dia diajak main.
+  function buildStatusScreen(list) {
+    const dev = el('div', 'tama');
+    const lcd = el('div', 'tama-lcd');
+    lcd.append(el('div', 'tama-title', 'STATUS'));
+    list.forEach((s) => {
+      const row = el('div', 'tama-row');
+      const bar = el('span', 'tama-bar');
+      const fill = el('i');
+      const pct = s.max ? Math.max(0, Math.min(100, (s.value / s.max) * 100)) : 100;
+      fill.style.width = `${pct.toFixed(1)}%`;
+      bar.appendChild(fill);
+      row.append(el('span', 'tama-k', s.short || s.label), bar, el('b', null, s.number));
+      row.title = s.label;
+      lcd.appendChild(row);
+    });
+    // baris terakhir: kondisi Smoky, hidup mengikuti state di smoky.js
+    const mood = el('div', 'tama-row tama-mood');
+    const pips = el('span', 'tama-pips');
+    mood.append(el('span', 'tama-k', 'SMOKY'), pips);
+    const moodLabel = el('b');
+    mood.appendChild(moodLabel);
+    function drawHearts(n) {
+      pips.replaceChildren();
+      for (let i = 0; i < 5; i += 1) {
+        const pip = el('i', i < n ? 'on' : null);
+        pips.appendChild(pip);
+      }
+      moodLabel.textContent = n >= 4 ? 'happy' : (n >= 2 ? 'okay' : 'grumpy');
+    }
+    try {
+      drawHearts(window.Smoky.getHearts());
+      window.Smoky.onHearts(drawHearts);
+    } catch (e) { drawHearts(4); }
+    lcd.appendChild(mood);
+    // cangkang perangkat: tiga tombol karet ala Tamagotchi (dekorasi saja)
+    const btns = el('div', 'tama-btns');
+    for (let i = 0; i < 3; i += 1) btns.appendChild(el('i'));
+    dev.append(lcd, btns);
+    return dev;
+  }
+  // Meja kerja: benda-benda di atas meja jadi hotspot. Hover atau fokus
+  // keyboard memunculkan satu kalimat di papan kecil di bawah meja.
+  function buildDesk(items) {
+    const scene = el('div', 'desk');
+    scene.setAttribute('aria-label', 'My desk');
+    const shelf = el('div', 'desk-top');
+    const read = el('div', 'desk-read');
+    const readLabel = el('b');
+    const readFact = el('span');
+    read.append(readLabel, readFact);
+    function show(it) {
+      readLabel.textContent = it ? `${it.label} — ` : '';
+      readFact.textContent = it ? it.fact : 'hover an object on the desk';
+    }
+    (items || []).forEach((it) => {
+      const b = el('button', 'desk-item');
+      b.type = 'button';
+      b.setAttribute('aria-label', `${it.label}: ${it.fact}`);
+      b.appendChild(window.PixelArt.render(it.icon, 3));
+      b.appendChild(el('span', 'desk-tag', it.label));
+      ['pointerenter', 'focus'].forEach((ev) => b.addEventListener(ev, () => show(it)));
+      b.addEventListener('click', () => {
+        show(it);
+        try { window.Smoky.sfx.play('happy'); } catch (e) { /* audio opsional */ }
+      });
+      shelf.appendChild(b);
+    });
+    scene.append(shelf, el('div', 'desk-surface'), read);
+    show(null);
+    return scene;
+  }
+  // Footer Y2K: pencacah kunjungan ala GeoCities, badge 88x31, dan webring.
+  // Semua palsu dan lokal — tidak ada request keluar, angkanya dari
+  // localStorage perangkat sendiri.
+  function buildY2kFooter() {
+    const f = el('footer', 'y2k');
+    const hits = el('div', 'y2k-hits');
+    hits.append(el('span', 'y2k-label', 'You are visitor number'));
+    const odo = el('span', 'y2k-odo');
+    let n = 1;
+    try {
+      const seen = sessionStorage.getItem('y2k-counted');
+      n = Number(localStorage.getItem('y2k-hits') || '0');
+      if (!(n >= 0)) n = 0;
+      if (!seen) {
+        n += 1;
+        localStorage.setItem('y2k-hits', String(n));
+        sessionStorage.setItem('y2k-counted', '1');
+      }
+      if (n < 1) n = 1;
+    } catch (e) { n = 1; }
+    String(n).padStart(6, '0').split('').forEach((d) => odo.appendChild(el('i', null, d)));
+    hits.appendChild(odo);
+    hits.appendChild(el('span', 'y2k-note', '(counted on your device only)'));
+    const badges = el('div', 'y2k-badges');
+    [['HAND-CODED', 'no framework, no build step', '#1a1a1a', '#7ee787'],
+      ['BEST VIEWED', 'at 800 x 600', '#2f3b52', '#a9c7e8'],
+      ['SMOKY', 'approved', '#f5d93d', '#1a1a1a'],
+      ['NO ADS', 'never had any', '#c94867', '#fff']].forEach(([a, b, bg, fg]) => {
+      const badge = el('span', 'y2k-badge');
+      badge.style.background = bg;
+      badge.style.color = fg;
+      badge.append(el('b', null, a), el('i', null, b));
+      badges.appendChild(badge);
+    });
+    const ring = el('div', 'y2k-ring');
+    ring.append(
+      el('span', null, '<<'),
+      el('span', 'y2k-ring-name', 'the pixel webring'),
+      el('span', null, '>>'),
+    );
+    f.append(hits, badges, ring,
+      el('p', 'y2k-sig', 'this page is under construction · always has been'));
+    return f;
+  }
   function launcherFor(group) {
     const grid = el('div', 'launcher');
     window.AppWins.GROUPS[group].forEach((id) => {
