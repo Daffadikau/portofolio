@@ -628,6 +628,21 @@
       '..kwwwwwwk..',
       '..kkkkkkkk..',
     ],
+    // perisai tombol pemblokir pop-up di titlebar
+    iconShield: [
+      '..kkkkkkkk..',
+      '.kbbbbbbbbk.',
+      'kbbwwbbwwbbk',
+      'kbbbwbbwbbbk',
+      'kbbbbwwbbbbk',
+      'kbbbwbbwbbbk',
+      'kbbwwbbwwbbk',
+      '.kbbbbbbbbk.',
+      '..kbbbbbbk..',
+      '...kbbbbk...',
+      '....kbbk....',
+      '.....kk.....',
+    ],
     wHatParty: [
       '.......qq.......',
       '......yyyy......',

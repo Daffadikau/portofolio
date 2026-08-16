@@ -63,7 +63,40 @@
   const tabbar = el('div', 'tabbar');
   tabbar.setAttribute('role', 'tablist');
   tabbar.setAttribute('aria-label', 'Sections');
-  titlebar.append(lights, tabbar);
+  // Tombol ala ekstensi browser di ujung kanan: memblokir jendela aplikasi
+  // yang biasanya muncul sendiri tiap pindah tab.
+  let popupsBlocked = false;
+  try { popupsBlocked = localStorage.getItem('popup-blocked') === '1'; } catch (e) { /* ignore */ }
+  let blockedCount = 0;
+  const adBtn = el('button', 'ext-btn');
+  adBtn.type = 'button';
+  adBtn.appendChild(window.PixelArt.render('iconShield', 2));
+  const adBadge = el('span', 'ext-badge');
+  adBadge.hidden = true;
+  adBtn.appendChild(adBadge);
+  function syncAd() {
+    adBtn.setAttribute('aria-pressed', String(popupsBlocked));
+    adBtn.title = popupsBlocked
+      ? 'Pop-up windows blocked. Click to allow them again.'
+      : 'Windows open by themselves. Click to block them.';
+    adBtn.setAttribute('aria-label', adBtn.title);
+    adBadge.hidden = !(popupsBlocked && blockedCount);
+    adBadge.textContent = String(blockedCount);
+  }
+  adBtn.addEventListener('click', () => {
+    popupsBlocked = !popupsBlocked;
+    if (!popupsBlocked) blockedCount = 0;
+    try { localStorage.setItem('popup-blocked', popupsBlocked ? '1' : '0'); } catch (e) { /* ignore */ }
+    syncAd();
+    // langsung terasa: menyalakan menutup yang terbuka, mematikan membukanya
+    const tab = location.hash.replace('#', '') || 'about';
+    if (window.AppWins) {
+      if (popupsBlocked) window.AppWins.closeAll(['terminal', 'spotify']);
+      else if (window.AppWins.GROUPS[tab]) window.AppWins.openGroup(tab);
+    }
+  });
+  syncAd();
+  titlebar.append(lights, tabbar, adBtn);
 
   // baris 2 = toolbar browser: back / forward / reload + address bar
   const toolbar = el('div', 'toolbar');
@@ -793,9 +826,15 @@
   document.addEventListener('tabshown', (e) => {
     if (!window.AppWins) return;
     window.AppWins.closeAll(['terminal', 'spotify']);
-    if (e.detail.id === 'projects') window.AppWins.openGroup('projects');
-    else if (e.detail.id === 'skills') window.AppWins.openGroup('skills');
-    else if (e.detail.id === 'contact') window.AppWins.openGroup('contact');
+    const group = window.AppWins.GROUPS[e.detail.id];
+    if (!group) return;
+    if (popupsBlocked) {
+      // dihitung supaya lencananya menunjukkan berapa yang dicegah
+      blockedCount += group.length;
+      syncAd();
+      return;
+    }
+    window.AppWins.openGroup(e.detail.id);
   });
 
   // haptic "boing" — semua kontrol utama membal sesaat setelah diklik
