@@ -191,15 +191,20 @@
     // di dalam fungsi, bukan di scope modul: renderAbout jalan lebih dulu
     // dari deklarasi ini, jadi const di luar kena temporal dead zone.
     // seragam + lokasi kerja masing-masing — urutannya mengikuti D.experience
+    // scene = peta latar kamarnya, prop = benda yang cuma muncul saat tidur
     const TENANTS = [
       // PT IROSTECH: kemeja biru bergaris + dasi + kacamata, di bilik kantor
-      { fit: 'wFitShirtTie', acc: 'wAccGlasses', hat: null, unit: '4A', scene: 'office' },
+      { fit: 'wFitShirtTie', acc: 'wAccGlasses', hat: null, unit: '4A',
+        scene: 'sceneOffice', prop: null },
       // Rumah Prestasi UPI: blazer almamater merah, di panggung bersorot lampu
-      { fit: 'wFitBlazerUpi', acc: null, hat: null, unit: '3A', scene: 'stage' },
+      { fit: 'wFitBlazerUpi', acc: null, hat: null, unit: '3A',
+        scene: 'sceneStage', prop: 'propBulb' },
       // HIMA TEKKOM P2M: kaus volunteer, di tempat penyaluran donasi
-      { fit: 'wFitVolunteer', acc: null, hat: null, unit: '2A', scene: 'volunteer' },
+      { fit: 'wFitVolunteer', acc: null, hat: null, unit: '2A',
+        scene: 'sceneVolunteer', prop: 'propBox' },
       // KSR PMI: seragam medis + hard hat, di ruang rawat
-      { fit: 'wFitPmi', acc: null, hat: 'wHatHardHat', unit: '1A', scene: 'hospital' },
+      { fit: 'wFitPmi', acc: null, hat: 'wHatHardHat', unit: '1A',
+        scene: 'sceneHospital', prop: 'propBlanket' },
     ];
     const apt = el('section', 'apt');
     apt.setAttribute('aria-label', 'Experience, as an apartment building');
@@ -209,15 +214,16 @@
     list.forEach((x, i) => {
       const t = TENANTS[i % TENANTS.length];
       const floor = el('div', 'apt-floor');
-      const room = el('div', `apt-room scene-${t.scene} asleep`);
-      // latar lokasi: tiga lapis prop yang diposisikan CSS per scene
+      const room = el('div', `apt-room ${t.scene} asleep`);
+      // latar lokasi digambar sebagai peta pixel utuh, bukan susunan kotak CSS,
+      // supaya detailnya nyambung dengan gaya pixel di seluruh situs
       const back = el('div', 'apt-back');
       back.setAttribute('aria-hidden', 'true');
-      for (let n = 1; n <= 3; n += 1) back.appendChild(el('i', `b${n}`));
+      back.appendChild(window.PixelArt.render(t.scene, 3));
       // prop yang cuma muncul waktu penghuninya masih tidur
       const sleep = el('div', 'apt-sleep');
       sleep.setAttribute('aria-hidden', 'true');
-      for (let n = 1; n <= 2; n += 1) sleep.appendChild(el('i', `s${n}`));
+      if (t.prop) sleep.appendChild(window.PixelArt.render(t.prop, 3));
       const zzz = el('div', 'apt-zzz');
       zzz.setAttribute('aria-hidden', 'true');
       for (let n = 0; n < 3; n += 1) {
@@ -374,9 +380,11 @@
       window.Smoky.onHearts(drawHearts);
     } catch (e) { drawHearts(4); }
     lcd.appendChild(mood);
-    // cangkang perangkat: tiga tombol karet ala Tamagotchi (dekorasi saja)
+    // cangkang perangkat: tiga tombol karet ala Tamagotchi (dekorasi saja),
+    // digambar sebagai peta pixel — bukan lingkaran border-radius
     const btns = el('div', 'tama-btns');
-    for (let i = 0; i < 3; i += 1) btns.appendChild(el('i'));
+    btns.setAttribute('aria-hidden', 'true');
+    for (let i = 0; i < 3; i += 1) btns.appendChild(window.PixelArt.render('propKnob', 3));
     dev.append(lcd, btns);
     return dev;
   }

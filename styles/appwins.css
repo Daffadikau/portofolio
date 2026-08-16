@@ -383,8 +383,8 @@
   border-bottom: 3px solid var(--ink); overflow: hidden;
 }
 .li-banner i { position: absolute; left: -10%; width: 120%; height: 4px; background: repeating-linear-gradient(90deg, #7c8ce0 0 10px, transparent 10px 22px); }
-.li-banner i:first-child { top: 18px; transform: rotate(-4deg); }
-.li-banner i:nth-child(2) { top: 34px; transform: rotate(3deg); opacity: .6; }
+.li-banner i:first-child { top: 18px; }
+.li-banner i:nth-child(2) { top: 34px; opacity: .6; }
 .li-banner span {
   position: absolute; right: 10px; bottom: 8px;
   font-family: var(--font-pixel); font-size: 10px; color: #e8e8e8;
@@ -438,12 +438,13 @@
 .skin-idcard .appwin-bar { background: #4a90d9; }
 .skin-idcard .appwin-body { background: #d8cfae; padding: 10px; max-height: calc(100vh - 170px); }
 .id-card {
-  color: #2b2620; border-radius: 14px; border: 2px solid #cbbf98;
-  background:
-    radial-gradient(140px 90px at 12% 88%, rgba(196, 148, 90, 0.18), transparent 70%),
-    radial-gradient(120px 70px at 88% 30%, rgba(196, 170, 90, 0.14), transparent 70%),
-    radial-gradient(90px 60px at 70% 92%, rgba(160, 130, 70, 0.12), transparent 70%),
-    #f0e5c4;
+  /* sudut kotak + noda kertas berupa titik persegi: radial-gradient dan
+     border-radius bikin kartunya keluar dari bahasa pixel situs */
+  color: #2b2620; border: 2px solid #cbbf98;
+  background-color: #f0e5c4;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(160,130,70,.10) 0 2px, transparent 2px 8px),
+    repeating-linear-gradient(90deg, rgba(160,130,70,.10) 0 2px, transparent 2px 8px);
 }
 .id-frame {
   display: grid;
@@ -474,25 +475,25 @@
 .id-no { font-family: var(--font-pixel); font-size: 16px; text-align: center; letter-spacing: 1px; }
 .id-field { position: relative; display: flex; align-items: baseline; gap: 6px; font-size: 12px; min-height: 20px; }
 .id-label { flex: 0 0 auto; }
-.id-dots { flex: 1; border-bottom: 2px dotted #2b2620; transform: translateY(-4px); }
+.id-dots { flex: 1; height: 2px; transform: translateY(-4px); background: repeating-linear-gradient(90deg, #2b2620 0 2px, transparent 2px 5px); }
 .id-val {
   position: absolute; right: 6%; bottom: 0;
   font-family: var(--font-term); font-size: 23px; font-weight: 400;
-  transform: rotate(-2deg); white-space: nowrap;
+  white-space: nowrap;
 }
 .id-sub { font-size: 11px; letter-spacing: 2px; text-align: center; font-weight: 700; margin-top: 2px; }
 .id-cert { font-size: 11px; line-height: 1.5; }
 .id-stamp {
   position: absolute; right: -10px; bottom: 76px;
   font-family: var(--font-pixel); font-size: 14px; line-height: 1.5; color: #4a8fc2;
-  border: 4px solid #4a8fc2; border-radius: 50%;
-  padding: 20px 16px; transform: rotate(-14deg);
+  border: 4px solid #4a8fc2; box-shadow: inset 0 0 0 3px #f0e5c4, inset 0 0 0 6px #4a8fc2;
+  padding: 16px 14px;
   opacity: 0.75; width: 190px; text-align: center; pointer-events: none;
   mix-blend-mode: multiply;
 }
 .id-sig { display: grid; justify-items: start; gap: 0; margin-top: 6px; }
 .id-sig svg { image-rendering: pixelated; margin-bottom: -4px; margin-left: 8px; }
-.id-sigline { width: 100%; border-bottom: 2px dotted #2b2620; }
+.id-sigline { width: 100%; height: 2px; background: repeating-linear-gradient(90deg, #2b2620 0 2px, transparent 2px 5px); }
 .id-sigcap { font-size: 10px; font-style: italic; justify-self: end; margin-top: 3px; }
 
 /* area Finder di panel Projects */
