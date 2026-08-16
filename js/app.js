@@ -106,7 +106,37 @@
     }
   });
   syncAd();
-  titlebar.append(lights, tabbar, adBtn);
+  // Tombol musik latar. Mati secara bawaan: musik yang menyala sendiri itu
+  // mengganggu, dan peramban memang memblokir audio tanpa interaksi dulu.
+  const musicBtn = el('button', 'ext-btn ext-music');
+  musicBtn.type = 'button';
+  function syncMusic(on) {
+    musicBtn.replaceChildren(window.PixelArt.render(on ? 'iconSound' : 'iconMute', 2));
+    musicBtn.setAttribute('aria-pressed', String(on));
+    musicBtn.title = on ? 'Turn the 8-bit soundtrack off' : 'Play the 8-bit soundtrack';
+    musicBtn.setAttribute('aria-label', musicBtn.title);
+  }
+  syncMusic(false);
+  musicBtn.addEventListener('click', () => {
+    if (!window.Music) return;
+    window.Music.toggle();
+    try { localStorage.setItem('music-on', window.Music.isPlaying() ? '1' : '0'); } catch (e) { /* ignore */ }
+  });
+  try { if (window.Music) window.Music.onChange(syncMusic); } catch (e) { /* ignore */ }
+  // pilihan sebelumnya diingat, tapi tetap menunggu satu interaksi apa pun
+  // karena peramban tidak mengizinkan audio dimulai tanpa itu
+  try {
+    if (localStorage.getItem('music-on') === '1') {
+      const kick = () => {
+        document.removeEventListener('pointerdown', kick);
+        document.removeEventListener('keydown', kick);
+        if (window.Music) window.Music.start();
+      };
+      document.addEventListener('pointerdown', kick, { once: true });
+      document.addEventListener('keydown', kick, { once: true });
+    }
+  } catch (e) { /* ignore */ }
+  titlebar.append(lights, tabbar, musicBtn, adBtn);
 
   // baris 2 = toolbar browser: back / forward / reload + address bar
   const toolbar = el('div', 'toolbar');

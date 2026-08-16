@@ -78,7 +78,7 @@
 }
 /* ── Tombol pemblokir pop-up, gaya tombol ekstensi browser ──────────── */
 .ext-btn {
-  position: relative; margin-left: auto; margin-right: 6px; align-self: center;
+  position: relative; align-self: center;
   display: inline-flex; align-items: center; justify-content: center;
   width: 30px; height: 26px; flex: 0 0 auto;
   border: 3px solid var(--ink); background: var(--win-dark);
@@ -93,4 +93,7 @@
   padding: 2px 2px 1px; text-align: center;
 }
 .ext-badge[hidden] { display: none; }
+.ext-music { margin-left: auto; margin-right: 4px; }
+.ext-btn + .ext-btn { margin-left: 0; margin-right: 6px; }
+.ext-music[aria-pressed="true"] { background: var(--tl-yellow); }
 @media (max-width: 640px) { .ext-btn { width: 26px; height: 24px; } }

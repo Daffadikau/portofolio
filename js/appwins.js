@@ -1051,19 +1051,53 @@
       const hit = D2.rules.filter((r) => r.k.some((w) => has(q, w)))[0];
       return pick(hit ? hit.r : D2.fallback);
     }
+    // Riwayat singkat dikirim ke worker supaya Smoky ingat konteks obrolan.
+    const history = [];
+    const apiUrl = (D2.api && D2.api.url) || '';
     let busy = false;
+    async function ask(t) {
+      if (!apiUrl) return { text: answer(t), live: false };
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 12000);
+      try {
+        const r = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ messages: history.slice(-8) }),
+          signal: ctrl.signal,
+        });
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const j = await r.json();
+        if (!j || !j.reply) throw new Error('empty');
+        return { text: j.reply, live: true };
+      } catch (e) {
+        // jaringan atau kuota bermasalah — jatuh ke jawaban kata kunci
+        return { text: answer(t), live: false, failed: true };
+      } finally {
+        clearTimeout(timer);
+      }
+    }
     function send(text) {
       const t = String(text || '').trim();
       if (!t || busy) return;
       busy = true;
       bubble(t, true);
+      history.push({ role: 'user', text: t });
       const dots = typing();
-      const wait = 420 + Math.min(900, t.length * 22);
-      setTimeout(() => {
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const floor = new Promise((res) => setTimeout(res, reduced ? 0 : 420));
+      Promise.all([ask(t), floor]).then(([res]) => {
         dots.remove();
-        bubble(answer(t), false);
+        bubble(res.text, false);
+        history.push({ role: 'assistant', text: res.text });
+        if (res.failed) {
+          const w = el('div', 'chat-row');
+          w.appendChild(el('span', 'chat-warn', 'connection to the cat failed; that was a canned answer'));
+          log.appendChild(w);
+          log.scrollTop = log.scrollHeight;
+        }
         busy = false;
-      }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : wait);
+      });
     }
     D2.intro.forEach((line, i) => setTimeout(() => bubble(line, false), i * 260));
     const chips = el('div', 'chat-chips');
@@ -1087,7 +1121,8 @@
       send(input.value);
       input.value = '';
     });
-    wrap.append(head, log, chips, bar, el('p', 'chat-note', D2.note));
+    const noteText = (D2.api && D2.api.url) ? (D2.noteApi || D2.note) : D2.note;
+    wrap.append(head, log, chips, bar, el('p', 'chat-note', noteText));
     body.appendChild(wrap);
     setTimeout(() => input.focus(), 80);
   }
