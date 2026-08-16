@@ -188,11 +188,17 @@
   function buildApartment(list) {
     // di dalam fungsi, bukan di scope modul: renderAbout jalan lebih dulu
     // dari deklarasi ini, jadi const di luar kena temporal dead zone.
+    // seragam disesuaikan dengan organisasinya masing-masing, bukan wardrobe
+    // umum — urutannya mengikuti urutan D.experience
     const TENANTS = [
-      { fit: 'wFitSuit', acc: 'wAccGlasses', hat: null, unit: '4A' },
-      { fit: 'wFitHoodie', acc: 'wAccHeadphones', hat: null, unit: '3A' },
-      { fit: 'wFitScarf', acc: null, hat: 'wHatBeanie', unit: '2A' },
-      { fit: 'wFitScarf', acc: 'wAccBowtie', hat: 'wHatCap', unit: '1A' },
+      // PT IROSTECH: kemeja biru bergaris + dasi + kacamata
+      { fit: 'wFitShirtTie', acc: 'wAccGlasses', hat: null, unit: '4A' },
+      // Rumah Prestasi UPI: blazer almamater merah
+      { fit: 'wFitBlazerUpi', acc: null, hat: null, unit: '3A' },
+      // HIMA TEKKOM P2M: kaus volunteer biru tua
+      { fit: 'wFitVolunteer', acc: null, hat: null, unit: '2A' },
+      // KSR PMI: seragam medis + rompi palang merah + hard hat putih
+      { fit: 'wFitPmi', acc: null, hat: 'wHatHardHat', unit: '1A' },
     ];
     const apt = el('section', 'apt');
     apt.setAttribute('aria-label', 'Experience, as an apartment building');
