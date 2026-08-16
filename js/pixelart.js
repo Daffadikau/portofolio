@@ -643,6 +643,21 @@
       '....kbbk....',
       '.....kk.....',
     ],
+    // ikon aplikasi obrolan dengan Smoky di dock
+    iconChat: [
+      '.k........k.',
+      'kwk......kwk',
+      'kwwk....kwwk',
+      'kkkkkkkkkkkk',
+      'kwwwwwwwwwwk',
+      'kwkkwwwwkkwk',
+      'kwwwwwwwwwwk',
+      'kwwkwwwwkwwk',
+      'kwwwkkkkwwwk',
+      'kkwwwwwwwwkk',
+      '..kkwwkkkk..',
+      '....kk......',
+    ],
     wHatParty: [
       '.......qq.......',
       '......yyyy......',
