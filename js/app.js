@@ -172,9 +172,7 @@
     const status = el('p', 'status');
     status.append(el('span', 'dot'), document.createTextNode(D.status));
     head.appendChild(status);
-    const side = el('div', 'hero-side');
-    side.append(buildStatusScreen(D.stats), buildCvLink(D.cv));
-    hero.append(art, head, side);
+    hero.append(art, head, buildStatusScreen(D.stats));
     p.append(hero, el('p', 'bio', D.bio), buildDesk(D.desk),
       h2icon('cap', 'Education'),
       el('p', null, `${D.education.program} — ${D.education.school}, ${D.education.detail}`),
@@ -459,7 +457,15 @@
       el('span', 'y2k-ring-name', 'the pixel webring'),
       el('span', null, '>>'),
     );
-    f.append(hits, badges, ring,
+    // baris penutup: Smoky di kardusnya menemani webring + unduhan CV
+    const row = el('div', 'y2k-row');
+    const art = el('div', 'y2k-smoky');
+    art.setAttribute('aria-hidden', 'true');
+    art.appendChild(window.PixelArt.render('smokyBox', 3));
+    const col = el('div', 'y2k-col');
+    col.append(ring, buildCvLink(D.cv));
+    row.append(art, col);
+    f.append(hits, badges, row,
       el('p', 'y2k-sig', 'this page is under construction · always has been'));
     return f;
   }
