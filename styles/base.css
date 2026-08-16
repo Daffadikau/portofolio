@@ -2,6 +2,8 @@
   --bg-hi: #f5a46b; --bg-lo: #e8845a;
   --dither-a: .06; --dither-b: .10;
   --win: #e8e8e8; --win-dark: #cfcfcf; --ink: #1a1a1a;
+  /* permukaan kartu — dipisah dari --win supaya bisa dibalik di mode gelap */
+  --surface: #ffffff; --surface-soft: #fffbe8;
   --tl-red: #f0713d; --tl-yellow: #f5d93d; --tl-green: #9dc24c;
   --font-pixel: 'Silkscreen', monospace;
   --font-term: 'VT323', monospace;
@@ -79,7 +81,7 @@ button:disabled, a:not([href]) { cursor: inherit; }
   --bg-hi: #2f2f52; --bg-lo: #14142a;
   --dither-a: .18; --dither-b: .05;
 }
-:root.night body {
+:root.night body, :root.dark body {
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect x='0' y='0' width='1' height='1' fill='%23000' fill-opacity='.18'/%3E%3Crect x='4' y='2' width='1' height='1' fill='%23000' fill-opacity='.18'/%3E%3Crect x='2' y='5' width='1' height='1' fill='%23fff' fill-opacity='.05'/%3E%3Crect x='6' y='6' width='1' height='1' fill='%23000' fill-opacity='.18'/%3E%3C/svg%3E") repeat,
     url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='128'%20height='112'><g%20fill='%23fff'%20fill-opacity='.13'><rect%20x='20'%20y='14'%20width='4'%20height='4'/><rect%20x='16'%20y='18'%20width='12'%20height='4'/><rect%20x='20'%20y='22'%20width='4'%20height='4'/><rect%20x='70'%20y='8'%20width='3'%20height='3'/><rect%20x='96'%20y='30'%20width='2'%20height='2'/><rect%20x='44'%20y='52'%20width='2'%20height='2'/><rect%20x='108'%20y='72'%20width='3'%20height='3'/><rect%20x='12'%20y='88'%20width='2'%20height='2'/></g><g%20fill='%23fff'%20fill-opacity='.07'><rect%20x='78'%20y='54'%20width='16'%20height='16'/><rect%20x='84'%20y='50'%20width='10'%20height='4'/><rect%20x='84'%20y='70'%20width='10'%20height='4'/><rect%20x='60'%20y='86'%20width='4'%20height='4'/><rect%20x='66'%20y='82'%20width='4'%20height='4'/><rect%20x='72'%20y='78'%20width='4'%20height='4'/><rect%20x='28'%20y='60'%20width='4'%20height='4'/><rect%20x='34'%20y='60'%20width='4'%20height='4'/><rect%20x='26'%20y='66'%20width='14'%20height='6'/><rect%20x='30'%20y='72'%20width='6'%20height='3'/></g><g%20fill='%230b0b1a'%20fill-opacity='.55'><rect%20x='88'%20y='54'%20width='10'%20height='16'/></g></svg>") repeat,
@@ -87,3 +89,40 @@ button:disabled, a:not([href]) { cursor: inherit; }
 }
 /* jendela tetap terang — layar menyala di ruangan gelap */
 :root.night #window { box-shadow: 10px 10px 0 rgba(0, 0, 0, .45); }
+
+/* ── Mode gelap ──────────────────────────────────────────────────────
+   Cukup membalik tiga token warna: --ink jadi terang, --win dan --surface
+   jadi gelap. Karena --ink dipakai untuk teks DAN garis tepi, seluruh
+   chrome situs ikut terbalik tanpa aturan tambahan per komponen.
+   Jendela aplikasi (Excel, VS Code, Spotify, dll) sengaja TIDAK ikut —
+   mereka meniru tampilan aplikasi aslinya. */
+:root.dark {
+  --win: #23232b; --win-dark: #16161c; --ink: #e9e9ee;
+  --surface: #2d2d38; --surface-soft: #3a3626;
+  --bg-hi: #2f2f52; --bg-lo: #14142a;
+  --dither-a: .18; --dither-b: .05;
+}
+#dock, :root.dark #dock { }
+:root.dark #dock { background: rgba(35, 35, 43, .88); }
+/* Ikon pixel digambar dengan garis tepi hitam, jadi di latar gelap dia hilang.
+   Tombol titlebar dan ikon judul bagian dikasih alas terang supaya tetap kebaca. */
+:root.dark .ext-btn { background: #d5d5dc; }
+:root.dark .ext-btn:hover { background: #eaeaf0; }
+:root.dark .h2i svg { background: #d5d5dc; padding: 1px; }
+/* Beberapa elemen sengaja memakai warna tinta sebagai LATAR (papan nama
+   apartemen, papan keterangan, roti panggang). Karena --ink dibalik jadi
+   terang, mereka ikut terbalik dan jadi terlalu mencolok. Dikunci gelap. */
+:root.dark .apt-roof, :root.dark .apt-ground, :root.dark .flat-read,
+:root.dark .toast, :root.dark .apt-bubble::before {
+  background: #14141a; color: #e9e9ee;
+}
+:root.dark .apt-door:hover { background: #33333f; }
+:root.dark .tama { background: #3a3a45; }
+:root.dark .ext-btn:hover { background: #3a3a46; }
+:root.dark .tab:not([aria-selected="true"]) { color: #b9b9c4; }
+:root.dark .flat-stage { background: #2d2d38; }
+:root.dark .file:hover, :root.dark .launch-btn:hover, :root.dark .wr-opt:hover { background: #33333f; }
+/* kursor tangan versi terang di permukaan gelap */
+:root.dark a[href], :root.dark button, :root.dark summary, :root.dark [role="button"] {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='16' shape-rendering='crispEdges'%3E%3Crect x='2' y='0' width='2' height='1' fill='%23000000'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23000000'/%3E%3Crect x='2' y='1' width='2' height='1' fill='%23ffffff'/%3E%3Crect x='4' y='1' width='1' height='1' fill='%23000000'/%3E%3Crect x='1' y='2' width='1' height='1' fill='%23000000'/%3E%3Crect x='2' y='2' width='2' height='1' fill='%23ffffff'/%3E%3Crect x='4' y='2' width='1' height='1' fill='%23000000'/%3E%3Crect x='1' y='3' width='1' height='1' fill='%23000000'/%3E%3Crect x='2' y='3' width='2' height='1' fill='%23ffffff'/%3E%3Crect x='4' y='3' width='1' height='1' fill='%23000000'/%3E%3Crect x='1' y='4' width='1' height='1' fill='%23000000'/%3E%3Crect x='2' y='4' width='2' height='1' fill='%23ffffff'/%3E%3Crect x='4' y='4' width='3' height='1' fill='%23000000'/%3E%3Crect x='1' y='5' width='1' height='1' fill='%23000000'/%3E%3Crect x='2' y='5' width='2' height='1' fill='%23ffffff'/%3E%3Crect x='4' y='5' width='1' height='1' fill='%23000000'/%3E%3Crect x='5' y='5' width='2' height='1' fill='%23ffffff'/%3E%3Crect x='7' y='5' width='2' height='1' fill='%23000000'/%3E%3Crect x='0' y='6' width='2' height='1' fill='%23000000'/%3E%3Crect x='2' y='6' width='8' height='1' fill='%23ffffff'/%3E%3Crect x='10' y='6' width='1' height='1' fill='%23000000'/%3E%3Crect x='0' y='7' width='1' height='1' fill='%23000000'/%3E%3Crect x='1' y='7' width='9' height='1' fill='%23ffffff'/%3E%3Crect x='10' y='7' width='1' height='1' fill='%23000000'/%3E%3Crect x='0' y='8' width='1' height='1' fill='%23000000'/%3E%3Crect x='1' y='8' width='9' height='1' fill='%23ffffff'/%3E%3Crect x='10' y='8' width='1' height='1' fill='%23000000'/%3E%3Crect x='1' y='9' width='1' height='1' fill='%23000000'/%3E%3Crect x='2' y='9' width='8' height='1' fill='%23ffffff'/%3E%3Crect x='10' y='9' width='1' height='1' fill='%23000000'/%3E%3Crect x='1' y='10' width='1' height='1' fill='%23000000'/%3E%3Crect x='2' y='10' width='7' height='1' fill='%23ffffff'/%3E%3Crect x='9' y='10' width='1' height='1' fill='%23000000'/%3E%3Crect x='2' y='11' width='1' height='1' fill='%23000000'/%3E%3Crect x='3' y='11' width='6' height='1' fill='%23ffffff'/%3E%3Crect x='9' y='11' width='1' height='1' fill='%23000000'/%3E%3Crect x='2' y='12' width='1' height='1' fill='%23000000'/%3E%3Crect x='3' y='12' width='6' height='1' fill='%23ffffff'/%3E%3Crect x='9' y='12' width='1' height='1' fill='%23000000'/%3E%3Crect x='3' y='13' width='7' height='1' fill='%23000000'/%3E%3C/svg%3E") 2 0, pointer;
+}

@@ -29,7 +29,7 @@
 .nav-btn:active { transform: translate(1px, 1px); }
 .urlbar {
   flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px;
-  border: 2px solid var(--ink); background: #fff; padding: 3px 10px;
+  border: 2px solid var(--ink); background: var(--surface); padding: 3px 10px;
   font-family: var(--font-mono); font-size: 12px;
 }
 .url-lock { font-size: 10px; }
@@ -93,7 +93,8 @@
   padding: 2px 2px 1px; text-align: center;
 }
 .ext-badge[hidden] { display: none; }
-.ext-music { margin-left: auto; margin-right: 4px; }
+.ext-theme { margin-left: auto; margin-right: 4px; }
+.ext-music { margin-right: 4px; }
 .ext-btn + .ext-btn { margin-left: 0; margin-right: 6px; }
 .ext-music[aria-pressed="true"] { background: var(--tl-yellow); }
 @media (max-width: 640px) { .ext-btn { width: 26px; height: 24px; } }
