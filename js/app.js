@@ -174,7 +174,7 @@
     head.appendChild(status);
     hero.append(art, head);
     const stats = buildStatusScreen(D.stats);
-    p.append(hero, el('p', 'bio', D.bio), stats,
+    p.append(hero, el('p', 'bio', D.bio), buildDesk(D.desk), stats,
       h2icon('cap', 'Education'),
       el('p', null, `${D.education.program} — ${D.education.school}, ${D.education.detail}`),
       h2icon('case', 'Experience'));
@@ -350,6 +350,37 @@
     for (let i = 0; i < 3; i += 1) btns.appendChild(el('i'));
     dev.append(lcd, btns);
     return dev;
+  }
+  // Meja kerja: benda-benda di atas meja jadi hotspot. Hover atau fokus
+  // keyboard memunculkan satu kalimat di papan kecil di bawah meja.
+  function buildDesk(items) {
+    const scene = el('div', 'desk');
+    scene.setAttribute('aria-label', 'My desk');
+    const shelf = el('div', 'desk-top');
+    const read = el('div', 'desk-read');
+    const readLabel = el('b');
+    const readFact = el('span');
+    read.append(readLabel, readFact);
+    function show(it) {
+      readLabel.textContent = it ? `${it.label} — ` : '';
+      readFact.textContent = it ? it.fact : 'hover an object on the desk';
+    }
+    (items || []).forEach((it) => {
+      const b = el('button', 'desk-item');
+      b.type = 'button';
+      b.setAttribute('aria-label', `${it.label}: ${it.fact}`);
+      b.appendChild(window.PixelArt.render(it.icon, 3));
+      b.appendChild(el('span', 'desk-tag', it.label));
+      ['pointerenter', 'focus'].forEach((ev) => b.addEventListener(ev, () => show(it)));
+      b.addEventListener('click', () => {
+        show(it);
+        try { window.Smoky.sfx.play('happy'); } catch (e) { /* audio opsional */ }
+      });
+      shelf.appendChild(b);
+    });
+    scene.append(shelf, el('div', 'desk-surface'), read);
+    show(null);
+    return scene;
   }
   function launcherFor(group) {
     const grid = el('div', 'launcher');

@@ -166,6 +166,16 @@ window.PORTFOLIO_DATA = {
       ],
     },
   ],
+  // isi meja kerja di tab About. Tiap benda jadi hotspot yang mengeluarkan
+  // satu kalimat waktu di-hover/di-fokus.
+  desk: [
+    { icon: 'chip', label: 'ESP32', fact: 'Reads the gas sensors, then throws the numbers at my backend.' },
+    { icon: 'term', label: 'Terminal', fact: 'zsh and oh-my-zsh. Most of the day happens in here.' },
+    { icon: 'docker', label: 'Docker', fact: 'Everything I deploy ships as a container. No exceptions.' },
+    { icon: 'catSleep', label: 'Smoky', fact: 'Owns the warm spot next to the laptop. Non-negotiable.' },
+    { icon: 'fish', label: 'Snack', fact: "His, not mine. That is the official position." },
+    { icon: 'ball', label: 'Toy', fact: 'Rubber-duck debugging, except the duck is a ball and it is his.' },
+  ],
   // icon + rarity dipakai kartu Joker di tab About (rarity menentukan warna
   // pita bawah kartu, meniru sistem kelangkaan Balatro)
   awards: [
