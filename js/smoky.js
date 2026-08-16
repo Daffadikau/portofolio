@@ -154,7 +154,7 @@
       blinkTimer = setInterval(() => {
         if (sleeping || !bubble.hidden) return;
         setFace('catSleep');
-        setTimeout(() => { if (!sleeping) setFace('cat'); }, 160);
+        setTimeout(() => { if (!sleeping && current === 'catSleep') setFace('cat'); }, 160);
       }, 4800);
     }
     scheduleIdle();

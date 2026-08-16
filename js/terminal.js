@@ -225,6 +225,7 @@
     }
 
     input.addEventListener('keydown', (e) => {
+      if (e.isComposing || e.keyCode === 229) return;
       if (e.key === 'Enter') executeCommand();
       else if (e.key === 'ArrowUp') { e.preventDefault(); setInputFromHistory(historyIndex + 1); }
       else if (e.key === 'ArrowDown') { e.preventDefault(); setInputFromHistory(historyIndex - 1); }

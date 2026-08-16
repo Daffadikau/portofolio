@@ -43,6 +43,7 @@
   }
   const lvBar = (lv) => '█'.repeat(lv) + '░'.repeat(5 - lv);
   const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+  const grp = (name) => D.skills.find((g) => g.group === name) || { items: [] };
 
   // switcher generik: strip tombol + area konten yang berganti
   function makeViews(navClass, items, defaultKey) {
@@ -53,7 +54,11 @@
       const it = items.find((x) => x.key === key) || items[0];
       content.replaceChildren();
       it.render(content);
-      btns.forEach((b, k) => b.classList.toggle('on', k === it.key));
+      btns.forEach((b, k) => {
+        const on = k === it.key;
+        b.classList.toggle('on', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
     }
     items.forEach((it) => {
       const b = el('button', 'view-btn');
@@ -77,7 +82,7 @@
     const rows = D.projects.map((p, i) => [
       String(i + 2), p.title,
       p.tech.slice(0, 2).map((t) => t.label).join(', '),
-      i === 0 ? 'In progress' : 'Shipped',
+      i < 2 ? 'In progress' : 'Shipped',
     ]);
     body.appendChild(table('xl-grid', ['', 'A · Project', 'B · Stack', 'C · Status'],
       [['1', 'PROJECT', 'STACK', 'STATUS'], ...rows]));
@@ -139,7 +144,7 @@
         code.appendChild(codeLine([['tok-p', '};'], ['tok-cm', '  // do not deploy on Mondays']]));
       } else {
         code.appendChild(codeLine([['tok-kw', 'export const'], ['tok-var', ' languages'], ['tok-p', ' = {']]));
-        D.skills[0].items.forEach((s) => {
+        grp('Languages').items.forEach((s) => {
           code.appendChild(codeLineIcon(s.icon, [
             ['tok-key', `  ${slug(s.label)}`],
             ['tok-p', ': '], ['tok-str', `'${lvBar(s.level)}'`], ['tok-p', ','],
@@ -237,7 +242,7 @@
     const files = {
       'skills_ai.py': (code) => {
         code.appendChild(codeLine([['tok-var', 'AI_SKILLS'], ['tok-p', ' = {']]));
-        D.skills[2].items.forEach((s) => {
+        grp('AI & Data').items.forEach((s) => {
           code.appendChild(codeLine([
             ['tok-str', `  "${slug(s.label)}"`],
             ['tok-p', ': '], ['tok-num', String(s.level)], ['tok-p', ',  '], ['tok-cm', `# ${lvBar(s.level)}`],
@@ -267,7 +272,11 @@
       codeArea.replaceChildren();
       files[file](codeArea);
       showRun(file);
-      [...strip.children].forEach((s) => s.classList.toggle('on', s.textContent === file));
+      [...strip.children].forEach((s) => {
+        const on = s.textContent === file;
+        s.classList.toggle('on', on);
+        s.setAttribute('aria-pressed', String(on));
+      });
     }
     Object.keys(files).forEach((f) => {
       const t = el('button', null, f);
@@ -282,7 +291,7 @@
   function buildDocker(body) {
     const containersRender = (c) => {
       const cpus = ['0.4%', '1.2%', '0.8%', '0.6%', '2.1%', '0.3%'];
-      const rows = D.skills[3].items.map((s, i) => {
+      const rows = grp('DevOps, Cloud & IoT').items.map((s, i) => {
         const name = s.label.toLowerCase().replace(/[^a-z0-9]+/g, '-');
         const st = el('span', 'dk-status');
         st.append(el('i'), document.createTextNode(' Running'));
@@ -326,14 +335,17 @@
     const filter = el('div', 'ws-filter');
     filter.append(el('b', null, '⩓'), el('span', null, 'http || mqtt || icmp'));
     body.appendChild(filter);
+    // baris HTTP di-generate dari grup skill Web & Mobile biar tidak ada
+    // grup yang tercecer dari data.js
+    const web = grp('Web & Mobile').items.slice(0, 4);
     const rows = [
       ['1', '0.001', 'daffa.dev', 'recruiter.example', 'HTTP', 'GET /portfolio HTTP/1.1 200 OK', 'http'],
-      ['2', '0.087', 'browser', 'daffa.dev', 'HTTP', 'GET /skills/react 304 Not Modified', 'http'],
-      ['3', '0.132', 'browser', 'daffa.dev', 'HTTP', 'GET /skills/next.js 200 OK (prefetch)', 'http'],
-      ['4', '0.420', 'esp32-testkit', 'daffa.dev', 'MQTT', 'PUBLISH gas_level=safe qos=1', 'mqtt'],
-      ['5', '0.421', 'daffa.dev', 'esp32-testkit', 'MQTT', 'PUBACK — FastAPI ingested ✓', 'mqtt'],
-      ['6', '1.337', 'smoky.local', 'daffa.dev', 'ICMP', 'Echo (meow) request', 'icmp'],
-      ['7', '1.338', 'daffa.dev', 'smoky.local', 'ICMP', 'Echo (meow) reply ♥', 'icmp'],
+      ...web.map((s, i) => [String(i + 2), `0.0${87 + i * 45}`, 'browser', 'daffa.dev', 'HTTP',
+        `GET /skills/${slug(s.label)} 200 OK (lv ${s.level}/5)`, 'http']),
+      ['6', '0.420', 'esp32-testkit', 'daffa.dev', 'MQTT', 'PUBLISH gas_level=safe qos=1', 'mqtt'],
+      ['7', '0.421', 'daffa.dev', 'esp32-testkit', 'MQTT', 'PUBACK — FastAPI ingested ✓', 'mqtt'],
+      ['8', '1.337', 'smoky.local', 'daffa.dev', 'ICMP', 'Echo (meow) request', 'icmp'],
+      ['9', '1.338', 'daffa.dev', 'smoky.local', 'ICMP', 'Echo (meow) reply ♥', 'icmp'],
     ];
     const t = table('ws-grid', ['No.', 'Time', 'Source', 'Destination', 'Proto', 'Info'],
       rows.map((r) => r.slice(0, 6)));
@@ -346,6 +358,120 @@
     window.TerminalEngine.mount(body);
   }
 
+  // ---- builders: Contact (profil pixel GitHub / LinkedIn / Gmail) ----
+  function extBtn(cls, label, url) {
+    const a = el('a', cls, label);
+    a.href = url; a.target = '_blank'; a.rel = 'noreferrer';
+    return a;
+  }
+  function buildGithub(body) {
+    const wrap = el('div', 'gh-wrap');
+    const head = el('div', 'gh-head');
+    const ava = el('div', 'gh-avatar');
+    ava.appendChild(window.PixelArt.render('catCap', 4));
+    const who = el('div', 'gh-who');
+    who.append(el('b', null, 'Daffa Adika'), el('span', null, '@Daffadikau'),
+      extBtn('gh-follow', 'Follow', D.socials.github));
+    head.append(ava, who);
+    wrap.appendChild(head);
+    wrap.appendChild(el('p', 'gh-bio', 'Computer Engineering @ UPI · Robotics (AGV/ROS 2) · IoT & Full-stack'));
+    wrap.appendChild(el('p', 'gh-meta', '11 repositories · 📍 Bandung, Indonesia'));
+    // contribution graph — pola deterministik biar grid-nya hidup
+    const graph = el('div', 'gh-graph');
+    graph.setAttribute('role', 'img');
+    graph.setAttribute('aria-label', 'Contribution graph, suspiciously green');
+    for (let r = 0; r < 7; r += 1) {
+      const row = el('div', 'gh-row');
+      for (let c = 0; c < 26; c += 1) {
+        const v = (r * 5 + c * 11 + ((c * r) % 7)) % 9;
+        const lv = v < 3 ? 0 : v < 5 ? 1 : v < 7 ? 2 : v < 8 ? 3 : 4;
+        row.appendChild(el('i', `gh-c${lv}`));
+      }
+      graph.appendChild(row);
+    }
+    wrap.appendChild(graph);
+    wrap.appendChild(el('p', 'gh-meta', '1,337 contributions in the last year (Smoky walked on the keyboard for ~40 of them)'));
+    wrap.appendChild(extBtn('pxbtn', 'Open profile ↗', D.socials.github));
+    body.appendChild(wrap);
+  }
+  function buildLinkedin(body) {
+    const banner = el('div', 'li-banner');
+    banner.append(el('i'), el('i'), el('span', null, 'THE INTEGRATED ENGINEER'));
+    body.appendChild(banner);
+    const wrap = el('div', 'li-wrap');
+    const ava = el('div', 'li-avatar');
+    ava.appendChild(window.PixelArt.render('catCap', 3));
+    ava.appendChild(el('span', 'li-otw', '#OPENTOWORK'));
+    wrap.appendChild(ava);
+    wrap.append(
+      el('b', 'li-name', 'Daffa Adika (He/Him)'),
+      el('p', 'li-head', 'Undergraduate Computer Engineering Student at Universitas Pendidikan Indonesia'),
+      el('p', 'li-meta', 'Bandung, West Java, Indonesia · 58 connections'));
+    const otwBox = el('div', 'li-box', 'Open to work — Bekasi +1 more · Hybrid · Remote');
+    wrap.appendChild(otwBox);
+    const row = el('div', 'li-btns');
+    row.append(extBtn('li-pill', 'Open to', D.socials.linkedin),
+      extBtn('li-pill li-ghost', 'Message', D.socials.linkedin));
+    wrap.appendChild(row);
+    body.appendChild(wrap);
+  }
+  function buildGmail(body) {
+    const bar = el('div', 'gm-top');
+    const inp = el('input');
+    inp.value = 'is:unread from:opportunity'; inp.readOnly = true;
+    inp.setAttribute('aria-label', 'Search mail');
+    const compose = el('a', 'gm-compose', '✎ Compose');
+    compose.href = `mailto:${D.socials.email}`;
+    bar.append(compose, inp);
+    body.appendChild(bar);
+    const list = el('div', 'gm-list');
+    [['Recruiter', 'Re: Opportunity — are you available for a chat?', '14:02', true],
+      ['GitHub', '⭐ Daffadikau/portofolio — you have a new star', '13:37', true],
+      ['Smoky', '(no subject) — meow meow meowwwwwww', '03:00', false],
+      ['UPI Akademik', 'Reminder: KRS semester 7', 'Aug 15', false]].forEach(([from, subj, time, unread]) => {
+      const row = el('div', unread ? 'gm-row unread' : 'gm-row');
+      row.append(el('b', null, from), el('span', null, subj), el('i', null, time));
+      list.appendChild(row);
+    });
+    body.appendChild(list);
+    body.appendChild(el('p', 'gm-note', `inbox zero is a myth · write to ${D.socials.email}`));
+  }
+
+  // ---- builder: easter egg — CMIYGL travel license ----
+  function buildIdcard(body) {
+    const field = (label, value) => {
+      const row = el('div', 'id-field');
+      row.append(el('span', 'id-label', `${label}`), el('span', 'id-dots'), el('b', 'id-val', value));
+      return row;
+    };
+    const card = el('div', 'id-card');
+    card.appendChild(el('div', 'id-stars', '★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★'));
+    const inner = el('div', 'id-inner');
+    const photo = el('div', 'id-photo');
+    photo.appendChild(window.PixelArt.render('catTyler', 5));
+    photo.appendChild(el('span', null, 'Photograph of Authorized traveler'));
+    const info = el('div', 'id-info');
+    info.append(
+      el('h4', null, 'PERMANENT LICENSE OF TRAVEL'),
+      el('b', 'id-no', 'NO. SMK1402026'),
+      field('Issued to', 'Daffa Adika & Smoky'),
+      field('Date of birth', '10/06/·····'),
+      field('Place of issue', 'Bandung, Indonesia'),
+      field('Date of issue', '06/25/2021'),
+      el('p', 'id-cert', 'This is to Certify that the person (and cat) named above is permitted to travel, build, and explore freely — unless detained by deadlines.'));
+    const stamp = el('div', 'id-stamp', 'CALL ME IF YOU GET LOST');
+    stamp.setAttribute('aria-hidden', 'true');
+    info.appendChild(stamp);
+    const sig = el('div', 'id-sig');
+    sig.appendChild(window.PixelArt.render('sig', 2));
+    sig.appendChild(el('span', null, 'Signature of Authorized traveler'));
+    info.appendChild(sig);
+    inner.append(photo, info);
+    card.appendChild(inner);
+    card.appendChild(el('div', 'id-stars', '★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★'));
+    body.appendChild(card);
+  }
+
   // ---- defs & groups ----
   const DEFS = {
     excel: { title: 'projects.xlsx — Excel', skin: 'excel', icon: 'excel', w: 470, fx: 0.05, fy: 90, build: buildExcel },
@@ -356,10 +482,15 @@
     docker: { title: 'Containers — Docker Desktop', skin: 'docker', icon: 'docker', w: 500, fx: 0.09, fy: 360, build: buildDocker },
     wireshark: { title: 'capture.pcapng — Wireshark', skin: 'wireshark', icon: 'wireshark', w: 540, fx: 0.42, fy: 440, build: buildWireshark },
     terminal: { title: 'daffa@portfolio: ~ — Terminal', skin: 'terminal', icon: 'term', w: 600, fx: 0.2, fy: 150, build: buildTerminal },
+    ghprofile: { title: 'Daffadikau — GitHub', skin: 'github', icon: 'github', w: 440, fx: 0.05, fy: 100, build: buildGithub },
+    liprofile: { title: 'daffadikau — LinkedIn', skin: 'linkedin', icon: 'linkedin', w: 400, fx: 0.57, fy: 130, build: buildLinkedin },
+    gmail: { title: 'Inbox (2) — Gmail', skin: 'gmail', icon: 'gmail', w: 480, fx: 0.26, fy: 400, build: buildGmail },
+    idcard: { title: 'travel-license — Wallet', skin: 'idcard', icon: 'catBox', w: 600, fx: 0.16, fy: 110, build: buildIdcard },
   };
   const GROUPS = {
     projects: ['excel', 'word', 'notion'],
     skills: ['vscode', 'idea', 'docker', 'wireshark'],
+    contact: ['ghprofile', 'liprofile', 'gmail'],
   };
 
   const wins = new Map();
@@ -367,15 +498,58 @@
   const timers = [];
 
   function toFront(w) { zTop += 1; w.style.zIndex = zTop; }
-  function close(id) { const w = wins.get(id); if (w) { w.remove(); wins.delete(id); } }
+  function close(id) {
+    const w = wins.get(id);
+    if (!w) return;
+    if (w.contains(document.activeElement)) {
+      const tab = document.getElementById(`tab-${location.hash.replace('#', '') || 'about'}`);
+      if (tab) tab.focus();
+    }
+    w.remove();
+    wins.delete(id);
+  }
+
+  // target genie: ikon aplikasi milik window (launcher di panel, tombol peer
+  // di Contact, ikon dock utk terminal); fallback: dock
+  function genieTarget(id) {
+    const candidates = [
+      document.querySelector(`[data-appid="${id}"]`),
+      id === 'terminal' ? document.querySelector('#dock .dock-item[aria-label="Terminal"]') : null,
+      document.getElementById('dock'),
+    ];
+    return candidates.find((c) => {
+      if (!c) return false;
+      const r = c.getBoundingClientRect();
+      return r.width > 0 && r.height > 0;
+    }) || null;
+  }
+  function minimize(id) {
+    const w = wins.get(id);
+    if (!w || w.dataset.min) return;
+    const wr = w.getBoundingClientRect();
+    let dx = window.innerWidth / 2 - (wr.left + wr.width / 2);
+    let dy = window.innerHeight - wr.top;
+    const t = genieTarget(id);
+    if (t) {
+      const tr = t.getBoundingClientRect();
+      dx = tr.left + tr.width / 2 - (wr.left + wr.width / 2);
+      dy = tr.top + tr.height / 2 - (wr.top + wr.height / 2);
+    }
+    w.style.setProperty('--gx', `${Math.round(dx)}px`);
+    w.style.setProperty('--gy', `${Math.round(dy)}px`);
+    const finish = () => { w.classList.remove('genie-out'); w.classList.add('minimized'); w.dataset.min = '1'; };
+    if (reduced) { finish(); return; }
+    w.classList.add('genie-out');
+    w.addEventListener('animationend', finish, { once: true });
+  }
 
   function makeWin(id, def, idx) {
     const win = el('section', `appwin skin-${def.skin}`);
     const mobile = window.innerWidth <= 640;
     const width = mobile ? Math.min(def.w, window.innerWidth - 16) : def.w;
     win.style.width = `${width}px`;
-    win.style.left = `${mobile ? 8 : Math.round(window.innerWidth * def.fx)}px`;
-    win.style.top = `${mobile ? 64 + idx * 34 : def.fy}px`;
+    win.style.left = `${mobile ? 8 : Math.min(Math.round(window.innerWidth * def.fx), window.innerWidth - 100)}px`;
+    win.style.top = `${mobile ? 64 + idx * 34 : Math.min(def.fy, Math.max(60, window.innerHeight - 160))}px`;
     win.setAttribute('role', 'dialog');
     win.setAttribute('aria-label', def.title);
     win.tabIndex = -1;
@@ -383,19 +557,22 @@
     const bar = el('div', 'appwin-bar');
     bar.appendChild(window.PixelArt.render(def.icon, 1));
     bar.appendChild(el('span', 'appwin-title', def.title));
+    const minBtn = el('button', 'appwin-min', '–');
+    minBtn.setAttribute('aria-label', `Minimize ${def.title}`);
+    minBtn.addEventListener('click', (e) => { e.stopPropagation(); minimize(id); });
     const closeBtn = el('button', 'appwin-close', '×');
     closeBtn.setAttribute('aria-label', `Close ${def.title}`);
     closeBtn.addEventListener('click', (e) => { e.stopPropagation(); close(id); });
-    bar.appendChild(closeBtn);
+    bar.append(minBtn, closeBtn);
 
     const body = el('div', 'appwin-body');
     def.build(body);
     win.append(bar, body);
 
     win.addEventListener('pointerdown', () => toFront(win));
-    win.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(id); });
+    win.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !e.isComposing) close(id); });
     bar.addEventListener('pointerdown', (e) => {
-      if (e.target === closeBtn) return;
+      if (e.target === closeBtn || e.target === minBtn) return;
       const dx = e.clientX - win.offsetLeft;
       const dy = e.clientY - win.offsetTop;
       const move = (ev) => {
@@ -405,9 +582,11 @@
       const up = () => {
         document.removeEventListener('pointermove', move);
         document.removeEventListener('pointerup', up);
+        document.removeEventListener('pointercancel', up);
       };
       document.addEventListener('pointermove', move);
       document.addEventListener('pointerup', up);
+      document.addEventListener('pointercancel', up);
       e.preventDefault();
     });
     return win;
@@ -417,7 +596,18 @@
     const def = DEFS[id];
     if (!def) return;
     const existing = wins.get(id);
-    if (existing) { toFront(existing); return; }
+    if (existing) {
+      toFront(existing);
+      if (existing.dataset.min) {
+        delete existing.dataset.min;
+        existing.classList.remove('minimized', 'genie-out');
+        if (!reduced) {
+          existing.classList.add('genie-in');
+          existing.addEventListener('animationend', () => existing.classList.remove('genie-in'), { once: true });
+        }
+      }
+      return;
+    }
     const w = makeWin(id, def, idx);
     wins.set(id, w);
     document.body.appendChild(w);

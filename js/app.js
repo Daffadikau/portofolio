@@ -77,10 +77,12 @@
     document.dispatchEvent(new CustomEvent('tabshown', { detail: { id } }));
   }
   function fromHash() {
-    const id = location.hash.replace('#', '') || 'about';
+    let id = location.hash.replace('#', '') || 'about';
+    if (!TABS.includes(id)) {
+      id = 'about';
+      history.replaceState(null, '', '#about');
+    }
     showTab(id);
-    // kompat link lama #terminal: terminal kini app window, bukan tab
-    if (id === 'terminal' && window.AppWins) window.AppWins.open('terminal');
   }
   window.addEventListener('hashchange', fromHash);
 
@@ -99,7 +101,11 @@
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     const n = Number(e.key);
-    if (n >= 1 && n <= TABS.length) location.hash = TABS[n - 1];
+    if (n >= 1 && n <= TABS.length) {
+      const id = TABS[n - 1];
+      if ((location.hash.replace('#', '') || 'about') === id) showTab(id);
+      else location.hash = id;
+    }
   });
 
   const D = window.PORTFOLIO_DATA;
@@ -167,6 +173,7 @@
     window.AppWins.GROUPS[group].forEach((id) => {
       const def = window.AppWins.DEFS[id];
       const b = el('button', 'launch-btn');
+      b.dataset.appid = id;
       b.appendChild(window.PixelArt.render(def.icon, 2));
       b.appendChild(document.createTextNode(def.title.split(' — ')[1] || def.title));
       b.addEventListener('click', () => window.AppWins.open(id));
@@ -234,9 +241,13 @@
     h.prepend(window.PixelArt.render('mail', 2));
     // mesh ala Tailscale: Smoky sebagai relay node di atas, tiga peer di bawah
     const mesh = el('div', 'mesh');
-    const guard = el('div', 'contact-smoky');
+    const guard = el('button', 'contact-smoky');
+    guard.dataset.appid = 'idcard';
+    guard.setAttribute('aria-label', 'Smoky in his cardboard box — click him');
+    guard.title = 'psst... click Smoky';
     guard.appendChild(window.PixelArt.render('catBox', 4));
     guard.appendChild(el('span', 'char-partner', 'Smoky guards the inbox'));
+    guard.addEventListener('click', () => window.AppWins.open('idcard'));
     const stem = el('div', 'mesh-stem');
     const rail = el('div', 'mesh-rail');
     const drops = el('div', 'mesh-drops');
@@ -244,9 +255,12 @@
     const btns = el('div', 'contact-btns mesh-peers');
     const mail = el('a', 'pxbtn big peer', '✉ Email');
     mail.href = `mailto:${D.socials.email}`;
-    [mail, extLink('pxbtn big peer', 'GitHub', D.socials.github),
-      extLink('pxbtn big peer', 'LinkedIn', D.socials.linkedin)]
-      .forEach((b) => { b.prepend(el('span', 'peer-dot')); btns.appendChild(b); });
+    mail.dataset.appid = 'gmail';
+    const gh = extLink('pxbtn big peer', 'GitHub', D.socials.github);
+    gh.dataset.appid = 'ghprofile';
+    const li = extLink('pxbtn big peer', 'LinkedIn', D.socials.linkedin);
+    li.dataset.appid = 'liprofile';
+    [mail, gh, li].forEach((b) => { b.prepend(el('span', 'peer-dot')); btns.appendChild(b); });
     mesh.append(guard, stem, rail, drops, btns);
     p.append(h,
       el('p', 'bio', `${D.availability} ${D.replyNote}`),
@@ -312,7 +326,7 @@
         if (tab) tab.focus();
       }
     }
-    window.addEventListener('hashchange', restore);
+    document.addEventListener('tabshown', restore);
     document.getElementById('dock').addEventListener('click', (e) => {
       if (e.target.closest('[data-tab]')) restore();
     });
@@ -325,6 +339,7 @@
     window.AppWins.closeAll(['terminal']);
     if (e.detail.id === 'projects') window.AppWins.openGroup('projects');
     else if (e.detail.id === 'skills') window.AppWins.openGroup('skills');
+    else if (e.detail.id === 'contact') window.AppWins.openGroup('contact');
   });
 
   // haptic "boing" — semua kontrol utama membal sesaat setelah diklik
