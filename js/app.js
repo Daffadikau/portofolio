@@ -306,11 +306,18 @@
     const drops = el('div', 'mesh-drops');
     drops.append(el('i'), el('i'), el('i'));
     const btns = el('div', 'contact-btns mesh-peers');
-    const mail = el('a', 'pxbtn big peer', '✉ Email');
-    mail.href = `mailto:${D.socials.email}`;
-    [mail, extLink('pxbtn big peer', 'GitHub', D.socials.github),
-      extLink('pxbtn big peer', 'LinkedIn', D.socials.linkedin)]
-      .forEach((b) => { b.prepend(el('span', 'peer-dot')); btns.appendChild(b); });
+    [
+      { cls: 'peer-gmail', icon: 'gmail', label: 'Email', href: `mailto:${D.socials.email}` },
+      { cls: 'peer-github', icon: 'github', label: 'GitHub', href: D.socials.github, ext: true },
+      { cls: 'peer-linkedin', icon: 'linkedin', label: 'LinkedIn', href: D.socials.linkedin, ext: true },
+    ].forEach((p) => {
+      const a = el('a', `pxbtn big peer ${p.cls}`);
+      a.href = p.href;
+      if (p.ext) { a.target = '_blank'; a.rel = 'noreferrer'; }
+      a.appendChild(window.PixelArt.render(p.icon, 2));
+      a.appendChild(el('span', null, p.label));
+      btns.appendChild(a);
+    });
     mesh.append(guard, stem, rail, drops, btns);
     p.append(h,
       el('p', 'bio', `${D.availability} ${D.replyNote}`),
