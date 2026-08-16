@@ -407,11 +407,12 @@
     meta.append(title, artist, eq);
     now.append(cover, meta);
 
-    const bar = el('div', 'sp-bar');
-    const fill = el('i');
-    bar.appendChild(fill);
-    const times = el('div', 'sp-times');
-    times.append(el('span', null, '--:--'), el('span', null, '--:--'));
+    // pemutar asli: Spotify Embed (resmi, tanpa login). Pengunjung dapat
+    // preview 30 detik; yang sedang login Premium dapat lagu utuh.
+    const embedHost = el('div', 'sp-embed');
+    const embedMount = el('div');
+    embedHost.appendChild(embedMount);
+    const note = el('p', 'sp-note', 'Preview 30 detik · putar penuh kalau kamu login Spotify Premium');
 
     const ctrls = el('div', 'sp-ctrls');
     const prev = el('button', 'sp-btn', '⏮');
@@ -450,15 +451,56 @@
     }
     function select(i) {
       idx = (i + tracks.length) % tracks.length;
-      playing = true;
       render();
+      if (ctrl && tracks[idx].sid) {
+        ctrl.loadUri(`spotify:track:${tracks[idx].sid}`);
+        ctrl.play();
+      }
     }
     prev.addEventListener('click', () => select(idx - 1));
     next.addEventListener('click', () => select(idx + 1));
-    play.addEventListener('click', () => { playing = !playing; render(); });
+    play.addEventListener('click', () => {
+      if (ctrl) ctrl.togglePlay();
+      else { playing = !playing; render(); }
+    });
 
-    body.append(now, bar, times, ctrls, el('div', 'sp-head', 'Daffa’s favourites'), list);
+    body.append(now, embedHost, note, ctrls, el('div', 'sp-head', 'Daffa’s favourites'), list);
     render();
+
+    // pasang controller Spotify; kalau gagal (offline/diblokir), UI tetap
+    // jalan sebagai daftar lagu + tautan ke Spotify
+    let ctrl = null;
+    spotifyApi().then((IFrameAPI) => {
+      IFrameAPI.createController(embedMount, {
+        uri: `spotify:track:${tracks[idx].sid}`,
+        width: '100%',
+        height: '80',
+      }, (controller) => {
+        ctrl = controller;
+        controller.addListener('playback_update', (e) => {
+          playing = e && e.data && !e.data.isPaused;
+          render();
+        });
+      });
+    }).catch(() => {
+      note.textContent = 'Pemutar Spotify tidak bisa dimuat — buka playlist-nya lewat tautan di atas.';
+    });
+  }
+
+  // memuat Spotify IFrame API sekali saja, aman dipanggil berkali-kali
+  let spotifyApiPromise = null;
+  function spotifyApi() {
+    if (spotifyApiPromise) return spotifyApiPromise;
+    spotifyApiPromise = new Promise((resolve, reject) => {
+      window.onSpotifyIframeApiReady = resolve;
+      const s = document.createElement('script');
+      s.src = 'https://open.spotify.com/embed/iframe-api/v1';
+      s.async = true;
+      s.onerror = () => reject(new Error('spotify iframe api gagal dimuat'));
+      document.head.appendChild(s);
+      setTimeout(() => reject(new Error('spotify iframe api timeout')), 12000);
+    });
+    return spotifyApiPromise;
   }
 
   // ---- builders: Contact (profil pixel GitHub / LinkedIn / Gmail) ----
@@ -618,7 +660,7 @@
     liprofile: { title: 'daffadikau — LinkedIn', skin: 'linkedin', icon: 'linkedin', w: 400, fx: 0.57, fy: 130, build: buildLinkedin },
     gmail: { title: 'Inbox (2) — Gmail', skin: 'gmail', icon: 'gmail', w: 480, fx: 0.26, fy: 400, build: buildGmail },
     idcard: { title: 'travel-license — Wallet', skin: 'idcard', icon: 'catBox', w: 720, fx: 0.13, fy: 90, center: true, build: buildIdcard },
-    spotify: { title: 'Spotify', skin: 'spotify', icon: 'spotify', w: 320, fx: 0.62, fy: 200, build: buildSpotify },
+    spotify: { title: 'Spotify', skin: 'spotify', icon: 'spotify', w: 340, fx: 0.6, fy: 110, build: buildSpotify },
   };
   const GROUPS = {
     projects: ['excel', 'word', 'notion'],
