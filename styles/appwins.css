@@ -166,7 +166,7 @@
 .skin-spotify .appwin-body { background: #121212; color: #e8e8e8; padding: 12px; }
 .sp-now { display: flex; gap: 12px; align-items: center; }
 .sp-cover { flex: 0 0 auto; border: 2px solid #000; line-height: 0; }
-.sp-cover svg { image-rendering: pixelated; display: block; }
+.sp-cover img { image-rendering: pixelated; display: block; width: 84px; height: 84px; object-fit: cover; }
 .sp-meta { min-width: 0; display: grid; gap: 3px; }
 .sp-title { font-family: var(--font-pixel); font-size: 13px; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sp-artist { font-size: 11px; color: #b3b3b3; }

@@ -423,6 +423,7 @@
     const open = el('a', 'sp-open', 'Open in Spotify ↗');
     open.target = '_blank';
     open.rel = 'noreferrer';
+    open.href = D.musicPlaylist || 'https://open.spotify.com/';
     ctrls.append(prev, play, next, open);
 
     const list = el('div', 'sp-list');
@@ -436,10 +437,12 @@
 
     function render() {
       const t = tracks[idx];
-      cover.replaceChildren(window.PixelArt.render(t.cover, 5));
+      const img = el('img');
+      img.src = t.cover;
+      img.alt = `${t.title} — ${t.artist} album cover`;
+      cover.replaceChildren(img);
       title.textContent = t.title;
       artist.textContent = t.artist;
-      open.href = `https://open.spotify.com/search/${encodeURIComponent(`${t.title} ${t.artist}`)}`;
       play.textContent = playing ? '⏸' : '▶';
       play.setAttribute('aria-label', playing ? 'Pause' : 'Play');
       body.classList.toggle('sp-playing', playing);

@@ -21,10 +21,12 @@ window.PORTFOLIO_DATA = {
       memento: 'Soft Brush',
     },
   },
+  // sampul dibuat Dikau sendiri via giventofly.github.io/pixelit
+  musicPlaylist: 'https://sptfy.bio/dikau',
   music: [
-    { title: 'Chanel', artist: 'Frank Ocean', cover: 'albChanel' },
-    { title: 'Going to Bable On', artist: 'The Strokes', cover: 'albStrokes' },
-    { title: 'Juna', artist: 'Clairo', cover: 'albJuna' },
+    { title: 'Chanel', artist: 'Frank Ocean', cover: 'assets/covers/chanel.png' },
+    { title: 'Going to Bable On', artist: 'The Strokes', cover: 'assets/covers/bable-on.png' },
+    { title: 'Juna', artist: 'Clairo', cover: 'assets/covers/juna.png' },
   ],
   education: {
     school: 'Universitas Pendidikan Indonesia (UPI)',
