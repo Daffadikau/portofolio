@@ -206,7 +206,7 @@
     status.append(el('span', 'dot'), document.createTextNode(D.status));
     head.appendChild(status);
     hero.append(art, head, buildStatusScreen(D.stats));
-    p.append(hero, el('p', 'bio', D.bio), buildDesk(D.desk),
+    p.append(hero, el('p', 'bio', D.bio), buildFlat(D.flat),
       h2icon('cap', 'Education'),
       el('p', null, `${D.education.program} — ${D.education.school}, ${D.education.detail}`),
       h2icon('case', 'Experience'));
@@ -427,36 +427,85 @@
     dev.append(lcd, btns);
     return dev;
   }
-  // Meja kerja: benda-benda di atas meja jadi hotspot. Hover atau fokus
-  // keyboard memunculkan satu kalimat di papan kecil di bawah meja.
-  function buildDesk(items) {
-    const scene = el('div', 'desk');
-    scene.setAttribute('aria-label', 'My desk');
-    const shelf = el('div', 'desk-top');
-    const read = el('div', 'desk-read');
-    const readLabel = el('b');
-    const readFact = el('span');
-    read.append(readLabel, readFact);
-    function show(it) {
-      readLabel.textContent = it ? `${it.label} — ` : '';
-      readFact.textContent = it ? it.fact : 'hover an object on the desk';
+  // Apartemen Smoky: satu potongan denah dengan empat zona. Smoky pindah
+  // zona sendiri tiap beberapa detik dan mengerjakan sesuatu di sana, jadi
+  // halamannya terasa hidup walau pengunjung diam saja.
+  function buildFlat(zones) {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const wrap = el('div', 'flat');
+    const stage = el('div', 'flat-stage');
+    stage.appendChild(window.PixelArt.render('flatApartment', 6));
+    const cat = el('button', 'flat-cat');
+    cat.type = 'button';
+    cat.setAttribute('aria-label', 'Poke Smoky');
+    function outfitLayers() {
+      try {
+        const w = window.Smoky.getWorn();
+        const find = (slot) => {
+          const it = window.Smoky.WARDROBE[slot].filter((x) => x.id === w[slot])[0];
+          return it && it.map;
+        };
+        return [find('outfit'), find('acc'), find('hat')].filter(Boolean);
+      } catch (e) { return []; }
     }
-    (items || []).forEach((it) => {
-      const b = el('button', 'desk-item');
-      b.type = 'button';
-      b.setAttribute('aria-label', `${it.label}: ${it.fact}`);
-      b.appendChild(window.PixelArt.render(it.icon, 3));
-      b.appendChild(el('span', 'desk-tag', it.label));
-      ['pointerenter', 'focus'].forEach((ev) => b.addEventListener(ev, () => show(it)));
-      b.addEventListener('click', () => {
-        show(it);
-        try { window.Smoky.sfx.play('happy'); } catch (e) { /* audio opsional */ }
-      });
-      shelf.appendChild(b);
+    function face(map) {
+      cat.replaceChildren(window.PixelArt.renderStack([map].concat(outfitLayers()), 4));
+    }
+    const read = el('div', 'flat-read');
+    const who = el('b');
+    const what = el('span');
+    read.append(who, what);
+    let at = 0;
+    let hovering = false;
+    function say(label, text) { who.textContent = `${label} — `; what.textContent = text; }
+    function sayCurrent() {
+      if (hovering) return;
+      say('Smoky', `is ${zones[at].act}.`);
+    }
+    // hotspot per zona: hover/fokus menampilkan keterangannya
+    const spots = el('div', 'flat-spots');
+    zones.forEach((z, i) => {
+      const b2 = el('button', 'flat-spot');
+      b2.type = 'button';
+      b2.style.left = `${(i / zones.length) * 100}%`;
+      b2.style.width = `${100 / zones.length}%`;
+      b2.setAttribute('aria-label', `${z.label}: ${z.fact}`);
+      b2.appendChild(el('span', 'flat-tag', z.label));
+      const show = () => { hovering = true; say(z.label, z.fact); };
+      ['pointerenter', 'focus'].forEach((ev) => b2.addEventListener(ev, show));
+      ['pointerleave', 'blur'].forEach((ev) => b2.addEventListener(ev, () => {
+        hovering = false; sayCurrent();
+      }));
+      b2.addEventListener('click', show);
+      spots.appendChild(b2);
     });
-    scene.append(shelf, el('div', 'desk-surface'), read);
-    show(null);
-    return scene;
+    function goTo(i) {
+      at = i;
+      const z = zones[i];
+      cat.style.left = `${z.pct}%`;
+      // ganti pose setelah dia sampai, bukan waktu masih jalan
+      clearTimeout(cat._arrive);
+      face('cat');
+      cat._arrive = setTimeout(() => { face(z.face); sayCurrent(); }, reduced ? 0 : 2300);
+    }
+    cat.addEventListener('click', () => {
+      face('catHappy');
+      say('Smoky', 'mrrp.');
+      try { window.Smoky.interact('poke'); } catch (e) { /* opsional */ }
+      clearTimeout(cat._arrive);
+      cat._arrive = setTimeout(() => { face(zones[at].face); sayCurrent(); }, 1400);
+    });
+    try { window.Smoky.onOutfit(() => face(zones[at].face)); } catch (e) { /* opsional */ }
+    stage.append(spots, cat);
+    wrap.append(stage, read);
+    goTo(reduced ? 3 : 1);
+    if (!reduced) {
+      // urutannya tidak berurutan supaya tidak terasa seperti loop
+      const ORDER = [1, 0, 2, 3, 1, 2, 0, 3];
+      let step = 0;
+      setInterval(() => { step += 1; goTo(ORDER[step % ORDER.length]); }, 9000);
+    }
+    return wrap;
   }
   // Footer Y2K: pencacah kunjungan ala GeoCities, badge 88x31, dan webring.
   // Semua palsu dan lokal — tidak ada request keluar, angkanya dari

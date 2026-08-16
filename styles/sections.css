@@ -358,49 +358,40 @@
   .tama { display: flex; }
   .tama-lcd { min-width: 0; }
 }
-/* ── Meja kerja interaktif (Neko Atsume core: benda yang bisa dicolek) ── */
-.desk { margin: 14px 0 18px; }
-.desk-top {
-  display: flex; align-items: flex-end; justify-content: space-evenly;
-  gap: 10px; flex-wrap: wrap; padding: 14px 12px 0; min-height: 92px;
-  border: 3px solid var(--ink); border-bottom: 0; background: #efe7d8;
-  /* dinding dengan garis wainscot tipis biar tidak kosong melompong */
-  background-image: repeating-linear-gradient(90deg, rgba(0,0,0,.05) 0 2px, transparent 2px 26px);
+/* ── Apartemen Smoky: denah pixel + penghuni yang pindah zona sendiri ── */
+.flat { margin: 14px 0 18px; }
+.flat-stage {
+  position: relative; border: 3px solid var(--ink); overflow: hidden;
+  line-height: 0; background: #efe0c8;
 }
-.desk-item {
-  /* tinggi seragam + rata bawah supaya semua benda kelihatan menapak meja,
-     walau ukuran ikonnya beda-beda */
-  position: relative; background: none; border: 0; padding: 4px 4px 6px;
-  min-height: 62px; justify-content: flex-end;
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  font-family: var(--font-mono); color: var(--ink);
-  transition: transform .1s steps(2);
+.flat-stage > svg { width: 100%; height: auto; display: block; image-rendering: pixelated; }
+/* hotspot per zona: tidak terlihat sampai di-hover/di-fokus */
+.flat-spots { position: absolute; inset: 0; }
+.flat-spot { position: absolute; top: 0; bottom: 0; padding: 0; background: none; border: 0; }
+.flat-spot:hover, .flat-spot:focus-visible { background: rgba(255, 255, 255, .16); }
+.flat-tag {
+  position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+  font-family: var(--font-pixel); font-size: 8px; white-space: nowrap;
+  border: 2px solid var(--ink); background: var(--tl-yellow); color: var(--ink);
+  padding: 2px 4px; opacity: 0;
 }
-.desk-item svg, .desk-item img { image-rendering: pixelated; display: block; }
-/* bayangan tipis di kaki benda */
-.desk-item::after {
-  content: ''; position: absolute; bottom: 0; left: 50%; margin-left: -16px;
-  width: 32px; height: 3px; background: rgba(0, 0, 0, .18);
+.flat-spot:hover .flat-tag, .flat-spot:focus-visible .flat-tag { opacity: 1; }
+/* lebarnya persen, bukan piksel tetap, supaya proporsinya terhadap ruangan
+   tetap sama waktu denahnya mengecil di layar sempit */
+.flat-cat {
+  position: absolute; bottom: 14%; left: 38%; width: 8%;
+  transform: translateX(-50%);
+  padding: 0; background: none; border: 0; line-height: 0; z-index: 2;
+  transition: left 2.2s steps(14);
 }
-.desk-item:hover, .desk-item:focus-visible { transform: translateY(-6px); }
-.desk-tag {
-  font-family: var(--font-pixel); font-size: 8px; opacity: 0;
-  border: 2px solid var(--ink); background: var(--tl-yellow); padding: 2px 4px;
-}
-.desk-item:hover .desk-tag, .desk-item:focus-visible .desk-tag { opacity: 1; }
-/* papan meja: garis tebal + bayangan tipis, bukan gambar isometrik */
-.desk-surface {
-  height: 14px; border: 3px solid var(--ink); background: #c08f52;
-  box-shadow: inset 0 4px 0 rgba(255, 255, 255, .25);
-}
-.desk-read {
+.flat-cat svg { width: 100%; height: auto; image-rendering: pixelated; display: block; }
+.flat-read {
   border: 3px solid var(--ink); border-top: 0; background: var(--ink);
-  color: var(--win); padding: 7px 12px; font-size: 12px;
+  color: var(--win); padding: 7px 12px; font-size: 12px; min-height: 34px;
 }
-.desk-read b { color: var(--tl-yellow); }
-@media (max-width: 640px) {
-  .desk-top { gap: 8px; }
-}
+.flat-read b { color: var(--tl-yellow); }
+@media (prefers-reduced-motion: reduce) { .flat-cat { transition: none; } }
+@media (max-width: 640px) { .flat-read { font-size: 11px; } }
 /* ── Footer Y2K (GeoCities core) ────────────────────────────────────── */
 .y2k {
   margin: 24px 0 8px; padding: 14px 12px;

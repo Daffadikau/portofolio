@@ -173,15 +173,17 @@ window.PORTFOLIO_DATA = {
     note: "If you're feeling nerdy, here's a much more detailed one.",
     label: 'Download CV (PDF)',
   },
-  // isi meja kerja di tab About. Tiap benda jadi hotspot yang mengeluarkan
-  // satu kalimat waktu di-hover/di-fokus.
-  desk: [
-    { icon: 'deskEsp', label: 'ESP32', fact: 'Reads the gas sensors, then throws the numbers at my backend.' },
-    { icon: 'deskLaptop', label: 'Laptop', fact: 'zsh and oh-my-zsh on it. Most of the day happens in here.' },
-    { icon: 'deskDrone', label: 'Drone', fact: 'The CBRN platform I build at IROSTECH flies on one of these.' },
-    { icon: 'catSleep', label: 'Smoky', fact: 'Owns the warm spot next to the laptop. Non-negotiable.' },
-    { icon: 'fish', label: 'Snack', fact: "His, not mine. That is the official position." },
-    { icon: 'deskMug', label: 'Coffee', fact: 'Refuelling. The mug is older than most of my repos.' },
+  // Zona di apartemen Smoky (tab About). pct = posisi Smoky dalam persen
+  // lebar denah; act = yang dia lakukan begitu sampai di zona itu.
+  flat: [
+    { id: 'kitchen', label: 'Kitchen', pct: 8, act: 'raiding the food bowl', face: 'catHappy',
+      fact: 'Fuel stop. The bowl gets refilled more reliably than my sleep schedule.' },
+    { id: 'desk', label: 'Workspace', pct: 38, act: 'supervising my commits', face: 'cat',
+      fact: 'Where the CBRN platform and the gas monitor actually get built.' },
+    { id: 'play', label: 'Play corner', pct: 65, act: 'wrecking the toy box', face: 'catHappy',
+      fact: 'Cat tree, toy box, and the shelf where the trophies end up.' },
+    { id: 'bed', label: 'Bedroom', pct: 86, act: 'napping in the box', face: 'catSleep',
+      fact: 'The cardboard box. Non-negotiable, as established.' },
   ],
   // icon + rarity dipakai kartu Joker di tab About (rarity menentukan warna
   // pita bawah kartu, meniru sistem kelangkaan Balatro)
