@@ -193,16 +193,16 @@
     const TENANTS = [
       // PT IROSTECH: kemeja biru bergaris + dasi + kacamata, di bilik kantor
       { fit: 'wFitShirtTie', acc: 'wAccGlasses', hat: null, unit: '4A',
-        scene: 'sceneOffice', prop: null },
+        scene: 'sceneOffice', ceil: 'ceilOffice', decor: 'decorDrone', prop: null },
       // Rumah Prestasi UPI: blazer almamater merah, di panggung bersorot lampu
       { fit: 'wFitBlazerUpi', acc: null, hat: null, unit: '3A',
-        scene: 'sceneStage', prop: 'propBulb' },
+        scene: 'sceneStage', ceil: 'ceilStage', decor: 'decorMedal', prop: 'propBulb' },
       // HIMA TEKKOM P2M: kaus volunteer, di tempat penyaluran donasi
       { fit: 'wFitVolunteer', acc: null, hat: null, unit: '2A',
-        scene: 'sceneVolunteer', prop: 'propBox' },
+        scene: 'sceneVolunteer', ceil: 'ceilVolunteer', decor: 'decorShelf', prop: 'propBox' },
       // KSR PMI: seragam medis + hard hat, di ruang rawat
       { fit: 'wFitPmi', acc: null, hat: 'wHatHardHat', unit: '1A',
-        scene: 'sceneHospital', prop: 'propBlanket' },
+        scene: 'sceneHospital', ceil: 'ceilHospital', decor: 'decorClock', prop: 'propBlanket' },
     ];
     const apt = el('section', 'apt');
     apt.setAttribute('aria-label', 'Experience, as an apartment building');
@@ -213,11 +213,19 @@
       const t = TENANTS[i % TENANTS.length];
       const floor = el('div', 'apt-floor');
       const room = el('div', `apt-room ${t.scene} asleep`);
-      // latar lokasi digambar sebagai peta pixel utuh, bukan susunan kotak CSS,
-      // supaya detailnya nyambung dengan gaya pixel di seluruh situs
+      // Kamar disusun tiga lapis supaya tetap terisi waktu memanjang:
+      // langit-langit menempel di atas, perabot menempel di bawah, dan
+      // dinding di antaranya diisi pola yang berulang (lihat sections.css).
       const back = el('div', 'apt-back');
       back.setAttribute('aria-hidden', 'true');
-      back.appendChild(window.PixelArt.render(t.scene, 3));
+      const ceil = el('div', 'apt-ceil');
+      ceil.appendChild(window.PixelArt.render(t.ceil, 3));
+      back.append(ceil, window.PixelArt.render(t.scene, 3));
+      // hiasan dinding: cuma muncul kalau kamarnya sedang memanjang, supaya
+      // tidak bertabrakan dengan perabot waktu kamarnya masih pendek
+      const decor = el('div', 'apt-decor');
+      decor.setAttribute('aria-hidden', 'true');
+      decor.appendChild(window.PixelArt.render(t.decor, 3));
       // prop yang cuma muncul waktu penghuninya masih tidur
       const sleep = el('div', 'apt-sleep');
       sleep.setAttribute('aria-hidden', 'true');
@@ -238,7 +246,7 @@
           [awake ? 'cat' : 'catSleep', t.fit, t.acc, t.hat].filter(Boolean), 3));
       }
       drawTenant(false);
-      room.append(back, el('i', 'apt-lamp'), sleep, tenant, zzz, el('i', 'apt-dim'));
+      room.append(back, decor, sleep, tenant, zzz, el('i', 'apt-dim'));
       const info = el('div', 'apt-info');
       const id = `apt-bubble-${i}`;
       const door = el('button', 'apt-door');
@@ -459,9 +467,26 @@
     );
     // baris penutup: Smoky di kardusnya menemani webring + unduhan CV
     const row = el('div', 'y2k-row');
-    const art = el('div', 'y2k-smoky');
-    art.setAttribute('aria-hidden', 'true');
+    const art = el('button', 'y2k-smoky');
+    art.type = 'button';
+    art.setAttribute('aria-label', 'Poke Smoky');
     art.appendChild(window.PixelArt.render('smokyBox', 3));
+    const purr = el('span', 'y2k-purr');
+    purr.hidden = true;
+    art.appendChild(purr);
+    const LINES = ['mrrp', 'the box is mine', 'you again', 'purr', 'do not resize me', '...'];
+    let saidAt = 0;
+    art.addEventListener('click', () => {
+      purr.textContent = LINES[saidAt % LINES.length];
+      saidAt += 1;
+      purr.hidden = false;
+      art.classList.remove('poked');
+      void art.offsetWidth;
+      art.classList.add('poked');
+      try { window.Smoky.sfx.play('happy'); } catch (e) { /* audio opsional */ }
+      clearTimeout(art._t);
+      art._t = setTimeout(() => { purr.hidden = true; }, 2200);
+    });
     const col = el('div', 'y2k-col');
     col.append(ring, buildCvLink(D.cv));
     row.append(art, col);
@@ -480,11 +505,58 @@
     // bukan nama berkas di repo
     a.setAttribute('download', cv.download || '');
     a.setAttribute('type', 'application/pdf');
-    a.appendChild(window.PixelArt.render('fileDoc', 2));
+    a.appendChild(window.PixelArt.render('iconCv', 2));
     a.appendChild(el('span', null, cv.label || 'Download CV (PDF)'));
     wrap.appendChild(a);
     return wrap;
   }
+  // Easter egg: kode Konami membuka topi pesta di wardrobe Smoky.
+  // Sekali terbuka tetap terbuka (disimpan di localStorage oleh smoky.js).
+  (function konami() {
+    const SEQ = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
+      'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+    let at = 0;
+    document.addEventListener('keydown', (e) => {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+      const key = e.key && e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      at = key === SEQ[at] ? at + 1 : (key === SEQ[0] ? 1 : 0);
+      if (at < SEQ.length) return;
+      at = 0;
+      party();
+    });
+    function party() {
+      const first = window.Smoky.unlock('party');
+      window.Smoky.wear('hat', 'party');
+      try { window.Smoky.sfx.play('play'); } catch (err) { /* audio opsional */ }
+      try {
+        console.log('%c🎉 Party hat unlocked — check the wardrobe in Skills.',
+          'font-weight:bold;color:#f5d93d;background:#1a1a1a;padding:2px 6px');
+      } catch (err) { /* ignore */ }
+      toast(first ? 'PARTY HAT UNLOCKED' : 'PARTY HAT ON');
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) confetti();
+    }
+    function toast(text) {
+      const t = el('div', 'egg-toast', text);
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 2600);
+    }
+    // konfeti: kotak-kotak pixel, bukan bentuk bulat
+    function confetti() {
+      const wrap = el('div', 'confetti');
+      wrap.setAttribute('aria-hidden', 'true');
+      const COLORS = ['#f0713d', '#f5d93d', '#9dc24c', '#4a90d9', '#c94867', '#7d5ba6'];
+      for (let i = 0; i < 40; i += 1) {
+        const bit = el('i');
+        bit.style.left = `${Math.round(Math.random() * 100)}%`;
+        bit.style.background = COLORS[i % COLORS.length];
+        bit.style.animationDelay = `${(Math.random() * 0.9).toFixed(2)}s`;
+        bit.style.animationDuration = `${(1.6 + Math.random() * 1.2).toFixed(2)}s`;
+        wrap.appendChild(bit);
+      }
+      document.body.appendChild(wrap);
+      setTimeout(() => wrap.remove(), 3200);
+    }
+  })();
   function launcherFor(group) {
     const grid = el('div', 'launcher');
     window.AppWins.GROUPS[group].forEach((id) => {
@@ -577,6 +649,19 @@
         const b = el('button', 'wr-opt', item.label);
         b.dataset.slot = slot;
         b.dataset.item = item.id;
+        // barang rahasia tampil sebagai ??? sampai dibuka lewat easter egg
+        if (item.secret) {
+          b.dataset.secret = '1';
+          b.dataset.label = item.label;
+          const lockIt = () => {
+            const open = window.Smoky.isUnlocked(item.id);
+            b.textContent = open ? item.label : '???';
+            b.disabled = !open;
+            b.title = open ? item.label : 'Locked. Something unlocks this.';
+          };
+          lockIt();
+          window.Smoky.onUnlock(lockIt);
+        }
         b.addEventListener('click', () => window.Smoky.wear(slot, item.id));
         opts.appendChild(b);
       });

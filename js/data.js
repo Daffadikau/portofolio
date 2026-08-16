@@ -176,44 +176,44 @@ window.PORTFOLIO_DATA = {
   // isi meja kerja di tab About. Tiap benda jadi hotspot yang mengeluarkan
   // satu kalimat waktu di-hover/di-fokus.
   desk: [
-    { icon: 'chip', label: 'ESP32', fact: 'Reads the gas sensors, then throws the numbers at my backend.' },
-    { icon: 'term', label: 'Terminal', fact: 'zsh and oh-my-zsh. Most of the day happens in here.' },
-    { icon: 'docker', label: 'Docker', fact: 'Everything I deploy ships as a container. No exceptions.' },
+    { icon: 'deskEsp', label: 'ESP32', fact: 'Reads the gas sensors, then throws the numbers at my backend.' },
+    { icon: 'deskLaptop', label: 'Laptop', fact: 'zsh and oh-my-zsh on it. Most of the day happens in here.' },
+    { icon: 'deskDrone', label: 'Drone', fact: 'The CBRN platform I build at IROSTECH flies on one of these.' },
     { icon: 'catSleep', label: 'Smoky', fact: 'Owns the warm spot next to the laptop. Non-negotiable.' },
     { icon: 'fish', label: 'Snack', fact: "His, not mine. That is the official position." },
-    { icon: 'ball', label: 'Toy', fact: 'Rubber-duck debugging, except the duck is a ball and it is his.' },
+    { icon: 'deskMug', label: 'Coffee', fact: 'Refuelling. The mug is older than most of my repos.' },
   ],
   // icon + rarity dipakai kartu Joker di tab About (rarity menentukan warna
   // pita bawah kartu, meniru sistem kelangkaan Balatro)
   awards: [
     {
       title: 'Best Department of the Year (P2M)', org: 'HIMA TEKKOM UPI', when: '2026',
-      icon: 'trophy', rarity: 'rare', blurb: 'Ran the department that shipped the most.',
+      icon: 'awCup', rarity: 'rare', blurb: 'Ran the department that shipped the most.',
     },
     {
       title: '2nd Place (Silver Medal), National Digital Learning Video Competition (LIDM)',
       org: 'Ministry of Education', when: '2025',
-      icon: 'brush', rarity: 'legendary', blurb: 'National stage. Silver, out of the whole country.',
+      icon: 'awMedal', rarity: 'legendary', blurb: 'National stage. Silver, out of the whole country.',
     },
     {
       title: 'Best Biro of the Year (Pengabdian)', org: 'KSR PMI Unit UPI Kampus Cibiru', when: '2026',
-      icon: 'trophy', rarity: 'rare', blurb: 'Community service, done properly for a full year.',
+      icon: 'awShield', rarity: 'rare', blurb: 'Community service, done properly for a full year.',
     },
     {
       title: '2nd Place Winner, Best UI/UX Front-End Design', org: 'HIMA UPI', when: '2025',
-      icon: 'brush', rarity: 'rare', blurb: 'Design and front-end, judged together.',
+      icon: 'awPalette', rarity: 'rare', blurb: 'Design and front-end, judged together.',
     },
     {
       title: 'Staff of the Month (July)', org: 'KSR PMI Unit UPI Kampus Cibiru', when: '2025',
-      icon: 'cap', rarity: 'common', blurb: 'Showed up, every single time.',
+      icon: 'awStar', rarity: 'common', blurb: 'Showed up, every single time.',
     },
     {
       title: 'Biro of the Month (September)', org: 'KSR PMI Unit UPI Kampus Cibiru', when: '2025',
-      icon: 'cap', rarity: 'common', blurb: 'Same energy, one month later.',
+      icon: 'awRosette', rarity: 'common', blurb: 'Same energy, one month later.',
     },
     {
       title: 'Best Robotics and IT Student Program', org: 'SMAI PB Soedirman Bekasi', when: '2022',
-      icon: 'chip', rarity: 'uncommon', blurb: 'Where the whole thing started.',
+      icon: 'awRobot', rarity: 'uncommon', blurb: 'Where the whole thing started.',
     },
   ],
 };
