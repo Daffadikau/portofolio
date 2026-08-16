@@ -1,6 +1,98 @@
 (function () {
   function createCommands(D) {
     const line = (s) => s.join('\n');
+  const ART = {
+    smoky: [
+      "        ██                ██",
+      "      ██▓▓██            ██▓▓██",
+      "      ██▓▓▓▓██        ██▓▓▓▓██",
+      "      ██▓▓▓▓▓▓██████████▓▓▓▓▓▓██",
+      "    ██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██",
+      "    ██▓▓▓▓░░░░▓▓▓▓▓▓▓▓▓▓▓▓░░░░▓▓▓▓██",
+      "    ██▓▓▓▓░░░░▓▓▓▓▓▓▓▓▓▓▓▓░░░░▓▓▓▓██",
+      "    ██▓▓▓▓▓▓▓▓▓▓▓▓▓▓██▓▓▓▓▓▓▓▓▓▓▓▓██",
+      "████████████████████████████████████████",
+      "██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██",
+      "██▒▒▒▒▒▒▒▒░░░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██",
+      "██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██",
+      "██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██",
+      "██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██",
+      "████████████████████████████████████████",
+      "",
+      "   Smoky · くろねこさん · penjaga inbox, perusak deploy",
+    ],
+    daffa: [
+      "███████▒  ▓████▒  ██████░█████▓ ▓████▓     ▓██████▓ ░█████▓███▓ ▓███",
+      "███▓▒███  ██████  ███▓▒░░███▒▒░ ██████     ▓███▒███░░███▒▒░▓███ ███▓",
+      "███▒░███ ░██▓▓██░ ███▓░ ░███▒░  ███▓██░    ▓██▓ ███░░███▒░ ░███░███▒",
+      "███▒▒███ ▒██▒▒██▒ █████▓░█████▒░██▓▒██▓    ▓██▓░███░░█████▒ ███▓███░",
+      "███▒░███ ▓██▓▓██▓ ███▓  ░███▒  ▓██▓▓███    ▓██▓ ███░░███░   ▓██████",
+      "███▓▓███░████████ ███▒  ░███░  ████████░▒▒ ▓███▒███░░███▒▒░ ▒█████▓",
+      "███████▒░███░░███░███▒  ░███░ ░███▒ ███▓██░▓██████▓ ░██████ ░█████▒",
+      "",
+      "   Computer Engineering · UPI · fullstack + IoT",
+    ],
+    docker: [
+      "                ▒██  ▓█▓",
+      "                 ░░   ░",
+      "       ▒▓░ ░▓▓░ ░▓▓  ▒▓▒    ░▓▒",
+      "       ▒▒░  ▒▒░ ░▒▒  ░▒▒    ▒██▒▒",
+      "  ░▒░  ░░░  ░░   ░░  ░░░    ▒████▒░░░░",
+      "  ▒█▓  ▓█▒ ░▓█░ ░█▓  ▒█▓    ▒█████████",
+      "                            ▒█████████",
+      "███████████████████████████████████▓",
+      "██████████████████████████████▓░░░░",
+      "███████████████████████████████",
+      "▒▒▒▒▒▒▒█████████████████████▓▒▒",
+      "       ▒▓▓████████████████▓▓░",
+      "         ░▓▓▓▓███████▓▓▓▓▓",
+      "              ▓██████░",
+      "",
+      "   Docker · semua project-ku hidup di container",
+    ],
+    git: [
+      "              ▓██████▓▒▒",
+      "              ░░▒██████▓▒▒",
+      "         ░▓▒▒▓░  ▒░░░▓██▓▓▒░░",
+      "       ░▒▓████░      ▒████▓▓▒░░",
+      "     ░░███████░      ▒▓▓████▓▓▓░░",
+      "    ░█████████░        ░█▓█████▓▓░",
+      "  ▒█████████████▒  ▓█░    ▓██████▓▒▒",
+      "▓▓██████████████▒  ██▓▓▒  ░░▒██████▓▒▒",
+      "████████████████▒  █████▓▓  ░░░░░▓██▓▓",
+      "████████████████▒  ███████░      ▓████",
+      "████████████████▓  ███████       ▓████",
+      "██████████████▓▓▒  ▓▓█████░░░░░░░▓██▓▓",
+      "  ▓███████████░      ▒█████████████▒",
+      "   ░▒█████████░      ▒███████████░",
+      "     ░░███████░      ▒█████████░░",
+      "       ▒▒▓████▓▒▒▒▒▒▒▓██████▓▒░",
+      "         ░▓▓██████████████▓▓░",
+      "            ████████████▓▓",
+      "              █████████▓",
+      "",
+      "   Git · commit sering, push berani",
+    ],
+    github: [
+      "                ▒░░▒░░",
+      "            ▒▒▒▓█████▓▓▒▒▒",
+      "          ▒▓██████████████▓▒",
+      "        ░▓██▓▓██████████▓▒██▓▒",
+      "       ▓████░ ░░░░░░░░░░  ███▓░░",
+      "     ░░█████░             █████▒",
+      "     ▓████▒               ▓████▒",
+      "     ▓████▒               ▓████▒",
+      "     ▒▓███▓░              ▓████▒",
+      "      ░█████▒▒         ░▒▓█████▒",
+      "      ░███▓░██▓▓    ░▒▓██████▓░░",
+      "        ▒█▓▓▒░▒░    ░▒▓█████▒░",
+      "          ▒█▓▓█▓    ░▒▓███▒░",
+      "            ░░▓▒    ░▒▒▓░",
+      "",
+      "   github.com/Daffadikau",
+    ],
+  };
+
     return {
       help: () => line([
         '[AVAILABLE COMMANDS]', '',
@@ -12,6 +104,8 @@
         'contact     how to reach me',
         'neofetch    system info',
         'smoky       meet the mascot',
+        'ascii       ASCII art gallery',
+        'matrix      ???',
         'clear       clear screen',
       ]),
       about: () => line([
@@ -79,6 +173,25 @@
         '(affection +1 — but personality is Hot and Cold,',
         ' tomorrow he might ignore you completely)',
       ]),
+      ascii: (args) => {
+        const name = (args && args[0]) || '';
+        if (ART[name]) return line(ART[name]);
+        return line([
+          '[ASCII ART GALLERY]', '',
+          ...Object.keys(ART).map((k) => `  ${k.padEnd(8)} ${ART[k][ART[k].length - 1].trim()}`),
+          '', 'pakai: ascii <nama>',
+        ]);
+      },
+      matrix: () => line([
+        '01000100 01100001 01100110 01100110 01100001',
+        '  ア ミ ツ ネ ム レ カ サ タ ナ',
+        '01101000 01101001 01110010 01100101 00100001',
+        '',
+        'Wake up, visitor...',
+        'The portfolio has you.',
+        '',
+        '(bercanda — situs ini 100% HTML statis, tanpa framework)',
+      ]),
       'sudo hire-me': () => line([
         '[sudo] password for visitor: ********',
         'Permission granted. Initiating handshake...',
@@ -143,8 +256,20 @@
     const isUrl = (v) => /^https?:\/\/[^\s]+$/.test(v);
     const isEmail = (v) => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(v);
 
+    // VT323 tidak punya glyph Block Elements, jadi browser fallback per-karakter
+    // dan lebarnya jadi tidak seragam -> art textmode miring. Baris yang memuat
+    // blok dipindah ke font mono yang punya glyph-nya.
+    const blockRe = /[\u2580-\u259f]/;
     function renderOutput(container, output) {
       output.split('\n').forEach((lineText, i, arr) => {
+        if (blockRe.test(lineText)) {
+          const span = document.createElement('span');
+          span.className = 'tm-art';
+          span.textContent = lineText;
+          container.appendChild(span);
+          if (i < arr.length - 1) container.appendChild(document.createTextNode('\n'));
+          return;
+        }
         const tokens = lineText.split(urlRe).flatMap((part) => (isUrl(part) ? [part] : part.split(emailRe)));
         tokens.forEach((token) => {
           if (isUrl(token)) {
@@ -201,8 +326,9 @@
         return;
       }
       const lookup = (k) => (Object.prototype.hasOwnProperty.call(commands, k) ? commands[k] : null);
-      const fn = lookup(cmd) || lookup(cmd.split(/\s+/)[0]);
-      const output = fn ? fn() : `Command not found: ${cmd}\nType help to see available commands.`;
+      const parts = cmd.split(/\s+/);
+      const fn = lookup(cmd) || lookup(parts[0]);
+      const output = fn ? fn(parts.slice(1)) : `Command not found: ${cmd}\nType help to see available commands.`;
       history.push({ command: raw, output });
       announce(output);
       renderHistory();

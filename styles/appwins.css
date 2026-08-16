@@ -143,6 +143,12 @@
 .gl-commits h5 { font-size: 10px; text-transform: uppercase; opacity: .6; margin-bottom: 4px; }
 .gl-commit { display: flex; gap: 8px; font-size: 11px; padding: 2px 0; }
 .gl-commit i { margin-left: auto; font-style: normal; opacity: .55; font-size: 10px; flex: 0 0 auto; }
+.gl-graph { font-family: var(--font-mono); font-size: 11px; overflow-x: auto; }
+.gl-grow { display: flex; align-items: baseline; gap: 6px; padding: 1px 0; white-space: pre; }
+.gl-gl { color: var(--tl-red); white-space: pre; flex: 0 0 auto; }
+.gl-sha { font-weight: 700; opacity: .75; flex: 0 0 auto; }
+.gl-msg { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gl-when { margin-left: auto; font-style: normal; opacity: .55; font-size: 10px; flex: 0 0 auto; }
 
 /* Notion */
 .nt-wrap { display: flex; min-height: 180px; }
