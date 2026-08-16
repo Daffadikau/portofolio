@@ -63,7 +63,7 @@
   reloadBtn.addEventListener('click', () => location.reload());
   navBtns.append(backBtn, fwdBtn, reloadBtn);
   const urlBar = el('div', 'urlbar');
-  urlBar.append(el('span', 'url-lock', '🔒'), el('span', 'url-text', 'daffa.dev'));
+  urlBar.append(el('span', 'url-lock', '🔒'), el('span', 'url-text', 'https://daffadikau.dev/'));
   const urlText = urlBar.querySelector('.url-text');
   toolbar.append(navBtns, urlBar);
 
@@ -97,7 +97,7 @@
       panel.hidden = !active;
       if (active) { panel.classList.remove('pop'); void panel.offsetWidth; panel.classList.add('pop'); }
     });
-    urlText.textContent = `daffa.dev/${id === 'about' ? '' : id}`;
+    urlText.textContent = `https://daffadikau.dev/${id === 'about' ? '' : id}`;
     document.dispatchEvent(new CustomEvent('tabshown', { detail: { id } }));
   }
   function fromHash() {
