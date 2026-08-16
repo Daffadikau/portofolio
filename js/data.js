@@ -21,6 +21,11 @@ window.PORTFOLIO_DATA = {
       memento: 'Soft Brush',
     },
   },
+  music: [
+    { title: 'Chanel', artist: 'Frank Ocean', cover: 'albChanel' },
+    { title: 'Going to Bable On', artist: 'The Strokes', cover: 'albStrokes' },
+    { title: 'Juna', artist: 'Clairo', cover: 'albJuna' },
+  ],
   education: {
     school: 'Universitas Pendidikan Indonesia (UPI)',
     program: 'Computer Engineering',

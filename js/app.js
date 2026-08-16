@@ -334,6 +334,7 @@
       { map: 'chip', tab: 'skills', label: 'Skills' },
       { map: 'mail', tab: 'contact', label: 'Contact' },
       { map: 'term', app: 'terminal', label: 'Terminal' },
+      { map: 'spotify', app: 'spotify', label: 'Spotify' },
       { sep: true },
       { map: 'github', url: D.socials.github, label: 'GitHub' },
       { map: 'linkedin', url: D.socials.linkedin, label: 'LinkedIn' },

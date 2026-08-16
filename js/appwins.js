@@ -389,6 +389,75 @@
     window.TerminalEngine.mount(body);
   }
 
+  // ---- builder: Spotify (player lagu favorit — tanpa audio, tautan ke Spotify) ----
+  function buildSpotify(body) {
+    const tracks = D.music || [];
+    if (!tracks.length) return;
+    let idx = 0;
+    let playing = false;
+
+    const now = el('div', 'sp-now');
+    const cover = el('div', 'sp-cover');
+    const meta = el('div', 'sp-meta');
+    const title = el('b', 'sp-title');
+    const artist = el('span', 'sp-artist');
+    const eq = el('span', 'sp-eq');
+    eq.setAttribute('aria-hidden', 'true');
+    eq.append(el('i'), el('i'), el('i'), el('i'));
+    meta.append(title, artist, eq);
+    now.append(cover, meta);
+
+    const bar = el('div', 'sp-bar');
+    const fill = el('i');
+    bar.appendChild(fill);
+    const times = el('div', 'sp-times');
+    times.append(el('span', null, '--:--'), el('span', null, '--:--'));
+
+    const ctrls = el('div', 'sp-ctrls');
+    const prev = el('button', 'sp-btn', '⏮');
+    prev.setAttribute('aria-label', 'Previous track');
+    const play = el('button', 'sp-btn sp-play', '▶');
+    play.setAttribute('aria-label', 'Play');
+    const next = el('button', 'sp-btn', '⏭');
+    next.setAttribute('aria-label', 'Next track');
+    const open = el('a', 'sp-open', 'Open in Spotify ↗');
+    open.target = '_blank';
+    open.rel = 'noreferrer';
+    ctrls.append(prev, play, next, open);
+
+    const list = el('div', 'sp-list');
+    tracks.forEach((t, i) => {
+      const row = el('button', 'sp-row');
+      row.append(el('i', 'sp-num', String(i + 1)),
+        el('span', 'sp-rt', t.title), el('span', 'sp-ra', t.artist));
+      row.addEventListener('click', () => select(i));
+      list.appendChild(row);
+    });
+
+    function render() {
+      const t = tracks[idx];
+      cover.replaceChildren(window.PixelArt.render(t.cover, 5));
+      title.textContent = t.title;
+      artist.textContent = t.artist;
+      open.href = `https://open.spotify.com/search/${encodeURIComponent(`${t.title} ${t.artist}`)}`;
+      play.textContent = playing ? '⏸' : '▶';
+      play.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+      body.classList.toggle('sp-playing', playing);
+      [...list.children].forEach((r, i) => r.setAttribute('aria-pressed', String(i === idx)));
+    }
+    function select(i) {
+      idx = (i + tracks.length) % tracks.length;
+      playing = true;
+      render();
+    }
+    prev.addEventListener('click', () => select(idx - 1));
+    next.addEventListener('click', () => select(idx + 1));
+    play.addEventListener('click', () => { playing = !playing; render(); });
+
+    body.append(now, bar, times, ctrls, el('div', 'sp-head', 'Daffa’s favourites'), list);
+    render();
+  }
+
   // ---- builders: Contact (profil pixel GitHub / LinkedIn / Gmail) ----
   function extBtn(cls, label, url) {
     const a = el('a', cls, label);
@@ -546,6 +615,7 @@
     liprofile: { title: 'daffadikau — LinkedIn', skin: 'linkedin', icon: 'linkedin', w: 400, fx: 0.57, fy: 130, build: buildLinkedin },
     gmail: { title: 'Inbox (2) — Gmail', skin: 'gmail', icon: 'gmail', w: 480, fx: 0.26, fy: 400, build: buildGmail },
     idcard: { title: 'travel-license — Wallet', skin: 'idcard', icon: 'catBox', w: 720, fx: 0.13, fy: 90, center: true, build: buildIdcard },
+    spotify: { title: 'Spotify', skin: 'spotify', icon: 'spotify', w: 320, fx: 0.62, fy: 200, build: buildSpotify },
   };
   const GROUPS = {
     projects: ['excel', 'word', 'notion'],
