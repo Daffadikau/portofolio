@@ -50,6 +50,15 @@
 @keyframes heartfloat { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-34px); opacity: 0; } }
 .heart-float { position: absolute; top: 18%; color: #c94867; font-size: 16px; animation: heartfloat .9s steps(5) forwards; pointer-events: none; }
 .care-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.wardrobe { display: grid; gap: 8px; }
+.wr-slot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.wr-label { font-family: var(--font-pixel); font-size: 11px; flex: 0 0 78px; }
+.wr-opts { display: flex; gap: 6px; flex-wrap: wrap; }
+.wr-opt {
+  font-family: var(--font-mono); font-size: 12px; color: var(--ink);
+  border: 2px solid var(--ink); background: #fff; padding: 3px 10px;
+}
+.wr-opt[aria-pressed="true"] { background: var(--tl-yellow); font-weight: 700; box-shadow: 2px 2px 0 var(--ink); }
 .pxbtn.care { display: inline-flex; align-items: center; gap: 6px; background: var(--win); }
 .pxbtn.care svg { image-rendering: pixelated; }
 .stat-group { font-family: var(--font-pixel); font-size: 13px; margin: 14px 0 6px; }

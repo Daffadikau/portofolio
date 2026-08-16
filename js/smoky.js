@@ -69,6 +69,52 @@
     heartListeners.forEach((f) => f(hearts));
   }
 
+  // ---- wardrobe: outfit Smoky, dipakai semua instance (About & Skills) ----
+  const WARDROBE = {
+    hat: [
+      { id: 'none', label: 'None', map: null },
+      { id: 'cap', label: 'Cap', map: 'wHatCap' },
+      { id: 'ushanka', label: 'Ushanka', map: 'wHatUshanka' },
+      { id: 'crown', label: 'Crown', map: 'wHatCrown' },
+      { id: 'beanie', label: 'Beanie', map: 'wHatBeanie' },
+    ],
+    outfit: [
+      { id: 'none', label: 'None', map: null },
+      { id: 'suit', label: 'Suit', map: 'wFitSuit' },
+      { id: 'hoodie', label: 'Hoodie', map: 'wFitHoodie' },
+      { id: 'scarf', label: 'Scarf', map: 'wFitScarf' },
+    ],
+    acc: [
+      { id: 'none', label: 'None', map: null },
+      { id: 'glasses', label: 'Shades', map: 'wAccGlasses' },
+      { id: 'headphones', label: 'Headphones', map: 'wAccHeadphones' },
+      { id: 'bowtie', label: 'Bowtie', map: 'wAccBowtie' },
+    ],
+  };
+  const SLOT_ORDER = ['outfit', 'acc', 'hat']; // baju dulu, lalu aksesoris, topi paling atas
+  let worn = { hat: 'none', outfit: 'none', acc: 'none' };
+  try {
+    const saved = JSON.parse(localStorage.getItem('smoky-outfit') || 'null');
+    if (saved && typeof saved === 'object') {
+      Object.keys(worn).forEach((slot) => {
+        if (WARDROBE[slot].some((it) => it.id === saved[slot])) worn[slot] = saved[slot];
+      });
+    }
+  } catch (e) { /* storage tidak tersedia — pakai default */ }
+
+  const outfitListeners = [];
+  function layerMaps() {
+    return SLOT_ORDER
+      .map((slot) => (WARDROBE[slot].find((it) => it.id === worn[slot]) || {}).map)
+      .filter(Boolean);
+  }
+  function wear(slot, id) {
+    if (!WARDROBE[slot] || !WARDROBE[slot].some((it) => it.id === id)) return;
+    worn = Object.assign({}, worn, { [slot]: id });
+    try { localStorage.setItem('smoky-outfit', JSON.stringify(worn)); } catch (e) { /* ignore */ }
+    outfitListeners.forEach((f) => f(worn));
+  }
+
   const instances = [];
 
   function interact(kind) {
@@ -96,7 +142,7 @@
     btn.setAttribute('aria-label', 'Interact with Smoky the cat');
     btn.title = 'poke Smoky';
     let current = 'cat';
-    let svg = window.PixelArt.render(current, scale);
+    let svg = window.PixelArt.renderStack([current, ...layerMaps()], scale);
     btn.appendChild(svg);
     container.appendChild(btn);
     const bubble = document.createElement('span');
@@ -108,13 +154,17 @@
     let revertTimer, idleTimer, blinkTimer;
     let sleeping = false;
 
-    function setFace(name) {
-      if (name === current) return;
-      const next = window.PixelArt.render(name, scale);
+    function draw(name) {
+      const next = window.PixelArt.renderStack([name, ...layerMaps()], scale);
       btn.replaceChild(next, svg);
       svg = next;
       current = name;
     }
+    function setFace(name) {
+      if (name === current) return;
+      draw(name);
+    }
+    outfitListeners.push(() => draw(current));
     function say(text, ms) {
       bubble.hidden = false;
       bubble.textContent = text;
@@ -171,5 +221,9 @@
     getHearts: () => hearts,
     onHearts: (f) => heartListeners.push(f),
     sfx: Sfx,
+    WARDROBE,
+    wear,
+    getWorn: () => Object.assign({}, worn),
+    onOutfit: (f) => outfitListeners.push(f),
   };
 })();

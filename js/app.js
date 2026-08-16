@@ -251,7 +251,38 @@
       snd.setAttribute('aria-pressed', String(!muted));
     });
     care.appendChild(snd);
-    p.append(h2icon('about', 'Character'), card, h2icon('chip', 'Toolbox'));
+    // wardrobe: dandani Smoky — berlaku juga untuk Smoky di tab About
+    const SLOTS = [['hat', 'Hat'], ['outfit', 'Outfit'], ['acc', 'Accessory']];
+    const wardrobe = el('div', 'wardrobe');
+    SLOTS.forEach(([slot, label]) => {
+      const row = el('div', 'wr-slot');
+      row.appendChild(el('span', 'wr-label', label));
+      const opts = el('div', 'wr-opts');
+      opts.setAttribute('role', 'group');
+      opts.setAttribute('aria-label', `${label} options for Smoky`);
+      window.Smoky.WARDROBE[slot].forEach((item) => {
+        const b = el('button', 'wr-opt', item.label);
+        b.dataset.slot = slot;
+        b.dataset.item = item.id;
+        b.addEventListener('click', () => window.Smoky.wear(slot, item.id));
+        opts.appendChild(b);
+      });
+      row.appendChild(opts);
+      wardrobe.appendChild(row);
+    });
+    function syncWardrobe(w) {
+      wardrobe.querySelectorAll('.wr-opt').forEach((b) => {
+        b.setAttribute('aria-pressed', String(w[b.dataset.slot] === b.dataset.item));
+      });
+    }
+    syncWardrobe(window.Smoky.getWorn());
+    window.Smoky.onOutfit(syncWardrobe);
+
+    p.append(h2icon('about', 'Character'), card,
+      h2icon('cap', 'Wardrobe'),
+      el('p', 'bio', 'Dress Smoky up — whatever he wears here is what he wears everywhere.'),
+      wardrobe,
+      h2icon('chip', 'Toolbox'));
     p.appendChild(el('p', 'bio', 'My skills, opened in their natural habitat — a very busy desktop.'));
     p.appendChild(launcherFor('skills'));
     p.appendChild(el('p', 'launch-hint', 'Tip: drag the windows around · click one to bring it to front · Esc or × closes it'));

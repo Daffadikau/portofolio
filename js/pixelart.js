@@ -4,7 +4,7 @@
     g: '#9dc24c', e: '#e8e8e8', b: '#4a90d9', p: '#f2b5a0',
     s: '#43434a', c: '#c08f52',
     x: '#217346', d: '#2b579a', m: '#1d63ed', v: '#0065a9', q: '#fe315d',
-    a: '#ea4335', u: '#a9c7e8', f: '#eef4fb',
+    a: '#ea4335', u: '#a9c7e8', f: '#eef4fb', r: '#c94867', n: '#2f3b52',
   };
   const MAPS = {
     // Smoky — Neko Atsume regular cat, くろねこさん "Black Cat" (solid black, yellow eyes)
@@ -253,6 +253,187 @@
       'k..kk..k.k.k...k..kk.k...k..',
       '.kk.k..k.k..k...kk.k..kkk...',
       '............................',
+    ],
+    // ---- wardrobe Smoky: overlay 16x16 sejajar peta kucing ----
+    wHatCap: [
+      '................',
+      '.....kkkkkk.....',
+      '...kkbbbbbbkk...',
+      '..kbbbbbbbbbbk..',
+      'kkbbbbbbbbbbbbkk',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+    ],
+    wHatUshanka: [
+      '................',
+      '....ffuuffuu....',
+      '..kfuuffuuffuk..',
+      '..kuffuuffuufk..',
+      'kkuffuuffuuffukk',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+    ],
+    wHatCrown: [
+      '................',
+      '..k..k..k..k..k.',
+      '..kyykyykyykyyk.',
+      '..kyyyyyyyyyyyk.',
+      '..kkkkkkkkkkkkk.',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+    ],
+    wHatBeanie: [
+      '................',
+      '....kkkkkkkk....',
+      '..kkooooooookk..',
+      '.kkoooooooooook.',
+      'kkooooooooooookk',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+    ],
+    wFitSuit: [
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '.kuukwwwwkkuuk..',
+      'kuuukwwwwkuuuuk.',
+      'kuuuukkkkuuuuuk.',
+      '................',
+    ],
+    wFitHoodie: [
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '.nnnnnnnnnnnnnn.',
+      'nnwnnnnnnnnnnwnn',
+      'nnwnnnnnnnnnnwnn',
+      '................',
+    ],
+    wFitScarf: [
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '.rrrrrrrrrrrrrr.',
+      'krrrrrrrrrrrrrrk',
+      '.krrrrrrrrrrrrk.',
+      '..kkrrrrrrrrkk..',
+    ],
+    wAccGlasses: [
+      '................',
+      '................',
+      '................',
+      '................',
+      '.kkkkkkkkkkkkkk.',
+      '.kwwwwkkkkwwwwk.',
+      '.kwwwwk..kwwwwk.',
+      '..kkkk....kkkk..',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+    ],
+    wAccHeadphones: [
+      '................',
+      '................',
+      '...kkkkkkkkkk...',
+      '..k..........k..',
+      'krrk........krrk',
+      'krrk........krrk',
+      'krrk........krrk',
+      '.kk..........kk.',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+    ],
+    wAccBowtie: [
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '....krrkkrrk....',
+      '....krrkkrrk....',
+      '................',
     ],
     gmail: [
       'kkkkkkkkkkkk',
@@ -545,5 +726,36 @@
     });
     return svg;
   }
-  window.PixelArt = { render, MAPS };
+  // renderStack: gambar beberapa peta berlapis (untuk wardrobe Smoky).
+  // Layer wajib berdimensi sama dengan peta dasar; yang tidak cocok dilewati.
+  function renderStack(names, scale = 1) {
+    const list = names.filter((n) => n && MAPS[n]);
+    if (!list.length) return render('cat', scale);
+    const base = MAPS[list[0]];
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    const h = base.length, w = base[0].length;
+    svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    svg.setAttribute('width', w * scale);
+    svg.setAttribute('height', h * scale);
+    svg.setAttribute('shape-rendering', 'crispEdges');
+    svg.setAttribute('aria-hidden', 'true');
+    list.forEach((name) => {
+      const map = MAPS[name];
+      if (map.length !== h || map[0].length !== w) return;
+      map.forEach((row, y) => {
+        [...row].forEach((ch, x) => {
+          if (ch === '.') return;
+          const r = document.createElementNS(NS, 'rect');
+          r.setAttribute('x', x); r.setAttribute('y', y);
+          r.setAttribute('width', 1); r.setAttribute('height', 1);
+          r.setAttribute('fill', PALETTE[ch] || '#000');
+          svg.appendChild(r);
+        });
+      });
+    });
+    return svg;
+  }
+
+  window.PixelArt = { render, renderStack, MAPS };
 })();
