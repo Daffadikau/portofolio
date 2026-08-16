@@ -364,7 +364,9 @@
   position: relative; border: 3px solid var(--ink); overflow: hidden;
   line-height: 0; background: #efe0c8;
 }
-.flat-stage > svg { width: 100%; height: auto; display: block; image-rendering: pixelated; }
+.flat-stage > svg, .flat-stage > img {
+  width: 100%; height: auto; display: block; image-rendering: pixelated;
+}
 /* hotspot per zona: tidak terlihat sampai di-hover/di-fokus */
 .flat-spots { position: absolute; inset: 0; }
 .flat-spot { position: absolute; top: 0; bottom: 0; padding: 0; background: none; border: 0; }

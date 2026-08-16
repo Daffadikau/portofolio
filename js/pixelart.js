@@ -643,43 +643,6 @@
       '....kbbk....',
       '.....kk.....',
     ],
-    // denah apartemen Smoky di tab About — empat zona dalam satu potongan
-    flatApartment: [
-      'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHkHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHkHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHkHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
-      'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHkHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHkHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHkHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
-      'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPkIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIkQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQkuuukuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu',
-      'PPPPPPPPPPPPPPPPPPPPPPPPPPggPPPPPPkIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIkQQQQQQQQQQQQQQyyyyQQQQQrQQQQQQQkuuukuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu',
-      'PPPPPPPPPPPPPPPPPPPPPPPPxxxxxxPPPPkIIkkkkkkkkkIIIIIIIIIIIIIkkIIIIIIIkkIkQQQQQQQQQQQQQQQyyQQQQQeeeQQQQQQkuuukuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu',
-      'PPPPPPPPPPPPPPPPPPPPPPPPxxxxxxPPPPkIIkaaaaaaakIIIIIIIIIIIIIIkkkkkkkkkIIkQQQQQQQQQQQQQQQyyQQQQQeeeQQQQQQkuuukkkkkkkkkkkkkkkuuuukkkkkkkkuuuu',
-      'PPPkkkkkkkkkkkkkkkPPPPPPxxxxxxPPPPkIIkawwwwwakIIIIIIIIIIIIIIkssssssskIIkQQQQQQQQQQQQQQQyyQQQQQeeeQQQQQQkukkkkknnnnknnnnnnkuuuukwwaawwkuuuu',
-      'PPPkJJJJJJJJJJJJJkPPPPPPxxxxxxPPPPkIIkaaaaaaakIIIIIIIIIIIIIIkssssssskIIkQQQQQQQQQQQQkkkkkkkkkkkkkkkkQQQkukyyykwnnnknnnnnnkuuuukwwaawwkuuuu',
-      'PPPkJJJJJJJJJJJJJkPPPPPPxxxxxxPPPPkIIkawwwwwakIIIIIIIIIIIIIIkssssssskIIkQQQQQQQQQQQQkJJJJJJJJJJJJJJkQQQkukyyyknnnnknnnwnnkuuuukaaaaaakuuuu',
-      'PPPkJJJJJJJJJJJJJkPPPPPPxxxxxxPPPPkIIkaaaaaaakIIIIIIIIIIIIIIkkkkkkkkkIIkQQQQQQQQQQQQkJJJJJJJJJJJJJJkQQQkukkkkknnnnknnnnnnkuuuukaaaaaakuuuu',
-      'PPPkkkkkkkkkkkkkkkPPPPPPPPPPPPPPPPkIIkkkkkkkkkIIIIIIIIIIIIIIIIIkkkIIIIIkQQQQQQQQQQQQkkkkkkkkkkkkkkkkQQQkuuKKKkkkkkkkkkkkkkuuuukwwaawwkuuuu',
-      'PPPkJJJJJJJJJJJJJkPPPPPPPPPPPPPPPPkIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIkQQQQQQQQQQQQkkkkkkkkkkkkkkkkQQQkuuuuknnnnnknnnnnnkuuuukkkkkkkkuuuu',
-      'PPPkJJJJJJJJJJJJJkPPPPkkkkkkkkkkPPkIIIIIIIIIIkkkkkkkkkkkkkkIIIIIIIIIIIIkQQQkkkcckQQQQQQQQQQQQQQQQQQQQQQkuuuuknnnnnknnnnnnkuuuuuuuuuuuuuuuu',
-      'PPPkkkkkkkkkkkkkkkPPPPkwwwwwwwwkPPkIIIIIIIIIIkvvvvvvvvvvvvkIIIIIIIIIIIIkQQQkcccckQQQQQQQQQQQQQQQQQQQQQQkuuuuknnnwnknnnnwnkuuuuuuuuuuuuuuuu',
-      'PPPPPPPPPPPPPPPPPPPPPPkwwwwwwwwkPPkIIIIIIIIIIkvvvvvvvvvvvvkIIIIIIIIIIIIkQQQkcccckQQQQQQQQQQQQQQQQQQQQQQkuuuuknnnnnknnnnnnkuuuuuuuuuuuuuuuu',
-      'PPPPPPPPPPPPPPPPkPPPPPkwwwwwwewkPPkIIIIIIIIIIkvggggggvvvvvkIIIIIIIIIIIIkQQQkcccckQQQQQQQQQQQQQQQQQQQQQQkuuuukkkkkkkkkkkkkkuuuuuuuuuuuuuuuu',
-      'PPPPPPPPPPPPPPkkkkkPPPkwwwwwwewkPPkIIIIIIIIIIkvvvvvvvvvvvvkIIIIIIIIIIIIkQQQkcccckQQQQQQQQQQQQQQQQQQQQQQkuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu',
-      'PPPPPPPPPPPPPPkeeekPPPkwwwwwwewkPPkIIIIIIIIIIkvggggkkkkkvvkIIIIIIIIIIIIkQQQkcccckQQQQQQQQQQQQQQQQQQggggkuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu',
-      'PPPPPPPPPPPPPPkeeekPPPkwwwwwwwwkPPkIIIIkkkkkkkvvvvvsssssvvkIIIIIIIIIIIIkQQQkcccckQQQQQQQQQQQQQQgggQggggkuuuuuuuuccccccuuccccccuuuuuuuuuuuu',
-      'PPPPPPPPPPPPPPkkkkkPPPkkkkkkkkkkPPkIIIIkeeeekkvjjjjsssssvvkIIIIIIIIIIIIkQQQkcccckQQQQQQQQQQQQQQgggQggggkuuuuuuuuccccccuuccccccuuuuuuuuuuuu',
-      'PPeeeeeeeeeeeeeeeeeeePkwwwwwwwwkPPkIIIIkkkkkkkkkkkkssssskkkIIIIIIIIIIIIkQQkkkkkkkkkQQQQQQQQQQQQggggggggkuuuuuukkkkkkkkkkkkkkkkkkuuuuuuuuuu',
-      'PPkJJJJJJJJJJJJJJJJJkPkwwwwwwwwkPPkIIkkkkkkkkkkkkkkssssskkkkkkkkkkkIIIIkQQkccccccckQQQQQQQQQQQQggggggggkuuuuuukccccccckcccccccckuuuuuuuuuu',
-      'PPkJJJJJJJJJJJJJJJJJkPkwwwwwwewkPPkIIJJJJJJJJJJJJJJsssssJJJJJJJJJJJIIIIkQQkccccccckQQQQQkkkkkkkQkgggkkkkuuuuuukccccccckcccccccckuuuuuuuuuu',
-      'PPkkkkkkkkkkkkkkkkkkkPkwwwwwwewkPPkIIJJJJJJJJJJJJJkkkkkkkJJJJJJJJJJIIIIkQQkkkkkkkkkQQQQQkkkkkkkQkccccckkuuuuuukkkkkkkkkkkkkkkkkkuuuuuuuuuu',
-      'PPPPkPPPPPPPPPPPPPkPPPkwwwwwwewkPPkIIIIkIIIIIIIIIIkssssskIIIIIIIkIIIIIIkQQQkcccckQQQQQQQkccccckQkccccckkuuuuuukccccccckcccccccckuuuuuuuuuu',
-      'PPPPkPPkkkkkkkPPPPkPPPkwwwwwwwwkPPkIIIIkIIIIIIIIIIkssssskIIIIIIIkIIIIIIkQQQkcccckQQQQQQQkcjcbckQkccccckkuuuuuukccccccckcccccccckuuuuuuuuuu',
-      'PPPPkPPkoooookPPPPkPPPkwwwwwwwwkPPkIIIIkIIIIIIIIIIkssssskIIIIIIIkIIIIIIkQQQkcccckQQQQrrrkkkkkkkrrccccckkuuuuuukccccccckcccccccckuuuuuuuuuu',
-      'PPPPkPPkkkkkkkPPPPkPPPkkkkkkkkkkPPkIIIIkIIIIIIIIIIkkkkkkkIIIIIIIkIIIIIIkQQQkkkkkkQQQrrrrrrrrrrrrrrkkkkkkuuuuuukkkkkkkkkkkkkkkkkkuuuuuuuuuu',
-      'kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk',
-      'RJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJ',
-      'RJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJ',
-      'RJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJ',
-      'RJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJ',
-      'RJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJJJJJJJRJJ',
-    ],
     wHatParty: [
       '.......qq.......',
       '......yyyy......',
@@ -1509,10 +1472,14 @@
   };
   // ikon yang dibuat Dikau sendiri lewat pixelit — dipakai sebagai gambar,
   // bukan peta pixel, karena hasilnya lebih bagus dari gambar tangan
+  // string = sprite 16x16; objek = aset berukuran lain
   const IMAGES = {
     github: 'assets/icons/brand/github.png',
     linkedin: 'assets/icons/brand/linkedin.png',
     spotify: 'assets/icons/brand/spotify.png',
+    // denah apartemen dipakai sebagai PNG, bukan peta SVG: pada resolusi
+    // sedetail ini satu <rect> per piksel berarti ~20.000 simpul DOM
+    flatApartment: { src: 'assets/flat-apartment.png', w: 276, h: 72 },
   };
   function render(name, scale = 1) {
     if (!IMAGES[name] && !MAPS[name]) {
@@ -1521,12 +1488,14 @@
       return document.createElement('span');
     }
     if (IMAGES[name]) {
+      const def = IMAGES[name];
+      const isObj = typeof def === 'object';
       const img = document.createElement('img');
-      img.src = IMAGES[name];
+      img.src = isObj ? def.src : def;
       img.alt = '';
       img.className = 'px-img';
-      img.width = 16 * scale;
-      img.height = 16 * scale;
+      img.width = (isObj ? def.w : 16) * scale;
+      img.height = (isObj ? def.h : 16) * scale;
       return img;
     }
     const map = MAPS[name];

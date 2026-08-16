@@ -434,7 +434,7 @@
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const wrap = el('div', 'flat');
     const stage = el('div', 'flat-stage');
-    stage.appendChild(window.PixelArt.render('flatApartment', 6));
+    stage.appendChild(window.PixelArt.render('flatApartment', 1));
     const cat = el('button', 'flat-cat');
     cat.type = 'button';
     cat.setAttribute('aria-label', 'Poke Smoky');
