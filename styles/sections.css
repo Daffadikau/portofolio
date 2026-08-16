@@ -273,7 +273,12 @@
 .joker-count b { font-family: var(--font-pixel); font-size: 14px; color: var(--tl-yellow); }
 .joker-count i { font-style: normal; margin-left: auto; opacity: .6; font-size: 10px; }
 @media (max-width: 640px) {
-  .joker { flex-basis: 88px; width: 88px; min-height: 136px; }
+  /* di layar sempit kartu terpaksa wrap jadi beberapa baris; kalau sudut
+     kipasnya dipertahankan, baris bawah nabrak baris atas. --fan dan --lift
+     di-set inline lewat JS, jadi butuh !important untuk menimpanya. */
+  .joker { flex-basis: 88px; width: 88px; min-height: 136px;
+    --fan: 0deg !important; --lift: 0px !important; }
+  .joker-hand { align-items: flex-start; padding-bottom: 14px; }
   .joker-count i { display: none; }
 }
 /* ── Stats sebagai layar status Tamagotchi ──────────────────────────── */
