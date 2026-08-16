@@ -173,7 +173,6 @@
     window.AppWins.GROUPS[group].forEach((id) => {
       const def = window.AppWins.DEFS[id];
       const b = el('button', 'launch-btn');
-      b.dataset.appid = id;
       b.appendChild(window.PixelArt.render(def.icon, 2));
       b.appendChild(document.createTextNode(def.title.split(' — ')[1] || def.title));
       b.addEventListener('click', () => window.AppWins.open(id));
@@ -242,7 +241,6 @@
     // mesh ala Tailscale: Smoky sebagai relay node di atas, tiga peer di bawah
     const mesh = el('div', 'mesh');
     const guard = el('button', 'contact-smoky');
-    guard.dataset.appid = 'idcard';
     guard.setAttribute('aria-label', 'Smoky in his cardboard box — click him');
     guard.title = 'psst... click Smoky';
     guard.appendChild(window.PixelArt.render('catBox', 4));
@@ -255,12 +253,9 @@
     const btns = el('div', 'contact-btns mesh-peers');
     const mail = el('a', 'pxbtn big peer', '✉ Email');
     mail.href = `mailto:${D.socials.email}`;
-    mail.dataset.appid = 'gmail';
-    const gh = extLink('pxbtn big peer', 'GitHub', D.socials.github);
-    gh.dataset.appid = 'ghprofile';
-    const li = extLink('pxbtn big peer', 'LinkedIn', D.socials.linkedin);
-    li.dataset.appid = 'liprofile';
-    [mail, gh, li].forEach((b) => { b.prepend(el('span', 'peer-dot')); btns.appendChild(b); });
+    [mail, extLink('pxbtn big peer', 'GitHub', D.socials.github),
+      extLink('pxbtn big peer', 'LinkedIn', D.socials.linkedin)]
+      .forEach((b) => { b.prepend(el('span', 'peer-dot')); btns.appendChild(b); });
     mesh.append(guard, stem, rail, drops, btns);
     p.append(h,
       el('p', 'bio', `${D.availability} ${D.replyNote}`),

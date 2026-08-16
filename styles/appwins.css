@@ -13,19 +13,6 @@
   100% { transform: scale(1); }
 }
 .appwin.spawn { animation: winspawn 0.2s steps(3); }
-@keyframes genieout {
-  0% { transform: translate(0, 0) scale(1, 1); opacity: 1; }
-  45% { transform: translate(calc(var(--gx) * 0.25), calc(var(--gy) * 0.15)) scale(0.55, 1.12); opacity: 1; }
-  100% { transform: translate(var(--gx), var(--gy)) scale(0.04, 0.12); opacity: 0.15; }
-}
-.appwin.genie-out { animation: genieout 0.38s steps(10) forwards; transform-origin: center bottom; pointer-events: none; }
-@keyframes geniein {
-  0% { transform: translate(var(--gx), var(--gy)) scale(0.04, 0.12); opacity: 0.15; }
-  55% { transform: translate(calc(var(--gx) * 0.2), calc(var(--gy) * 0.1)) scale(0.65, 1.1); opacity: 1; }
-  100% { transform: translate(0, 0) scale(1, 1); opacity: 1; }
-}
-.appwin.genie-in { animation: geniein 0.34s steps(10); transform-origin: center bottom; }
-.appwin.minimized { display: none; }
 .appwin-bar {
   display: flex; align-items: center; gap: 8px;
   padding: 6px 8px; border-bottom: 3px solid var(--ink);
@@ -35,7 +22,7 @@
 }
 .appwin-bar svg { image-rendering: pixelated; width: 18px; height: 18px; }
 .appwin-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.appwin-close, .appwin-min {
+.appwin-close {
   border: 2px solid currentColor; background: none; color: inherit;
   font-family: var(--font-pixel); font-size: 13px; line-height: 1;
   width: 24px; height: 24px; padding: 0; flex: 0 0 auto;
@@ -270,35 +257,61 @@
 .gm-row:not(.unread) { background: #f6f8fc; }
 .gm-note { font-size: 11px; opacity: .6; padding: 8px 12px; }
 
-/* Easter egg: CMIYGL travel license */
+/* Easter egg: CMIYGL travel license — setia ke referensi */
 .skin-idcard .appwin-bar { background: #4a90d9; }
-.id-card { background: #efe4c3; color: #2b2620; padding: 4px 10px; }
-.id-stars { font-size: 13px; text-align: center; letter-spacing: 2px; padding: 4px 0; color: #2b2620; }
-.id-inner { display: flex; gap: 16px; padding: 6px 8px 10px; align-items: stretch; }
+.skin-idcard .appwin-body { background: #d8cfae; padding: 10px; max-height: calc(100vh - 170px); }
+.id-card {
+  color: #2b2620; border-radius: 14px; border: 2px solid #cbbf98;
+  background:
+    radial-gradient(140px 90px at 12% 88%, rgba(196, 148, 90, 0.18), transparent 70%),
+    radial-gradient(120px 70px at 88% 30%, rgba(196, 170, 90, 0.14), transparent 70%),
+    radial-gradient(90px 60px at 70% 92%, rgba(160, 130, 70, 0.12), transparent 70%),
+    #f0e5c4;
+}
+.id-frame {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: 'ts ts ts' 'ls in rs' 'bs bs bs';
+}
+.id-stars { font-size: 14px; text-align: center; letter-spacing: 3px; padding: 8px 0 4px; }
+.id-stars.top { grid-area: ts; }
+.id-stars.bottom { grid-area: bs; padding: 4px 0 8px; }
+.id-starsv { display: flex; flex-direction: column; justify-content: space-between; padding: 6px 8px; font-size: 13px; }
+.id-starsv.left { grid-area: ls; }
+.id-starsv.right { grid-area: rs; }
+.id-inner { grid-area: in; display: flex; gap: 18px; padding: 4px 2px 6px; align-items: stretch; }
 .id-photo {
-  flex: 0 0 auto; display: grid; place-items: center; gap: 6px;
-  border: 3px solid #2b2620; background: #f5ecd2; padding: 10px 12px;
+  flex: 0 0 auto; display: flex; flex-direction: column; align-items: center;
+  justify-content: space-between; gap: 10px;
+  border: 3px solid #2b2620; background: #f4ebcf; padding: 18px 16px 8px;
 }
 .id-photo svg { image-rendering: pixelated; }
-.id-photo span { font-size: 9px; font-style: italic; max-width: 110px; text-align: center; }
-.id-info { flex: 1; min-width: 0; position: relative; display: grid; gap: 6px; align-content: start; }
-.id-info h4 { font-family: var(--font-pixel); font-size: 12px; letter-spacing: 1px; text-align: center; }
-.id-no { font-family: var(--font-pixel); font-size: 14px; text-align: center; }
-.id-field { display: flex; align-items: baseline; gap: 6px; font-size: 11px; }
+.id-photocap { font-size: 10px; font-style: italic; max-width: 130px; text-align: center; }
+.id-info { flex: 1; min-width: 0; position: relative; display: grid; gap: 7px; align-content: start; }
+.id-h { font-size: 13px; letter-spacing: 2px; text-align: center; font-weight: 700; }
+.id-no { font-family: var(--font-pixel); font-size: 16px; text-align: center; letter-spacing: 1px; }
+.id-field { position: relative; display: flex; align-items: baseline; gap: 6px; font-size: 12px; min-height: 22px; }
 .id-label { flex: 0 0 auto; }
-.id-dots { flex: 1; border-bottom: 2px dotted #2b2620; transform: translateY(-3px); }
-.id-val { font-family: var(--font-term); font-size: 19px; font-weight: 400; transform: rotate(-1deg); }
-.id-cert { font-size: 10.5px; line-height: 1.55; margin-top: 4px; }
-.id-stamp {
-  position: absolute; right: -6px; bottom: 34px;
-  font-family: var(--font-pixel); font-size: 12px; color: #3f7fbf;
-  border: 3px solid #3f7fbf; border-radius: 50%;
-  padding: 14px 10px; transform: rotate(-12deg);
-  opacity: 0.8; max-width: 150px; text-align: center; pointer-events: none;
+.id-dots { flex: 1; border-bottom: 2px dotted #2b2620; transform: translateY(-4px); }
+.id-val {
+  position: absolute; right: 6%; bottom: 0;
+  font-family: var(--font-term); font-size: 23px; font-weight: 400;
+  transform: rotate(-2deg); white-space: nowrap;
 }
-.id-sig { display: grid; justify-items: start; gap: 2px; margin-top: 6px; }
-.id-sig svg { image-rendering: pixelated; }
-.id-sig span { font-size: 9px; font-style: italic; }
+.id-sub { font-size: 11px; letter-spacing: 2px; text-align: center; font-weight: 700; margin-top: 4px; }
+.id-cert { font-size: 11px; line-height: 1.6; }
+.id-stamp {
+  position: absolute; right: -10px; bottom: 76px;
+  font-family: var(--font-pixel); font-size: 14px; line-height: 1.5; color: #4a8fc2;
+  border: 4px solid #4a8fc2; border-radius: 50%;
+  padding: 20px 16px; transform: rotate(-14deg);
+  opacity: 0.75; width: 190px; text-align: center; pointer-events: none;
+  mix-blend-mode: multiply;
+}
+.id-sig { display: grid; justify-items: start; gap: 0; margin-top: 10px; }
+.id-sig svg { image-rendering: pixelated; margin-bottom: -4px; margin-left: 8px; }
+.id-sigline { width: 100%; border-bottom: 2px dotted #2b2620; }
+.id-sigcap { font-size: 10px; font-style: italic; justify-self: end; margin-top: 3px; }
 
 /* launcher di panel */
 .launcher { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }

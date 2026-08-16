@@ -437,38 +437,50 @@
     body.appendChild(el('p', 'gm-note', `inbox zero is a myth · write to ${D.socials.email}`));
   }
 
-  // ---- builder: easter egg — CMIYGL travel license ----
+  // ---- builder: easter egg — remake setia ID card CMIYGL referensi Dikau ----
   function buildIdcard(body) {
     const field = (label, value) => {
       const row = el('div', 'id-field');
-      row.append(el('span', 'id-label', `${label}`), el('span', 'id-dots'), el('b', 'id-val', value));
+      row.append(el('span', 'id-label', label), el('span', 'id-dots'), el('b', 'id-val', value));
       return row;
     };
+    const starsV = (side) => {
+      const v = el('div', `id-starsv ${side}`);
+      for (let i = 0; i < 9; i += 1) v.appendChild(el('span', null, '★'));
+      return v;
+    };
     const card = el('div', 'id-card');
-    card.appendChild(el('div', 'id-stars', '★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★'));
-    const inner = el('div', 'id-inner');
+    const frame = el('div', 'id-frame');
     const photo = el('div', 'id-photo');
-    photo.appendChild(window.PixelArt.render('catTyler', 5));
-    photo.appendChild(el('span', null, 'Photograph of Authorized traveler'));
+    photo.appendChild(window.PixelArt.render('catTyler', 7));
+    photo.appendChild(el('span', 'id-photocap', 'Photograph of Authorized traveler'));
     const info = el('div', 'id-info');
     info.append(
-      el('h4', null, 'PERMANENT LICENSE OF TRAVEL'),
+      el('h4', 'id-h', 'PERMANENT LICENSE OF TRAVEL'),
       el('b', 'id-no', 'NO. SMK1402026'),
-      field('Issued to', 'Daffa Adika & Smoky'),
+      field('Issued to', 'Daffa Adika'),
       field('Date of birth', '10/06/·····'),
       field('Place of issue', 'Bandung, Indonesia'),
       field('Date of issue', '06/25/2021'),
-      el('p', 'id-cert', 'This is to Certify that the person (and cat) named above is permitted to travel, build, and explore freely — unless detained by deadlines.'));
+      el('h5', 'id-sub', 'LICENSE OF TRAVEL'),
+      el('p', 'id-cert', 'This is to Certify that the person (and cat) named and described above is permitted to travel and explore freely unless detained by law.'),
+      el('h5', 'id-sub', 'IMPORTANT'),
+      el('p', 'id-cert', 'The holder of this license wrote, designed, and shipped all projects within the attached portfolio, unless stated otherwise.'));
     const stamp = el('div', 'id-stamp', 'CALL ME IF YOU GET LOST');
     stamp.setAttribute('aria-hidden', 'true');
     info.appendChild(stamp);
     const sig = el('div', 'id-sig');
     sig.appendChild(window.PixelArt.render('sig', 2));
-    sig.appendChild(el('span', null, 'Signature of Authorized traveler'));
+    sig.appendChild(el('div', 'id-sigline'));
+    sig.appendChild(el('span', 'id-sigcap', 'Signature of Authorized traveler'));
     info.appendChild(sig);
+    const inner = el('div', 'id-inner');
     inner.append(photo, info);
-    card.appendChild(inner);
-    card.appendChild(el('div', 'id-stars', '★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★'));
+    frame.append(
+      el('div', 'id-stars top', '★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★'),
+      starsV('left'), inner, starsV('right'),
+      el('div', 'id-stars bottom', '★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★'));
+    card.appendChild(frame);
     body.appendChild(card);
   }
 
@@ -485,7 +497,7 @@
     ghprofile: { title: 'Daffadikau — GitHub', skin: 'github', icon: 'github', w: 440, fx: 0.05, fy: 100, build: buildGithub },
     liprofile: { title: 'daffadikau — LinkedIn', skin: 'linkedin', icon: 'linkedin', w: 400, fx: 0.57, fy: 130, build: buildLinkedin },
     gmail: { title: 'Inbox (2) — Gmail', skin: 'gmail', icon: 'gmail', w: 480, fx: 0.26, fy: 400, build: buildGmail },
-    idcard: { title: 'travel-license — Wallet', skin: 'idcard', icon: 'catBox', w: 600, fx: 0.16, fy: 110, build: buildIdcard },
+    idcard: { title: 'travel-license — Wallet', skin: 'idcard', icon: 'catBox', w: 700, fx: 0.13, fy: 90, build: buildIdcard },
   };
   const GROUPS = {
     projects: ['excel', 'word', 'notion'],
@@ -509,39 +521,6 @@
     wins.delete(id);
   }
 
-  // target genie: ikon aplikasi milik window (launcher di panel, tombol peer
-  // di Contact, ikon dock utk terminal); fallback: dock
-  function genieTarget(id) {
-    const candidates = [
-      document.querySelector(`[data-appid="${id}"]`),
-      id === 'terminal' ? document.querySelector('#dock .dock-item[aria-label="Terminal"]') : null,
-      document.getElementById('dock'),
-    ];
-    return candidates.find((c) => {
-      if (!c) return false;
-      const r = c.getBoundingClientRect();
-      return r.width > 0 && r.height > 0;
-    }) || null;
-  }
-  function minimize(id) {
-    const w = wins.get(id);
-    if (!w || w.dataset.min) return;
-    const wr = w.getBoundingClientRect();
-    let dx = window.innerWidth / 2 - (wr.left + wr.width / 2);
-    let dy = window.innerHeight - wr.top;
-    const t = genieTarget(id);
-    if (t) {
-      const tr = t.getBoundingClientRect();
-      dx = tr.left + tr.width / 2 - (wr.left + wr.width / 2);
-      dy = tr.top + tr.height / 2 - (wr.top + wr.height / 2);
-    }
-    w.style.setProperty('--gx', `${Math.round(dx)}px`);
-    w.style.setProperty('--gy', `${Math.round(dy)}px`);
-    const finish = () => { w.classList.remove('genie-out'); w.classList.add('minimized'); w.dataset.min = '1'; };
-    if (reduced) { finish(); return; }
-    w.classList.add('genie-out');
-    w.addEventListener('animationend', finish, { once: true });
-  }
 
   function makeWin(id, def, idx) {
     const win = el('section', `appwin skin-${def.skin}`);
@@ -557,13 +536,10 @@
     const bar = el('div', 'appwin-bar');
     bar.appendChild(window.PixelArt.render(def.icon, 1));
     bar.appendChild(el('span', 'appwin-title', def.title));
-    const minBtn = el('button', 'appwin-min', '–');
-    minBtn.setAttribute('aria-label', `Minimize ${def.title}`);
-    minBtn.addEventListener('click', (e) => { e.stopPropagation(); minimize(id); });
     const closeBtn = el('button', 'appwin-close', '×');
     closeBtn.setAttribute('aria-label', `Close ${def.title}`);
     closeBtn.addEventListener('click', (e) => { e.stopPropagation(); close(id); });
-    bar.append(minBtn, closeBtn);
+    bar.appendChild(closeBtn);
 
     const body = el('div', 'appwin-body');
     def.build(body);
@@ -572,7 +548,7 @@
     win.addEventListener('pointerdown', () => toFront(win));
     win.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !e.isComposing) close(id); });
     bar.addEventListener('pointerdown', (e) => {
-      if (e.target === closeBtn || e.target === minBtn) return;
+      if (e.target === closeBtn) return;
       const dx = e.clientX - win.offsetLeft;
       const dy = e.clientY - win.offsetTop;
       const move = (ev) => {
@@ -596,18 +572,7 @@
     const def = DEFS[id];
     if (!def) return;
     const existing = wins.get(id);
-    if (existing) {
-      toFront(existing);
-      if (existing.dataset.min) {
-        delete existing.dataset.min;
-        existing.classList.remove('minimized', 'genie-out');
-        if (!reduced) {
-          existing.classList.add('genie-in');
-          existing.addEventListener('animationend', () => existing.classList.remove('genie-in'), { once: true });
-        }
-      }
-      return;
-    }
+    if (existing) { toFront(existing); return; }
     const w = makeWin(id, def, idx);
     wins.set(id, w);
     document.body.appendChild(w);
