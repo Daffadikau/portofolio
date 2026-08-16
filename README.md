@@ -1,17 +1,37 @@
-# Portfolio Website
+# daffa.dev OS — Pixel macOS Portfolio
 
-This is a simple, fast static portfolio site (HTML/CSS/JS).
+Personal portfolio of **Daffa Adika**, redesigned as a pixel-art classic
+Macintosh scene: one System 7-style window with tab navigation, a pixel dock,
+a boot screen with a cat mascot, and a fully interactive terminal tab
+(try `neofetch` or `sudo hire-me`).
 
-## How to preview
-- Open `index.html` in a browser.
+**Live:** https://daffadikau.github.io/portofolio/
 
-## Publish to GitHub Pages
-1. Create a GitHub repo named `portfolio` (or any name).
-2. Push these files to the repo.
-3. In GitHub: Settings → Pages → Source → `main` branch → `/root`.
-4. Your site will be available at `https://<username>.github.io/<repo>/`.
+## Stack
 
-## What to edit
-- `index.html` → your content (name, projects, experience, links)
-- `styles.css` → colors and layout
-- `script.js` → mobile menu behavior
+Vanilla HTML/CSS/JS — no framework, no build step. Google Fonts
+(Silkscreen, VT323, JetBrains Mono) is the only runtime dependency.
+
+- `js/data.js` — single source of truth for all content; both the visual
+  tabs and the terminal render from it
+- `js/pixelart.js` — renders custom pixel art (dock icons, cat mascot)
+  from text grids into inline SVG
+- `js/app.js` — window chrome, tabs, hash routing, dock, traffic lights,
+  boot screen
+- `js/terminal.js` — terminal engine + commands
+
+## Local development
+
+```sh
+python3 -m http.server 4173
+# open http://localhost:4173/
+```
+
+## Credits
+
+- Tech icons: [Jerry's Pixel Icons](https://github.com/wolfsouldev/jerrys-pixel-icons)
+  (MIT) — see `assets/icons/tech/LICENSE-MIT.txt`
+- Design inspired by Gideon Low's
+  [2024 Portfolio Website](https://dribbble.com/shots/24073576-2024-Portfolio-Website)
+  and [juxtopposed's pixelated macOS icons](https://www.juxtopposed.com/macos-icons)
+  (all pixel art here is drawn from scratch)
