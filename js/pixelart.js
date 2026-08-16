@@ -706,20 +706,6 @@
       '...kkkkkk...',
       '............',
     ],
-    warn: [
-      '.....kk.....',
-      '....kyyk....',
-      '....kyyk....',
-      '...kyyyyk...',
-      '...kykkyk...',
-      '..kyykkyyk..',
-      '..kyykkyyk..',
-      '.kyyyyyyyyk.',
-      '.kyyykkyyyk.',
-      'kyyyyyyyyyyk',
-      'kkkkkkkkkkkk',
-      '............',
-    ],
     fish: [
       '............',
       '............',
@@ -842,6 +828,11 @@
     spotify: 'assets/icons/brand/spotify.png',
   };
   function render(name, scale = 1) {
+    if (!IMAGES[name] && !MAPS[name]) {
+      // jangan sampai satu nama salah mematikan seluruh proses render
+      console.warn('PixelArt: peta tidak dikenal:', name);
+      return document.createElement('span');
+    }
     if (IMAGES[name]) {
       const img = document.createElement('img');
       img.src = IMAGES[name];

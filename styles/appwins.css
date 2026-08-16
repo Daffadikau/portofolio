@@ -27,7 +27,15 @@
   font-family: var(--font-pixel); font-size: 13px; line-height: 1;
   width: 24px; height: 24px; padding: 0; flex: 0 0 auto;
 }
-.appwin :focus-visible { outline: 3px solid var(--tl-yellow); outline-offset: 1px; }
+.appwin :focus-visible { outline: 3px solid var(--ink); outline-offset: 1px; }
+/* di permukaan gelap, tinta hitam tak terlihat — pakai kuning terang */
+.vs-code :focus-visible, .ij-code :focus-visible, .vs-tree :focus-visible,
+.vs-results :focus-visible, .vs-scm :focus-visible, .vs-activity :focus-visible,
+.xc-main :focus-visible, .dk-logs :focus-visible, .gh-wrap :focus-visible,
+.skin-spotify .appwin-body :focus-visible, .skin-n8n .appwin-body :focus-visible,
+.terminal-host :focus-visible {
+  outline: 3px solid var(--tl-yellow); outline-offset: 1px;
+}
 .appwin-body { max-height: 46vh; overflow: auto; font-size: 12px; }
 
 /* skins — warna titlebar per aplikasi */
@@ -120,8 +128,8 @@
 .gl-branch { border: 1px solid #e24329; color: #e24329; padding: 0 6px; font-size: 10px; }
 .gl-bar { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-bottom: 1px solid #e0e0e0; }
 .gl-run { border: 2px solid var(--ink); background: #e24329; color: #fff; font: inherit; font-size: 11px; padding: 4px 10px; }
-.gl-badge { font-size: 10px; border: 1px solid #2e9e44; color: #2e9e44; padding: 1px 8px; }
-.gl-badge.run { border-color: #d9a616; color: #d9a616; }
+.gl-badge { font-size: 10px; border: 1px solid #1e7e34; color: #1a6b2c; padding: 1px 8px; }
+.gl-badge.run { border-color: #8a6a0b; color: #7a5c08; }
 .gl-stages { display: flex; align-items: flex-start; gap: 6px; padding: 10px; }
 .gl-stage { flex: 1; display: grid; gap: 4px; }
 .gl-stage h5 { font-size: 10px; text-transform: uppercase; opacity: .6; }
@@ -306,10 +314,10 @@
   display: flex; align-items: center; gap: 10px;
   padding: 5px 10px; background: #eceff3; border-bottom: 2px solid var(--ink); font-size: 11px;
 }
-.xc-run { color: #1a8f3c; }
+.xc-run { color: #146b2c; }
 .xc-stop { color: #8a8a8a; }
 .xc-scheme { border: 1px solid #c2c8d0; background: #fff; padding: 2px 8px; }
-.xc-ok { margin-left: auto; color: #1a8f3c; }
+.xc-ok { margin-left: auto; color: #146b2c; }
 .xc-wrap { display: flex; min-height: 180px; }
 .xc-nav {
   flex: 0 0 132px; background: #f2f4f7; border-right: 2px solid var(--ink);
@@ -510,8 +518,8 @@
 .ql-band svg { image-rendering: pixelated; }
 .ql-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px 4px; flex-wrap: wrap; }
 .ql-head h3 { font-family: var(--font-pixel); font-size: 14px; }
-.ql-badge { font-size: 10px; border: 2px solid #d9a616; color: #a67a10; padding: 0 6px; }
-.ql-badge.done { border-color: #2e9e44; color: #2e6e3a; }
+.ql-badge { font-size: 10px; border: 2px solid #d9a616; color: #7a5c08; padding: 0 6px; }
+.ql-badge.done { border-color: #2e9e44; color: #1a6b2c; }
 .ql-meta { display: flex; gap: 14px; padding: 0 12px 8px; font-size: 10px; opacity: .65; }
 .ql-desc { padding: 0 12px; font-size: 12px; line-height: 1.6; }
 .skin-ql .tags { padding: 10px 12px 0; }
@@ -529,3 +537,15 @@
 .launch-btn:active { transform: translate(3px, 3px); box-shadow: none; }
 .launch-btn svg, .launch-btn img { image-rendering: pixelated; width: 22px; height: 22px; }
 .launch-hint { font-size: 12px; opacity: 0.7; margin-top: 8px; }
+
+/* mobile: perbesar target sentuh di dalam jendela aplikasi (WCAG 2.5.8) */
+@media (max-width: 640px) {
+  .xl-cell, .xl-colbtn { min-height: 24px; padding: 4px 0; }
+  .wd-tab, .wd-fmt, .nt-side .view-btn, .dk-side .view-btn,
+  .vs-file, .sp-row, .ij-tabs button, .gl-run, .n8-run, .sp-btn, .wr-opt {
+    min-height: 26px;
+  }
+  .sp-btn { min-width: 32px; }
+  .nt-todo input { width: 20px; height: 20px; }
+  .appwin-body { max-height: 52vh; }
+}

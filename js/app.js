@@ -8,8 +8,10 @@
   (function boot() {
     const bootEl = document.getElementById('boot');
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced || sessionStorage.getItem('booted')) { bootEl.remove(); return; }
-    sessionStorage.setItem('booted', '1');
+    let booted = null;
+    try { booted = sessionStorage.getItem('booted'); } catch (e) { booted = '1'; }
+    if (reduced || booted) { bootEl.remove(); return; }
+    try { sessionStorage.setItem('booted', '1'); } catch (e) { /* abaikan */ }
     bootEl.hidden = false;
     const inner = el('div', 'boot-inner');
     const cat = el('div', 'boot-cat');
@@ -28,6 +30,7 @@
     document.addEventListener('keydown', done, { once: true });
   })();
 
+  let restoreMainWindow = () => {};
   const TABS = ['about', 'projects', 'skills', 'contact'];
   const LABELS = { about: 'About', projects: 'Projects', skills: 'Skills', contact: 'Contact' };
   const win = document.getElementById('window');
@@ -124,31 +127,20 @@
   document.addEventListener('keydown', (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    // jangan bajak angka saat fokus ada di dalam jendela aplikasi —
+    // pindah tab akan menutup jendela yang sedang dipakai
+    if (e.target.closest && e.target.closest('.appwin')) return;
     const n = Number(e.key);
     if (n >= 1 && n <= TABS.length) {
       const id = TABS[n - 1];
-      if ((location.hash.replace('#', '') || 'about') === id) showTab(id);
+      // tab yang sama: cukup pulihkan window utama kalau sedang di-minimize,
+      // JANGAN showTab() ulang karena itu memusnahkan semua jendela aplikasi
+      if ((location.hash.replace('#', '') || 'about') === id) restoreMainWindow();
       else location.hash = id;
     }
   });
 
   const D = window.PORTFOLIO_DATA;
-  function techTag(t) {
-    const s = el('span', 'tag');
-    if (t.icon) {
-      const img = el('img');
-      img.src = `assets/icons/tech/${t.icon}.svg`;
-      img.alt = ''; img.width = 16; img.height = 16;
-      s.appendChild(img);
-    }
-    s.appendChild(document.createTextNode(t.label));
-    return s;
-  }
-  function extLink(cls, label, url) {
-    const a = el('a', cls, label);
-    a.href = url; a.target = '_blank'; a.rel = 'noreferrer';
-    return a;
-  }
   function h2icon(map, text) {
     const h = el('h2', 'h2i');
     h.append(window.PixelArt.render(map, 2), document.createTextNode(text));
@@ -316,7 +308,7 @@
     // mesh ala Tailscale: Smoky sebagai relay node di atas, tiga peer di bawah
     const mesh = el('div', 'mesh');
     const guard = el('button', 'contact-smoky');
-    guard.setAttribute('aria-label', 'Smoky in his cardboard box — click him');
+    guard.setAttribute('aria-label', 'Smoky guards the inbox — click him');
     guard.title = 'psst... click Smoky';
     guard.appendChild(window.PixelArt.render('catBox', 4));
     guard.appendChild(el('span', 'char-partner', 'Smoky guards the inbox'));
@@ -395,7 +387,7 @@
       if (d) d.focus();
     });
     win.querySelector('.tl-green').addEventListener('click', () => win.classList.toggle('maximized'));
-    function restore() {
+    restoreMainWindow = function restore() {
       const wasMin = win.classList.contains('minimized');
       win.classList.remove('minimized');
       document.getElementById('dock').classList.remove('holds-window');
@@ -403,10 +395,10 @@
         const tab = document.getElementById(`tab-${location.hash.replace('#', '') || 'about'}`);
         if (tab) tab.focus();
       }
-    }
-    document.addEventListener('tabshown', restore);
+    };
+    document.addEventListener('tabshown', restoreMainWindow);
     document.getElementById('dock').addEventListener('click', (e) => {
-      if (e.target.closest('[data-tab]')) restore();
+      if (e.target.closest('[data-tab]')) restoreMainWindow();
     });
   })();
 
@@ -414,7 +406,7 @@
   // Terminal independen dari tab — tetap terbuka sampai ditutup sendiri.
   document.addEventListener('tabshown', (e) => {
     if (!window.AppWins) return;
-    window.AppWins.closeAll(['terminal']);
+    window.AppWins.closeAll(['terminal', 'spotify']);
     if (e.detail.id === 'projects') window.AppWins.openGroup('projects');
     else if (e.detail.id === 'skills') window.AppWins.openGroup('skills');
     else if (e.detail.id === 'contact') window.AppWins.openGroup('contact');

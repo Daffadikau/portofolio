@@ -14,13 +14,21 @@
   };
   const REFUSE_CHANCE = { poke: 0.35, feed: 0.25, brush: 0.05, play: 0.2 };
   const HEART_DELTA = { poke: 1, feed: 1, brush: 2, play: 1 };
+  // storage bisa dilempar error kalau cookie/penyimpanan diblokir browser —
+  // situs harus tetap jalan, jadi semua akses dibungkus
+  function safeGet(k) {
+    try { return sessionStorage.getItem(k); } catch (e) { return null; }
+  }
+  function safeSet(k, v) {
+    try { sessionStorage.setItem(k, v); } catch (e) { /* abaikan */ }
+  }
   const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Sound effect 8-bit sintetis (WebAudio, tanpa file). Volume kecil, bisa dimute.
   const Sfx = (function () {
     let ctx = null;
-    let muted = sessionStorage.getItem('smoky-muted') === '1';
+    let muted = safeGet('smoky-muted') === '1';
     const SEQ = {
       happy: [[880, 0.07], [1318, 0.1]],
       annoyed: [[233, 0.11], [174, 0.14]],
@@ -52,20 +60,20 @@
       isMuted: () => muted,
       toggle() {
         muted = !muted;
-        sessionStorage.setItem('smoky-muted', muted ? '1' : '0');
+        safeSet('smoky-muted', muted ? '1' : '0');
         if (!muted) play('happy');
         return muted;
       },
     };
   })();
 
-  const stored = sessionStorage.getItem('smoky-hearts');
+  const stored = safeGet('smoky-hearts');
   let hearts = stored === null ? 4 : Number(stored);
   if (!(hearts >= 0 && hearts <= 5)) hearts = 4;
   const heartListeners = [];
   function setHearts(n) {
     hearts = Math.max(0, Math.min(5, n));
-    sessionStorage.setItem('smoky-hearts', String(hearts));
+    safeSet('smoky-hearts', String(hearts));
     heartListeners.forEach((f) => f(hearts));
   }
 

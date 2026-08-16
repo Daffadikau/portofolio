@@ -358,6 +358,7 @@
         }, i * 420 + 380));
       });
     });
+    if (body._win) body._win._cleanup.push(() => timers.forEach(clearTimeout));
     body.append(bar, canvas, el('p', 'n8-note', 'Alur otomasi untuk TestKit Gas Monitor — sensor masuk, dinilai, lalu memicu peringatan.'));
   }
 
@@ -416,6 +417,7 @@
       r.append(el('span', null, m), el('i', null, t));
       commits.appendChild(r);
     });
+    if (body._win) body._win._cleanup.push(() => timers.forEach(clearTimeout));
     body.append(head, bar, stages, commits);
   }
 
@@ -522,7 +524,15 @@
     ], null);
     // default: langsung editor languages.ts; Explorer glyph menampilkan tree
     views = v;
-    v.showEditor = (file) => { v.content.replaceChildren(); vsEditor(file)(v.content); };
+    v.showEditor = (file) => {
+      v.content.replaceChildren();
+      vsEditor(file)(v.content);
+      // editor bukan salah satu view di activity bar — jangan tandai satu pun aktif
+      v.nav.querySelectorAll('.view-btn').forEach((b) => {
+        b.classList.remove('on');
+        b.setAttribute('aria-pressed', 'false');
+      });
+    };
     const wrap = el('div', 'vs-wrap');
     wrap.append(v.nav, v.content);
     body.appendChild(wrap);
@@ -747,12 +757,16 @@
       list.appendChild(row);
     });
 
+    let drawnIdx = -1;
     function render() {
       const t = tracks[idx];
-      const img = el('img');
-      img.src = t.cover;
-      img.alt = `${t.title} — ${t.artist} album cover`;
-      cover.replaceChildren(img);
+      if (drawnIdx !== idx) {
+        const img = el('img');
+        img.src = t.cover;
+        img.alt = `${t.title} — ${t.artist} album cover`;
+        cover.replaceChildren(img);
+        drawnIdx = idx;
+      }
       title.textContent = t.title;
       artist.textContent = t.artist;
       play.textContent = playing ? '⏸' : '▶';
@@ -797,6 +811,7 @@
         height: '80',
       }, (controller) => {
         ctrl = controller;
+        if (body._win) body._win._cleanup.push(() => { try { controller.destroy(); } catch (e2) { /* abaikan */ } });
         controller.addListener('playback_update', (e) => {
           const d = (e && e.data) || {};
           playing = !d.isPaused;
@@ -1016,6 +1031,8 @@
   function close(id) {
     const w = wins.get(id);
     if (!w) return;
+    // jalankan pembersihan milik builder (timer animasi, controller Spotify)
+    if (w._cleanup) w._cleanup.forEach((fn) => { try { fn(); } catch (e) { /* abaikan */ } });
     if (w.contains(document.activeElement)) {
       const tab = document.getElementById(`tab-${location.hash.replace('#', '') || 'about'}`);
       if (tab) tab.focus();
@@ -1028,7 +1045,9 @@
   function makeWin(id, def, idx) {
     const win = el('section', `appwin skin-${def.skin}`);
     const mobile = window.innerWidth <= 640;
-    const width = mobile ? Math.min(def.w, window.innerWidth - 16) : def.w;
+    // selalu batasi lebar ke viewport, bukan cuma di mobile — sebelumnya
+    // window lebar (Wireshark 540, ID card 720) terpotong di layar 641-950px
+    const width = Math.min(def.w, window.innerWidth - 16);
     win.style.width = `${width}px`;
     if (def.center && !mobile) {
       // window yang berdiri sendiri (mis. ID card) diletakkan center supaya
@@ -1036,7 +1055,7 @@
       win.style.left = `${Math.max(8, Math.round((window.innerWidth - width) / 2))}px`;
       win.style.top = `${Math.max(56, Math.round((window.innerHeight - Math.min(520, window.innerHeight * 0.8)) / 2))}px`;
     } else {
-      win.style.left = `${mobile ? 8 : Math.min(Math.round(window.innerWidth * def.fx), window.innerWidth - 100)}px`;
+      win.style.left = `${mobile ? 8 : Math.max(8, Math.min(Math.round(window.innerWidth * def.fx), window.innerWidth - width - 8))}px`;
       win.style.top = `${mobile ? 64 + idx * 34 : Math.min(def.fy, Math.max(60, window.innerHeight - 160))}px`;
     }
     win.setAttribute('role', 'dialog');
@@ -1052,11 +1071,13 @@
     bar.appendChild(closeBtn);
 
     const body = el('div', 'appwin-body');
+    win._cleanup = [];
+    body._win = win;
     def.build(body);
     win.append(bar, body);
 
     win.addEventListener('pointerdown', () => toFront(win));
-    win.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !e.isComposing) close(id); });
+
     bar.addEventListener('pointerdown', (e) => {
       if (e.target === closeBtn) return;
       const dx = e.clientX - win.offsetLeft;
@@ -1115,5 +1136,16 @@
     [...wins.keys()].forEach((id) => { if (!except.includes(id)) close(id); });
   }
 
+  // Escape menutup jendela paling atas dari mana pun fokus berada
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || e.isComposing || wins.size === 0) return;
+    let topId = null;
+    let topZ = -1;
+    wins.forEach((w, id) => {
+      const z = Number(w.style.zIndex) || 0;
+      if (w.isConnected && z > topZ) { topZ = z; topId = id; }
+    });
+    if (topId) close(topId);
+  });
   window.AppWins = { open, openGroup, closeAll, GROUPS, DEFS };
 })();
