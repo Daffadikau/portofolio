@@ -75,56 +75,316 @@
   }
 
   // ---- builders: Projects ----
+  // Excel: sel bisa dipilih (formula bar ikut), header kolom bisa diklik
+  // untuk sortir, status bar menghitung seperti Excel sungguhan
   function buildExcel(body) {
-    const fx = el('div', 'xl-formula');
-    fx.append(el('b', null, 'fx'), el('span', null, '=PORTFOLIO(A1:C8)'));
-    body.appendChild(fx);
-    const rows = D.projects.map((p, i) => [
-      String(i + 2), p.title,
+    const COLS = ['A · Project', 'B · Stack', 'C · Status'];
+    const data = D.projects.map((p) => [
+      p.title,
       p.tech.slice(0, 2).map((t) => t.label).join(', '),
-      i < 2 ? 'In progress' : 'Shipped',
+      D.projects.indexOf(p) < 2 ? 'In progress' : 'Shipped',
     ]);
-    body.appendChild(table('xl-grid', ['', 'A · Project', 'B · Stack', 'C · Status'],
-      [['1', 'PROJECT', 'STACK', 'STATUS'], ...rows]));
+    let sortCol = -1;
+    let sortAsc = true;
+    let sel = { r: 0, c: 0 };
+
+    const fx = el('div', 'xl-formula');
+    const cellRef = el('b', 'xl-ref', 'A2');
+    const fxVal = el('span', 'xl-val');
+    fx.append(cellRef, el('b', null, 'fx'), fxVal);
+    const gridWrap = el('div');
+    const status = el('div', 'xl-status');
+    body.append(fx, gridWrap, status);
+
+    function draw() {
+      const rows = data.slice();
+      if (sortCol >= 0) {
+        rows.sort((a, b) => (sortAsc ? 1 : -1) * a[sortCol].localeCompare(b[sortCol]));
+      }
+      gridWrap.replaceChildren();
+      const t = el('table', 'xl-grid');
+      const head = el('tr');
+      head.appendChild(el('th', 'xl-corner'));
+      COLS.forEach((c, i) => {
+        const th = el('th');
+        const b = el('button', 'xl-colbtn', c + (sortCol === i ? (sortAsc ? ' ▲' : ' ▼') : ''));
+        b.addEventListener('click', () => {
+          if (sortCol === i) sortAsc = !sortAsc; else { sortCol = i; sortAsc = true; }
+          draw();
+        });
+        th.appendChild(b);
+        head.appendChild(th);
+      });
+      t.appendChild(head);
+      rows.forEach((r, ri) => {
+        const tr = el('tr');
+        tr.appendChild(el('th', 'xl-rownum', String(ri + 2)));
+        r.forEach((val, ci) => {
+          const td = el('td');
+          const cell = el('button', 'xl-cell', val);
+          if (sel.r === ri && sel.c === ci) cell.classList.add('on');
+          cell.addEventListener('click', () => { sel = { r: ri, c: ci }; draw(); });
+          td.appendChild(cell);
+          tr.appendChild(td);
+        });
+        t.appendChild(tr);
+      });
+      gridWrap.appendChild(t);
+      const cur = rows[sel.r] ? rows[sel.r][sel.c] : '';
+      cellRef.textContent = `${'ABC'[sel.c]}${sel.r + 2}`;
+      fxVal.textContent = cur;
+      const shipped = data.filter((r) => r[2] === 'Shipped').length;
+      status.textContent = `Ready · ${data.length} rows · Shipped: ${shipped} · In progress: ${data.length - shipped}`;
+    }
+    draw();
   }
+  // Word: tab ribbon berpindah, tombol B/I/U benar-benar memformat dokumen,
+  // jumlah kata dihitung sungguhan di status bar
   function buildWord(body) {
+    const tabs = el('div', 'wd-tabs');
     const ribbon = el('div', 'wd-ribbon');
-    ['File', 'Home', 'Insert', 'Layout', 'Help'].forEach((m) => ribbon.appendChild(el('span', null, m)));
-    body.appendChild(ribbon);
     const page = el('div', 'wd-page');
+    const status = el('div', 'wd-status');
+
     page.appendChild(el('h3', null, 'Project Highlights'));
     D.projects.slice(0, 2).forEach((p) => {
       page.appendChild(el('h4', null, p.title));
       page.appendChild(el('p', null, p.desc));
     });
     page.appendChild(el('p', 'wd-note', 'Full list: see projects.xlsx →'));
-    body.appendChild(page);
-  }
-  function buildNotion(body) {
-    const wrap = el('div', 'nt-wrap');
-    const side = el('div', 'nt-side');
-    ['▸ Project Tracker', '▸ Ideas', '▸ Smoky’s naps'].forEach((s, i) => side.appendChild(el('div', i === 0 ? 'on' : null, s)));
-    const main = el('div', 'nt-main');
-    main.appendChild(el('h3', null, '📋 Project Tracker'));
-    const board = el('div', 'nt-board');
-    const cols = [['In Progress', D.projects.slice(0, 2)], ['Shipped', D.projects.slice(2)]];
-    cols.forEach(([name, items]) => {
-      const col = el('div', 'nt-col');
-      col.appendChild(el('h4', null, `${name} · ${items.length}`));
-      items.forEach((p) => {
-        const idx = D.projects.indexOf(p);
-        const card = el('div', 'nt-card');
-        card.appendChild(el('span', null, p.title));
-        const tag = el('i', 'nt-tag', p.tech[0].label);
-        tag.style.background = TAGCOLORS[idx % TAGCOLORS.length];
-        card.appendChild(tag);
-        col.appendChild(card);
-      });
-      board.appendChild(col);
+
+    const fmt = { b: false, i: false, u: false };
+    function applyFmt() {
+      page.classList.toggle('fmt-b', fmt.b);
+      page.classList.toggle('fmt-i', fmt.i);
+      page.classList.toggle('fmt-u', fmt.u);
+    }
+    const RIBBONS = {
+      Home: () => {
+        const g = el('div', 'wd-group');
+        [['B', 'b', 'Bold'], ['I', 'i', 'Italic'], ['U', 'u', 'Underline']].forEach(([lab, key, name]) => {
+          const b = el('button', `wd-fmt wd-${key}`, lab);
+          b.title = name;
+          b.setAttribute('aria-label', name);
+          b.setAttribute('aria-pressed', String(fmt[key]));
+          b.addEventListener('click', () => {
+            fmt[key] = !fmt[key];
+            b.setAttribute('aria-pressed', String(fmt[key]));
+            applyFmt();
+          });
+          g.appendChild(b);
+        });
+        g.append(el('span', 'wd-sep'), el('span', 'wd-dim', 'Calibri · 11'));
+        return g;
+      },
+      Insert: () => {
+        const g = el('div', 'wd-group');
+        ['Table', 'Picture', 'Chart', 'Link'].forEach((x) => g.appendChild(el('button', 'wd-fmt wide', x)));
+        return g;
+      },
+      Layout: () => {
+        const g = el('div', 'wd-group');
+        ['Margins', 'Columns', 'Orientation'].forEach((x) => g.appendChild(el('button', 'wd-fmt wide', x)));
+        return g;
+      },
+      Review: () => {
+        const g = el('div', 'wd-group');
+        g.appendChild(el('span', 'wd-dim', 'Spelling: 0 issues · Smoky proofread this'));
+        return g;
+      },
+    };
+    Object.keys(RIBBONS).forEach((name, i) => {
+      const b = el('button', 'wd-tab', name);
+      b.addEventListener('click', () => show(name));
+      tabs.appendChild(b);
+      if (i === 0) setTimeout(() => show(name), 0);
     });
-    main.appendChild(board);
-    wrap.append(side, main);
+    function show(name) {
+      ribbon.replaceChildren(RIBBONS[name]());
+      [...tabs.children].forEach((t) => {
+        const on = t.textContent === name;
+        t.classList.toggle('on', on);
+        t.setAttribute('aria-pressed', String(on));
+      });
+    }
+    const words = page.textContent.trim().split(/\s+/).length;
+    status.textContent = `Page 1 of 1 · ${words} words · English (US)`;
+    body.append(tabs, ribbon, page, status);
+  }
+  // Notion: halaman di sidebar benar-benar berpindah, checklist bisa
+  // dicentang, toggle block bisa dibuka-tutup
+  function buildNotion(body) {
+    const trackerPage = (c) => {
+      c.appendChild(el('h3', null, '📋 Project Tracker'));
+      const board = el('div', 'nt-board');
+      [['In Progress', D.projects.slice(0, 2)], ['Shipped', D.projects.slice(2)]].forEach(([name, items]) => {
+        const col = el('div', 'nt-col');
+        col.appendChild(el('h4', null, `${name} · ${items.length}`));
+        items.forEach((p) => {
+          const idx = D.projects.indexOf(p);
+          const card = el('div', 'nt-card');
+          card.appendChild(el('span', null, p.title));
+          const tag = el('i', 'nt-tag', p.tech[0].label);
+          tag.style.background = TAGCOLORS[idx % TAGCOLORS.length];
+          card.appendChild(tag);
+          col.appendChild(card);
+        });
+        board.appendChild(col);
+      });
+      c.appendChild(board);
+    };
+    const ideasPage = (c) => {
+      c.appendChild(el('h3', null, '💡 Ideas'));
+      [['Portfolio yang terasa seperti OS', true],
+        ['Smoky bisa didandani', true],
+        ['Dashboard sensor gas realtime', true],
+        ['Mode gelap untuk seluruh situs', false],
+        ['Mini-game di tab 404', false]].forEach(([text, done]) => {
+        const row = el('label', 'nt-todo');
+        const box = el('input');
+        box.type = 'checkbox';
+        box.checked = done;
+        const span = el('span', null, text);
+        box.addEventListener('change', () => span.classList.toggle('done', box.checked));
+        if (done) span.classList.add('done');
+        row.append(box, span);
+        c.appendChild(row);
+      });
+    };
+    const napsPage = (c) => {
+      c.appendChild(el('h3', null, '😴 Smoky’s naps'));
+      [['Di atas keyboard', 'Paling sering saat deploy'],
+        ['Di kardus mikan', 'Spot resmi, lihat tab Contact'],
+        ['Di kursi kerja', 'Diklaim sejak hari pertama']].forEach(([t, d]) => {
+        const tg = el('div', 'nt-toggle');
+        const b = el('button', 'nt-tgbtn', `▸ ${t}`);
+        const p = el('p', 'nt-tgbody', d);
+        p.hidden = true;
+        b.setAttribute('aria-expanded', 'false');
+        b.addEventListener('click', () => {
+          p.hidden = !p.hidden;
+          b.textContent = `${p.hidden ? '▸' : '▾'} ${t}`;
+          b.setAttribute('aria-expanded', String(!p.hidden));
+        });
+        tg.append(b, p);
+        c.appendChild(tg);
+      });
+    };
+    const v = makeViews('nt-side', [
+      { key: 'tracker', label: '▸ Project Tracker', render: trackerPage },
+      { key: 'ideas', label: '▸ Ideas', render: ideasPage },
+      { key: 'naps', label: '▸ Smoky’s naps', render: napsPage },
+    ], 'tracker');
+    v.content.classList.add('nt-main');
+    const wrap = el('div', 'nt-wrap');
+    wrap.append(v.nav, v.content);
     body.appendChild(wrap);
+  }
+
+  // ---- builder: n8n (kanvas workflow yang bisa dijalankan) ----
+  function buildN8n(body) {
+    const NODES = [
+      { name: 'MQTT Trigger', sub: 'esp32-testkit' },
+      { name: 'Function', sub: 'parse gas_level' },
+      { name: 'IF', sub: 'level > threshold' },
+      { name: 'HTTP Request', sub: 'POST /alerts' },
+      { name: 'Telegram', sub: 'notify Daffa' },
+    ];
+    const bar = el('div', 'n8-bar');
+    const run = el('button', 'n8-run', '▶ Execute Workflow');
+    const st = el('span', 'n8-st', 'idle');
+    bar.append(run, st);
+    const canvas = el('div', 'n8-canvas');
+    const nodeEls = NODES.map((n, i) => {
+      const wrapN = el('div', 'n8-nodewrap');
+      const node = el('div', 'n8-node');
+      node.append(el('b', null, n.name), el('span', null, n.sub));
+      wrapN.appendChild(node);
+      if (i < NODES.length - 1) wrapN.appendChild(el('span', 'n8-link'));
+      canvas.appendChild(wrapN);
+      return node;
+    });
+    let timers = [];
+    run.addEventListener('click', () => {
+      timers.forEach(clearTimeout);
+      timers = [];
+      nodeEls.forEach((n) => n.classList.remove('done', 'active'));
+      st.textContent = 'running…';
+      st.className = 'n8-st run';
+      nodeEls.forEach((n, i) => {
+        timers.push(setTimeout(() => {
+          nodeEls.forEach((m) => m.classList.remove('active'));
+          n.classList.add('active');
+        }, i * 420));
+        timers.push(setTimeout(() => {
+          n.classList.remove('active');
+          n.classList.add('done');
+          if (i === nodeEls.length - 1) {
+            st.textContent = 'success · 5 nodes · 1.2s';
+            st.className = 'n8-st ok';
+          }
+        }, i * 420 + 380));
+      });
+    });
+    body.append(bar, canvas, el('p', 'n8-note', 'Alur otomasi untuk TestKit Gas Monitor — sensor masuk, dinilai, lalu memicu peringatan.'));
+  }
+
+  // ---- builder: GitLab (pipeline CI yang bisa dijalankan) ----
+  function buildGitlab(body) {
+    const STAGES = [
+      { name: 'build', jobs: ['docker:build', 'flutter:build'] },
+      { name: 'test', jobs: ['pytest', 'lint'] },
+      { name: 'deploy', jobs: ['deploy:vps'] },
+    ];
+    const head = el('div', 'gl-head');
+    head.append(el('b', null, 'daffadikau / testkit-gas-monitor'),
+      el('span', 'gl-branch', 'main'));
+    const bar = el('div', 'gl-bar');
+    const run = el('button', 'gl-run', '▶ Run pipeline');
+    const badge = el('span', 'gl-badge', 'passed');
+    bar.append(run, badge);
+    const stages = el('div', 'gl-stages');
+    const jobEls = [];
+    STAGES.forEach((s, si) => {
+      const col = el('div', 'gl-stage');
+      col.appendChild(el('h5', null, s.name));
+      s.jobs.forEach((j) => {
+        const job = el('div', 'gl-job done');
+        job.append(el('i', 'gl-dot'), el('span', null, j));
+        col.appendChild(job);
+        jobEls.push({ el: job, order: si });
+      });
+      stages.appendChild(col);
+      if (si < STAGES.length - 1) stages.appendChild(el('span', 'gl-arrow', '→'));
+    });
+    let timers = [];
+    run.addEventListener('click', () => {
+      timers.forEach(clearTimeout);
+      timers = [];
+      jobEls.forEach((j) => j.el.className = 'gl-job');
+      badge.textContent = 'running';
+      badge.className = 'gl-badge run';
+      jobEls.forEach((j) => {
+        timers.push(setTimeout(() => { j.el.className = 'gl-job active'; }, j.order * 700));
+        timers.push(setTimeout(() => {
+          j.el.className = 'gl-job done';
+          if (j.order === STAGES.length - 1) {
+            badge.textContent = 'passed';
+            badge.className = 'gl-badge';
+          }
+        }, j.order * 700 + 650));
+      });
+    });
+    const commits = el('div', 'gl-commits');
+    commits.appendChild(el('h5', null, 'Recent commits'));
+    [['feat: alerting via telegram', '2 days ago'],
+      ['fix: timescaledb retention policy', '5 days ago'],
+      ['chore: bump fastapi', '1 week ago']].forEach(([m, t]) => {
+      const r = el('div', 'gl-commit');
+      r.append(el('span', null, m), el('i', null, t));
+      commits.appendChild(r);
+    });
+    body.append(head, bar, stages, commits);
   }
 
   // ---- builder: VS Code (activity bar interaktif) ----
@@ -683,7 +943,9 @@
   const DEFS = {
     excel: { title: 'projects.xlsx — Excel', skin: 'excel', icon: 'excel', w: 470, fx: 0.05, fy: 90, build: buildExcel },
     word: { title: 'report.docx — Word', skin: 'word', icon: 'word', w: 400, fx: 0.56, fy: 140, build: buildWord },
-    notion: { title: 'Project Tracker — Notion', skin: 'notion', icon: 'notion', w: 460, fx: 0.24, fy: 330, build: buildNotion },
+    notion: { title: 'Project Tracker — Notion', skin: 'notion', icon: 'notion', w: 460, fx: 0.2, fy: 330, build: buildNotion },
+    n8n: { title: 'gas-alerting — n8n', skin: 'n8n', icon: 'n8n', w: 430, fx: 0.55, fy: 300, build: buildN8n },
+    gitlab: { title: 'Pipelines — GitLab', skin: 'gitlab', icon: 'gitlab', w: 470, fx: 0.3, fy: 470, build: buildGitlab },
     vscode: { title: 'languages.ts — VS Code', skin: 'vscode', icon: 'vscode', w: 470, fx: 0.04, fy: 80, build: buildVSCode },
     idea: { title: 'skills_ai.py — IntelliJ IDEA', skin: 'idea', icon: 'idea', w: 440, fx: 0.58, fy: 110, build: buildIdea },
     xcode: { title: 'Runner.xcworkspace — Xcode', skin: 'xcode', icon: 'xcode', w: 470, fx: 0.3, fy: 250, build: buildXcode },
@@ -697,7 +959,7 @@
     spotify: { title: 'Spotify', skin: 'spotify', icon: 'spotify', w: 340, fx: 0.6, fy: 110, build: buildSpotify },
   };
   const GROUPS = {
-    projects: ['excel', 'word', 'notion'],
+    projects: ['excel', 'word', 'notion', 'n8n', 'gitlab'],
     skills: ['vscode', 'idea', 'xcode', 'docker', 'wireshark'],
     contact: ['ghprofile', 'liprofile', 'gmail'],
   };
