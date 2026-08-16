@@ -276,3 +276,44 @@
   .joker { flex-basis: 88px; width: 88px; min-height: 136px; }
   .joker-count i { display: none; }
 }
+/* ── Stats sebagai layar status Tamagotchi ──────────────────────────── */
+.tama {
+  display: inline-flex; flex-direction: column; gap: 8px;
+  border: 3px solid var(--ink); background: #d8d2c4;
+  padding: 10px 10px 8px; margin: 14px 0 18px;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, .25);
+  max-width: 100%;
+}
+.tama-lcd {
+  background: #9bbc0f; border: 3px solid #2f3a13;
+  padding: 8px 10px; min-width: 300px;
+  display: flex; flex-direction: column; gap: 5px;
+  font-family: var(--font-pixel); color: #21300b;
+}
+.tama-title { font-size: 9px; letter-spacing: 2px; opacity: .6; }
+.tama-row { display: flex; align-items: center; gap: 8px; font-size: 10px; }
+.tama-k { flex: 0 0 42px; }
+.tama-row b { margin-left: auto; font-size: 10px; }
+/* bar tersegmentasi biar kelihatan seperti LCD, bukan progress bar mulus */
+.tama-bar {
+  position: relative; flex: 1 1 auto; height: 12px;
+  border: 2px solid #2f3a13; background: #8bac0f;
+}
+.tama-bar i {
+  display: block; height: 100%;
+  background: repeating-linear-gradient(90deg, #21300b 0 4px, transparent 4px 6px);
+}
+.tama-pips { display: flex; gap: 3px; flex: 1 1 auto; }
+.tama-pips i {
+  width: 9px; height: 9px; border: 2px solid #2f3a13; background: transparent;
+}
+.tama-pips i.on { background: #21300b; }
+.tama-btns { display: flex; justify-content: center; gap: 14px; }
+.tama-btns i {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 3px solid var(--ink); background: #b8b0a0;
+}
+@media (max-width: 640px) {
+  .tama { display: flex; }
+  .tama-lcd { min-width: 0; }
+}

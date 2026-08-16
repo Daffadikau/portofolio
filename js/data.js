@@ -38,10 +38,12 @@ window.PORTFOLIO_DATA = {
     github: 'https://github.com/Daffadikau',
     linkedin: 'https://www.linkedin.com/in/daffadikau/',
   },
+  // value/max dipakai bar di layar status Tamagotchi (tab About).
+  // number tetap dipertahankan karena itu yang ditampilkan apa adanya.
   stats: [
-    { number: '3.65', label: 'GPA (of 4.00)' },
-    { number: '15+', label: 'Licenses & Certificates' },
-    { number: '7', label: 'Awards' },
+    { number: '3.65', label: 'GPA (of 4.00)', short: 'GPA', value: 3.65, max: 4 },
+    { number: '15+', label: 'Licenses & Certificates', short: 'CERT', value: 15, max: 20 },
+    { number: '7', label: 'Awards', short: 'AWRD', value: 7, max: 10 },
   ],
   projects: [
     {

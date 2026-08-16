@@ -173,12 +173,7 @@
     status.append(el('span', 'dot'), document.createTextNode(D.status));
     head.appendChild(status);
     hero.append(art, head);
-    const stats = el('div', 'stats');
-    D.stats.forEach((s) => {
-      const d = el('div', 'stat');
-      d.append(el('b', null, s.number), el('span', null, s.label));
-      stats.appendChild(d);
-    });
+    const stats = buildStatusScreen(D.stats);
     p.append(hero, el('p', 'bio', D.bio), stats,
       h2icon('cap', 'Education'),
       el('p', null, `${D.education.program} — ${D.education.school}, ${D.education.detail}`),
@@ -313,6 +308,48 @@
     wrap.append(hand, info, counter);
     if (list.length) select(0);
     return wrap;
+  }
+  // Stats sebagai layar status Tamagotchi: LCD hijau, bar tersegmentasi,
+  // plus baris kondisi Smoky yang ikut berubah kalau dia diajak main.
+  function buildStatusScreen(list) {
+    const dev = el('div', 'tama');
+    const lcd = el('div', 'tama-lcd');
+    lcd.append(el('div', 'tama-title', 'STATUS'));
+    list.forEach((s) => {
+      const row = el('div', 'tama-row');
+      const bar = el('span', 'tama-bar');
+      const fill = el('i');
+      const pct = s.max ? Math.max(0, Math.min(100, (s.value / s.max) * 100)) : 100;
+      fill.style.width = `${pct.toFixed(1)}%`;
+      bar.appendChild(fill);
+      row.append(el('span', 'tama-k', s.short || s.label), bar, el('b', null, s.number));
+      row.title = s.label;
+      lcd.appendChild(row);
+    });
+    // baris terakhir: kondisi Smoky, hidup mengikuti state di smoky.js
+    const mood = el('div', 'tama-row tama-mood');
+    const pips = el('span', 'tama-pips');
+    mood.append(el('span', 'tama-k', 'SMOKY'), pips);
+    const moodLabel = el('b');
+    mood.appendChild(moodLabel);
+    function drawHearts(n) {
+      pips.replaceChildren();
+      for (let i = 0; i < 5; i += 1) {
+        const pip = el('i', i < n ? 'on' : null);
+        pips.appendChild(pip);
+      }
+      moodLabel.textContent = n >= 4 ? 'happy' : (n >= 2 ? 'okay' : 'grumpy');
+    }
+    try {
+      drawHearts(window.Smoky.getHearts());
+      window.Smoky.onHearts(drawHearts);
+    } catch (e) { drawHearts(4); }
+    lcd.appendChild(mood);
+    // cangkang perangkat: tiga tombol karet ala Tamagotchi (dekorasi saja)
+    const btns = el('div', 'tama-btns');
+    for (let i = 0; i < 3; i += 1) btns.appendChild(el('i'));
+    dev.append(lcd, btns);
+    return dev;
   }
   function launcherFor(group) {
     const grid = el('div', 'launcher');
