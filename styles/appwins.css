@@ -601,3 +601,4 @@
 }
 .chat-send:hover { background: #5a9fe4; }
 .chat-note { font-size: 9px; opacity: .55; padding: 0 8px 8px; flex: 0 0 auto; }
+.chat-warn { font-size: 9px; opacity: .6; padding: 2px 4px; }

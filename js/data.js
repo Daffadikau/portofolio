@@ -209,7 +209,12 @@ window.PORTFOLIO_DATA = {
       '*stares at you until you rephrase*',
       'that word is not in my eight words.',
     ],
+    // Kosongkan url untuk memakai jawaban kata kunci di atas. Kalau diisi
+    // dengan alamat worker (lihat worker/README.md), Smoky memakai model
+    // bahasa dan daftar di atas jadi cadangan waktu jaringannya gagal.
+    api: { url: '' },
     note: 'Smoky answers from a short list of keywords. No AI, no network.',
+    noteApi: 'Smoky is an AI with Daffa\u2019s CV as context. He can still be wrong.',
   },
   // Zona di apartemen Smoky (tab About). pct = posisi Smoky dalam persen
   // lebar denah; act = yang dia lakukan begitu sampai di zona itu.
