@@ -40,12 +40,35 @@
       b.setAttribute('aria-label', label);
       lights.appendChild(b);
     });
-  titlebar.append(lights, el('span', 'win-title', 'daffa.dev'));
+  // baris 1 = traffic lights + tab strip (seperti tab browser)
   const tabbar = el('div', 'tabbar');
   tabbar.setAttribute('role', 'tablist');
   tabbar.setAttribute('aria-label', 'Sections');
+  titlebar.append(lights, tabbar);
+
+  // baris 2 = toolbar browser: back / forward / reload + address bar
+  const toolbar = el('div', 'toolbar');
+  const navBtns = el('div', 'nav-btns');
+  const backBtn = el('button', 'nav-btn', '‹');
+  backBtn.setAttribute('aria-label', 'Back');
+  backBtn.title = 'Back';
+  backBtn.addEventListener('click', () => history.back());
+  const fwdBtn = el('button', 'nav-btn', '›');
+  fwdBtn.setAttribute('aria-label', 'Forward');
+  fwdBtn.title = 'Forward';
+  fwdBtn.addEventListener('click', () => history.forward());
+  const reloadBtn = el('button', 'nav-btn', '⟳');
+  reloadBtn.setAttribute('aria-label', 'Reload');
+  reloadBtn.title = 'Reload';
+  reloadBtn.addEventListener('click', () => location.reload());
+  navBtns.append(backBtn, fwdBtn, reloadBtn);
+  const urlBar = el('div', 'urlbar');
+  urlBar.append(el('span', 'url-lock', '🔒'), el('span', 'url-text', 'daffa.dev'));
+  const urlText = urlBar.querySelector('.url-text');
+  toolbar.append(navBtns, urlBar);
+
   const panels = el('div', 'tabpanels');
-  win.append(titlebar, tabbar, panels);
+  win.append(titlebar, toolbar, panels);
 
   TABS.forEach((id) => {
     const b = el('button', 'tab', LABELS[id]);
@@ -74,6 +97,7 @@
       panel.hidden = !active;
       if (active) { panel.classList.remove('pop'); void panel.offsetWidth; panel.classList.add('pop'); }
     });
+    urlText.textContent = `daffa.dev/${id === 'about' ? '' : id}`;
     document.dispatchEvent(new CustomEvent('tabshown', { detail: { id } }));
   }
   function fromHash() {
