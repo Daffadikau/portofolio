@@ -193,16 +193,16 @@
     const TENANTS = [
       // PT IROSTECH: kemeja biru bergaris + dasi + kacamata, di bilik kantor
       { fit: 'wFitShirtTie', acc: 'wAccGlasses', hat: null, unit: '4A',
-        scene: 'sceneOffice', prop: null },
+        scene: 'sceneOffice', ceil: 'ceilOffice', decor: 'decorDrone', prop: null },
       // Rumah Prestasi UPI: blazer almamater merah, di panggung bersorot lampu
       { fit: 'wFitBlazerUpi', acc: null, hat: null, unit: '3A',
-        scene: 'sceneStage', prop: 'propBulb' },
+        scene: 'sceneStage', ceil: 'ceilStage', decor: 'decorMedal', prop: 'propBulb' },
       // HIMA TEKKOM P2M: kaus volunteer, di tempat penyaluran donasi
       { fit: 'wFitVolunteer', acc: null, hat: null, unit: '2A',
-        scene: 'sceneVolunteer', prop: 'propBox' },
+        scene: 'sceneVolunteer', ceil: 'ceilVolunteer', decor: 'decorShelf', prop: 'propBox' },
       // KSR PMI: seragam medis + hard hat, di ruang rawat
       { fit: 'wFitPmi', acc: null, hat: 'wHatHardHat', unit: '1A',
-        scene: 'sceneHospital', prop: 'propBlanket' },
+        scene: 'sceneHospital', ceil: 'ceilHospital', decor: 'decorClock', prop: 'propBlanket' },
     ];
     const apt = el('section', 'apt');
     apt.setAttribute('aria-label', 'Experience, as an apartment building');
@@ -213,11 +213,19 @@
       const t = TENANTS[i % TENANTS.length];
       const floor = el('div', 'apt-floor');
       const room = el('div', `apt-room ${t.scene} asleep`);
-      // latar lokasi digambar sebagai peta pixel utuh, bukan susunan kotak CSS,
-      // supaya detailnya nyambung dengan gaya pixel di seluruh situs
+      // Kamar disusun tiga lapis supaya tetap terisi waktu memanjang:
+      // langit-langit menempel di atas, perabot menempel di bawah, dan
+      // dinding di antaranya diisi pola yang berulang (lihat sections.css).
       const back = el('div', 'apt-back');
       back.setAttribute('aria-hidden', 'true');
-      back.appendChild(window.PixelArt.render(t.scene, 3));
+      const ceil = el('div', 'apt-ceil');
+      ceil.appendChild(window.PixelArt.render(t.ceil, 3));
+      back.append(ceil, window.PixelArt.render(t.scene, 3));
+      // hiasan dinding: cuma muncul kalau kamarnya sedang memanjang, supaya
+      // tidak bertabrakan dengan perabot waktu kamarnya masih pendek
+      const decor = el('div', 'apt-decor');
+      decor.setAttribute('aria-hidden', 'true');
+      decor.appendChild(window.PixelArt.render(t.decor, 3));
       // prop yang cuma muncul waktu penghuninya masih tidur
       const sleep = el('div', 'apt-sleep');
       sleep.setAttribute('aria-hidden', 'true');
@@ -238,7 +246,7 @@
           [awake ? 'cat' : 'catSleep', t.fit, t.acc, t.hat].filter(Boolean), 3));
       }
       drawTenant(false);
-      room.append(back, el('i', 'apt-lamp'), sleep, tenant, zzz, el('i', 'apt-dim'));
+      room.append(back, decor, sleep, tenant, zzz, el('i', 'apt-dim'));
       const info = el('div', 'apt-info');
       const id = `apt-bubble-${i}`;
       const door = el('button', 'apt-door');
@@ -480,7 +488,7 @@
     // bukan nama berkas di repo
     a.setAttribute('download', cv.download || '');
     a.setAttribute('type', 'application/pdf');
-    a.appendChild(window.PixelArt.render('fileDoc', 2));
+    a.appendChild(window.PixelArt.render('iconCv', 2));
     a.appendChild(el('span', null, cv.label || 'Download CV (PDF)'));
     wrap.appendChild(a);
     return wrap;

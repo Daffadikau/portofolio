@@ -143,14 +143,28 @@
 .apt-back { position: absolute; inset: 0; }
 /* svg-nya tidak diregangkan vertikal — piksel harus tetap persegi. Kamar yang
    tinggi diisi warna dinding scene-nya lewat background-color di bawah ini. */
-.apt-back svg {
+/* > svg: khusus peta perabot yang menempel di dasar kamar. Tanpa tanda ini
+   aturannya ikut kena ke svg langit-langit dan melemparnya ke luar kamar. */
+.apt-back > svg {
   position: absolute; left: 0; bottom: 0;
   width: 100%; height: auto; display: block; image-rendering: pixelated;
 }
-.sceneOffice { background: #8f8a7e; }
-.sceneStage { background: #3a3358; }
-.sceneVolunteer { background: #efe0c8; }
-.sceneHospital { background: #dfe9e6; }
+/* Dinding di antara langit-langit dan perabot diisi pola pixel yang berulang,
+   jadi kamar yang memanjang tidak menyisakan bidang warna kosong. */
+.apt-room { image-rendering: pixelated; background-repeat: repeat; }
+.apt-ceil { position: absolute; top: 0; left: 0; right: 0; z-index: 2; }
+.apt-ceil svg { position: static; width: 100%; height: auto; display: block; image-rendering: pixelated; }
+/* hiasan dinding baru muncul kalau kamarnya memanjang */
+.apt-decor { display: none; }
+.apt-floor.lit .apt-decor {
+  display: block; position: absolute; top: 48px; left: 50%;
+  transform: translateX(-50%); z-index: 2;
+}
+.apt-decor svg { image-rendering: pixelated; display: block; }
+.sceneOffice { background-color: #8f8a7e; background-image: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='20'%20height='20'%20shape-rendering='crispEdges'><rect%20width='20'%20height='20'%20fill='%238f8a7e'/><rect%20x='0'%20y='0'%20width='2'%20height='20'%20fill='%236f6a60'/><rect%20x='0'%20y='0'%20width='20'%20height='1'%20fill='%237f7a6e'/></svg>"); }
+.sceneStage { background-color: #3a3358; background-image: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='16'%20height='16'%20shape-rendering='crispEdges'><rect%20width='16'%20height='16'%20fill='%233a3358'/><rect%20x='0'%20y='0'%20width='8'%20height='8'%20fill='%23423a63'/><rect%20x='8'%20y='8'%20width='8'%20height='8'%20fill='%23423a63'/></svg>"); }
+.sceneVolunteer { background-color: #efe0c8; background-image: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='12'%20height='12'%20shape-rendering='crispEdges'><rect%20width='12'%20height='12'%20fill='%23efe0c8'/><rect%20x='0'%20y='0'%20width='2'%20height='12'%20fill='%23e2d0b2'/></svg>"); }
+.sceneHospital { background-color: #dfe9e6; background-image: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='16'%20height='16'%20shape-rendering='crispEdges'><rect%20width='16'%20height='16'%20fill='%23dfe9e6'/><rect%20x='0'%20y='0'%20width='16'%20height='1'%20fill='%23cfdcd8'/><rect%20x='0'%20y='8'%20width='16'%20height='1'%20fill='%23cfdcd8'/></svg>"); }
 .apt-dim {
   position: absolute; inset: 0; z-index: 5; pointer-events: none;
   background: rgba(10, 9, 18, .5);
