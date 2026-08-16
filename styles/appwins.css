@@ -177,9 +177,24 @@
 .sp-playing .sp-eq i:nth-child(2) { animation-delay: .15s; }
 .sp-playing .sp-eq i:nth-child(3) { animation-delay: .3s; }
 .sp-playing .sp-eq i:nth-child(4) { animation-delay: .45s; }
-.sp-embed { margin: 12px 0 6px; border: 2px solid #000; background: #000; min-height: 80px; }
+.skin-spotify .appwin-body { position: relative; }
+/* embed Spotify tetap dirender (audio butuh itu) tapi tak terlihat —
+   UI pixel kita yang jadi antarmukanya; atribusi ada di .sp-credit */
+.sp-embed {
+  position: absolute; bottom: 0; left: 0;
+  width: 300px; height: 80px;
+  opacity: 0; pointer-events: none; z-index: -1;
+}
 .sp-embed iframe { display: block; border: 0; }
-.sp-note { font-size: 10px; color: #b3b3b3; line-height: 1.4; }
+.sp-bar { height: 6px; background: #4d4d4d; margin: 14px 0 4px; border: 1px solid #000; }
+.sp-bar i { display: block; height: 100%; width: 0; background: #1db954; }
+.sp-times { display: flex; justify-content: space-between; font-size: 10px; color: #b3b3b3; }
+.sp-note { font-size: 10px; color: #b3b3b3; line-height: 1.4; margin-top: 6px; }
+.sp-credit {
+  display: flex; align-items: center; gap: 6px; margin-top: 12px;
+  font-size: 10px; color: #b3b3b3; text-decoration: none;
+}
+.sp-credit svg { image-rendering: pixelated; width: 14px; height: 14px; }
 .sp-ctrls { display: flex; align-items: center; gap: 10px; margin: 10px 0 4px; }
 .sp-btn { border: 0; background: none; color: #e8e8e8; font-size: 15px; padding: 2px 4px; line-height: 1; }
 .sp-play { background: #1db954; color: #06210f; border: 2px solid #000; padding: 3px 12px; }

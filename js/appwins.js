@@ -407,12 +407,31 @@
     meta.append(title, artist, eq);
     now.append(cover, meta);
 
-    // pemutar asli: Spotify Embed (resmi, tanpa login). Pengunjung dapat
-    // preview 30 detik; yang sedang login Premium dapat lagu utuh.
+    // Mesin pemutar: Spotify Embed resmi (tanpa login, preview 30 detik;
+    // utuh bila pengunjung login Premium). Embed-nya disembunyikan secara
+    // visual agar UI pixel kita tidak dobel — tetap dirender (bukan
+    // display:none) supaya audio jalan, dan `inert` menjaganya keluar dari
+    // urutan tab. Atribusi Spotify tetap ditampilkan di baris bawah.
     const embedHost = el('div', 'sp-embed');
+    embedHost.setAttribute('inert', '');
+    embedHost.setAttribute('aria-hidden', 'true');
     const embedMount = el('div');
     embedHost.appendChild(embedMount);
     const note = el('p', 'sp-note', 'Preview 30 detik · putar penuh kalau kamu login Spotify Premium');
+
+    // progress bar pixel — diisi dari posisi playback ASLI milik embed
+    const bar = el('div', 'sp-bar');
+    const fill = el('i');
+    bar.appendChild(fill);
+    const times = el('div', 'sp-times');
+    const tNow = el('span', null, '0:00');
+    const tEnd = el('span', null, '0:00');
+    times.append(tNow, tEnd);
+    const mmss = (ms) => {
+      if (!ms || ms < 0) return '0:00';
+      const s = Math.floor(ms / 1000);
+      return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    };
 
     const ctrls = el('div', 'sp-ctrls');
     const prev = el('button', 'sp-btn', '⏮');
@@ -446,6 +465,7 @@
       artist.textContent = t.artist;
       play.textContent = playing ? '⏸' : '▶';
       play.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+      credit.href = `https://open.spotify.com/track/${t.sid}`;
       body.classList.toggle('sp-playing', playing);
       [...list.children].forEach((r, i) => r.setAttribute('aria-pressed', String(i === idx)));
     }
@@ -464,7 +484,15 @@
       else { playing = !playing; render(); }
     });
 
-    body.append(now, embedHost, note, ctrls, el('div', 'sp-head', 'Daffa’s favourites'), list);
+    // atribusi: wajib tetap ada walau embed disembunyikan
+    const credit = el('a', 'sp-credit');
+    credit.target = '_blank';
+    credit.rel = 'noreferrer';
+    credit.appendChild(window.PixelArt.render('spotify', 1));
+    credit.appendChild(el('span', null, 'Powered by Spotify'));
+
+    body.append(now, embedHost, bar, times, note, ctrls,
+      el('div', 'sp-head', 'Daffa’s favourites'), list, credit);
     render();
 
     // pasang controller Spotify; kalau gagal (offline/diblokir), UI tetap
@@ -478,7 +506,13 @@
       }, (controller) => {
         ctrl = controller;
         controller.addListener('playback_update', (e) => {
-          playing = e && e.data && !e.data.isPaused;
+          const d = (e && e.data) || {};
+          playing = !d.isPaused;
+          if (d.duration) {
+            fill.style.width = `${Math.min(100, (d.position / d.duration) * 100)}%`;
+            tNow.textContent = mmss(d.position);
+            tEnd.textContent = mmss(d.duration);
+          }
           render();
         });
       });
