@@ -183,14 +183,7 @@
       h2icon('cap', 'Education'),
       el('p', null, `${D.education.program} — ${D.education.school}, ${D.education.detail}`),
       h2icon('case', 'Experience'));
-    D.experience.forEach((x) => {
-      const d = el('div', 'xp');
-      d.append(el('h3', null, `${x.role} · ${x.org}`), el('span', 'period', x.period));
-      const ul = el('ul');
-      x.points.forEach((pt) => ul.appendChild(el('li', null, pt)));
-      d.appendChild(ul);
-      p.appendChild(d);
-    });
+    p.appendChild(buildApartment(D.experience));
     p.appendChild(h2icon('trophy', 'Honors & Awards'));
     const ul = el('ul', 'awards');
     D.awards.forEach((a) => {
@@ -200,6 +193,64 @@
     });
     p.appendChild(ul);
   })();
+  // Experience sebagai apartemen ala Tomodachi Life: tiap lantai satu peran,
+  // penghuninya Smoky dengan setelan berbeda (pakai wardrobe yang sudah ada).
+  // Klik pintu -> lampu kamar nyala + speech bubble berisi poin pekerjaannya.
+  function buildApartment(list) {
+    // di dalam fungsi, bukan di scope modul: renderAbout jalan lebih dulu
+    // dari deklarasi ini, jadi const di luar kena temporal dead zone.
+    const TENANTS = [
+      { fit: 'wFitSuit', acc: 'wAccGlasses', hat: null, unit: '4A' },
+      { fit: 'wFitHoodie', acc: 'wAccHeadphones', hat: null, unit: '3A' },
+      { fit: 'wFitScarf', acc: null, hat: 'wHatBeanie', unit: '2A' },
+      { fit: 'wFitScarf', acc: 'wAccBowtie', hat: 'wHatCap', unit: '1A' },
+    ];
+    const apt = el('section', 'apt');
+    apt.setAttribute('aria-label', 'Experience, as an apartment building');
+    const roof = el('div', 'apt-roof');
+    roof.append(el('i', 'apt-antenna'), el('span', 'apt-sign', 'DAFFA APARTMENTS'));
+    apt.appendChild(roof);
+    list.forEach((x, i) => {
+      const t = TENANTS[i % TENANTS.length];
+      const floor = el('div', 'apt-floor');
+      const room = el('div', 'apt-room');
+      const tenant = el('div', 'apt-tenant');
+      // renderStack butuh urutan: base -> outfit -> aksesori -> topi
+      tenant.appendChild(window.PixelArt.renderStack(
+        ['cat', t.fit, t.acc, t.hat].filter(Boolean), 3));
+      room.append(el('i', 'apt-lamp'), tenant, el('i', 'apt-rug'));
+      const info = el('div', 'apt-info');
+      const id = `apt-bubble-${i}`;
+      const door = el('button', 'apt-door');
+      door.type = 'button';
+      door.setAttribute('aria-expanded', 'false');
+      door.setAttribute('aria-controls', id);
+      const plate = el('span', 'apt-unit', t.unit);
+      const who = el('span', 'apt-who');
+      who.append(el('b', null, x.role), el('i', null, x.org));
+      door.append(plate, who, el('span', 'apt-period', x.period), el('span', 'apt-knock', 'knock'));
+      const bubble = el('div', 'apt-bubble');
+      bubble.id = id;
+      bubble.hidden = true;
+      const ul = el('ul');
+      x.points.forEach((pt) => ul.appendChild(el('li', null, pt)));
+      bubble.appendChild(ul);
+      door.addEventListener('click', () => {
+        const open = door.getAttribute('aria-expanded') === 'true';
+        door.setAttribute('aria-expanded', String(!open));
+        bubble.hidden = open;
+        floor.classList.toggle('lit', !open);
+        try { window.Smoky.sfx.play(open ? 'wake' : 'happy'); } catch (e) { /* audio opsional */ }
+      });
+      info.append(door, bubble);
+      floor.append(room, info);
+      apt.appendChild(floor);
+    });
+    const ground = el('div', 'apt-ground');
+    ground.append(el('span', 'apt-mail', 'mailbox'), el('span', null, 'knock on a door to say hi'));
+    apt.appendChild(ground);
+    return apt;
+  }
   function launcherFor(group) {
     const grid = el('div', 'launcher');
     window.AppWins.GROUPS[group].forEach((id) => {
