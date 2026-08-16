@@ -281,6 +281,38 @@
     body.appendChild(wrap);
   }
 
+  // ---- Quick Look: jendela detail satu project (dibuka dari Finder) ----
+  function buildQuickLook(body, pr, i) {
+    const band = el('div', 'ql-band');
+    band.style.background = TAGCOLORS[i % TAGCOLORS.length];
+    band.appendChild(window.PixelArt.render('fileDoc', 3));
+    const head = el('div', 'ql-head');
+    head.appendChild(el('h3', null, pr.title));
+    const badge = el('span', 'ql-badge', i < 2 ? 'In progress' : 'Shipped');
+    if (i >= 2) badge.classList.add('done');
+    head.appendChild(badge);
+    const meta = el('div', 'ql-meta');
+    meta.append(el('span', null, `Kind: project`), el('span', null, `Stack: ${pr.tech.length} tech`));
+    const desc = el('p', 'ql-desc', pr.desc);
+    const tags = el('div', 'tags');
+    pr.tech.forEach((t) => tags.appendChild(techChip(t)));
+    const foot = el('div', 'ql-foot');
+    pr.links.forEach((l) => foot.appendChild(extBtn('pxbtn', l.label + ' ↗', l.url)));
+    const xls = el('button', 'pxbtn', 'Show in projects.xlsx');
+    xls.addEventListener('click', () => open('excel'));
+    foot.appendChild(xls);
+    body.append(band, head, meta, desc, tags, foot);
+  }
+  function projectDef(i) {
+    const pr = D.projects[i];
+    return {
+      title: `${pr.title} — Quick Look`,
+      skin: 'ql', icon: 'fileDoc', w: 380,
+      fx: 0.26 + (i % 3) * 0.09, fy: 130 + (i % 4) * 46,
+      build: (b) => buildQuickLook(b, pr, i),
+    };
+  }
+
   // ---- builder: n8n (kanvas workflow yang bisa dijalankan) ----
   function buildN8n(body) {
     const NODES = [
@@ -798,6 +830,18 @@
   }
 
   // ---- builders: Contact (profil pixel GitHub / LinkedIn / Gmail) ----
+  // tag tech lokal (app.js punya versinya sendiri di dalam IIFE-nya)
+  function techChip(t) {
+    const s = el('span', 'tag');
+    if (t.icon) {
+      const img = el('img');
+      img.src = `assets/icons/tech/${t.icon}.svg`;
+      img.alt = ''; img.width = 16; img.height = 16;
+      s.appendChild(img);
+    }
+    s.appendChild(document.createTextNode(t.label));
+    return s;
+  }
   function extBtn(cls, label, url) {
     const a = el('a', cls, label);
     a.href = url; a.target = '_blank'; a.rel = 'noreferrer';
@@ -1034,11 +1078,21 @@
     return win;
   }
 
+  // id 'ql:<n>' dibuat dinamis dari data project
+  function defFor(id) {
+    if (String(id).startsWith('ql:')) {
+      const i = Number(String(id).slice(3));
+      return D.projects[i] ? projectDef(i) : null;
+    }
+    return DEFS[id];
+  }
   function open(id, idx = 0) {
-    const def = DEFS[id];
+    const def = defFor(id);
     if (!def) return;
     const existing = wins.get(id);
-    if (existing) { toFront(existing); return; }
+    // hanya pakai ulang kalau window-nya masih benar-benar ada di DOM
+    if (existing && existing.isConnected) { toFront(existing); return; }
+    if (existing) wins.delete(id);
     const w = makeWin(id, def, idx);
     wins.set(id, w);
     document.body.appendChild(w);

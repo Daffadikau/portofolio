@@ -206,10 +206,30 @@
   }
   (function renderProjects() {
     const p = document.getElementById('panel-projects');
+    const COLORS = ['#e0662f', '#4a90d9', '#d9a616', '#7c5cc4', '#8fb83a', '#c94867', '#2fa392'];
     p.appendChild(h2icon('folder', 'Projects'));
     p.appendChild(el('p', 'bio', 'Opening the project suite — each app shows my work from a different angle.'));
     p.appendChild(launcherFor('projects'));
     p.appendChild(el('p', 'launch-hint', 'Tip: drag the windows around · click one to bring it to front · Esc or × closes it'));
+
+    // area Finder: tiap project sebagai berkas, klik untuk Quick Look
+    p.appendChild(h2icon('about', 'All files'));
+    const finder = el('div', 'finder');
+    D.projects.forEach((pr, i) => {
+      const f = el('button', 'file');
+      f.setAttribute('aria-label', `Quick Look: ${pr.title}`);
+      f.appendChild(window.PixelArt.render('fileDoc', 2));
+      f.appendChild(el('span', 'file-name', pr.title));
+      const tag = el('i', 'file-tag', i < 2 ? 'in progress' : 'shipped');
+      tag.style.background = COLORS[i % COLORS.length];
+      f.appendChild(tag);
+      f.addEventListener('click', () => window.AppWins.open(`ql:${i}`));
+      finder.appendChild(f);
+    });
+    p.appendChild(finder);
+    const shipped = D.projects.length - 2;
+    p.appendChild(el('div', 'finder-status',
+      `${D.projects.length} items · ${shipped} shipped · 2 in progress · click a file for Quick Look`));
   })();
   (function renderSkills() {
     const p = document.getElementById('panel-skills');
