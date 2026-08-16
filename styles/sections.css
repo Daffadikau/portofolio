@@ -360,3 +360,36 @@
 @media (max-width: 640px) {
   .desk-top { gap: 8px; }
 }
+/* ── Footer Y2K (GeoCities core) ────────────────────────────────────── */
+.y2k {
+  margin: 24px 0 8px; padding: 14px 12px;
+  border: 3px solid var(--ink); background: #1b1b2f; color: #e8e8f0;
+  text-align: center;
+}
+.y2k-hits { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; }
+.y2k-label { font-size: 11px; opacity: .8; }
+/* odometer: tiap digit kotak sendiri, seperti pencacah kunjungan lama */
+.y2k-odo { display: inline-flex; gap: 2px; }
+.y2k-odo i {
+  font-family: var(--font-pixel); font-style: normal; font-size: 14px;
+  background: #000; color: #33ff66; border: 2px solid #4a4a6a;
+  padding: 3px 5px; min-width: 18px;
+}
+.y2k-note { font-size: 10px; opacity: .45; width: 100%; }
+.y2k-badges {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 12px 0;
+}
+/* badge 88x31, ukuran wajib era webring */
+.y2k-badge {
+  width: 88px; height: 31px; border: 2px solid #000;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  line-height: 1.1; overflow: hidden;
+}
+.y2k-badge b { font-family: var(--font-pixel); font-size: 8px; }
+.y2k-badge i { font-style: normal; font-size: 7px; opacity: .8; }
+.y2k-ring {
+  display: inline-flex; align-items: center; gap: 10px;
+  border: 2px solid #4a4a6a; padding: 4px 10px; font-size: 11px;
+}
+.y2k-ring-name { font-family: var(--font-pixel); font-size: 9px; color: var(--tl-yellow); }
+.y2k-sig { font-size: 10px; opacity: .5; margin-top: 10px; }

@@ -181,6 +181,7 @@
     p.appendChild(buildApartment(D.experience));
     p.appendChild(h2icon('trophy', 'Honors & Awards'));
     p.appendChild(buildJokers(D.awards));
+    p.appendChild(buildY2kFooter());
   })();
   // Experience sebagai apartemen ala Tomodachi Life: tiap lantai satu peran,
   // penghuninya Smoky dengan setelan berbeda (pakai wardrobe yang sudah ada).
@@ -381,6 +382,50 @@
     scene.append(shelf, el('div', 'desk-surface'), read);
     show(null);
     return scene;
+  }
+  // Footer Y2K: pencacah kunjungan ala GeoCities, badge 88x31, dan webring.
+  // Semua palsu dan lokal — tidak ada request keluar, angkanya dari
+  // localStorage perangkat sendiri.
+  function buildY2kFooter() {
+    const f = el('footer', 'y2k');
+    const hits = el('div', 'y2k-hits');
+    hits.append(el('span', 'y2k-label', 'You are visitor number'));
+    const odo = el('span', 'y2k-odo');
+    let n = 1;
+    try {
+      const seen = sessionStorage.getItem('y2k-counted');
+      n = Number(localStorage.getItem('y2k-hits') || '0');
+      if (!(n >= 0)) n = 0;
+      if (!seen) {
+        n += 1;
+        localStorage.setItem('y2k-hits', String(n));
+        sessionStorage.setItem('y2k-counted', '1');
+      }
+      if (n < 1) n = 1;
+    } catch (e) { n = 1; }
+    String(n).padStart(6, '0').split('').forEach((d) => odo.appendChild(el('i', null, d)));
+    hits.appendChild(odo);
+    hits.appendChild(el('span', 'y2k-note', '(counted on your device only)'));
+    const badges = el('div', 'y2k-badges');
+    [['HAND-CODED', 'no framework, no build step', '#1a1a1a', '#7ee787'],
+      ['BEST VIEWED', 'at 800 x 600', '#2f3b52', '#a9c7e8'],
+      ['SMOKY', 'approved', '#f5d93d', '#1a1a1a'],
+      ['NO ADS', 'never had any', '#c94867', '#fff']].forEach(([a, b, bg, fg]) => {
+      const badge = el('span', 'y2k-badge');
+      badge.style.background = bg;
+      badge.style.color = fg;
+      badge.append(el('b', null, a), el('i', null, b));
+      badges.appendChild(badge);
+    });
+    const ring = el('div', 'y2k-ring');
+    ring.append(
+      el('span', null, '<<'),
+      el('span', 'y2k-ring-name', 'the pixel webring'),
+      el('span', null, '>>'),
+    );
+    f.append(hits, badges, ring,
+      el('p', 'y2k-sig', 'this page is under construction · always has been'));
+    return f;
   }
   function launcherFor(group) {
     const grid = el('div', 'launcher');
