@@ -453,6 +453,22 @@
     const frame = el('div', 'id-frame');
     const photo = el('div', 'id-photo');
     photo.appendChild(window.PixelArt.render('catTyler', 7));
+    // isi ruang kosong kolom foto: identitas pendamping + barcode pixel
+    const comp = el('div', 'id-comp');
+    comp.append(
+      el('b', null, 'SMOKY'),
+      el('span', null, 'travel companion · Lv.140'),
+      el('span', null, 'personality: hot and cold'));
+    photo.appendChild(comp);
+    const bars = el('div', 'id-barcode');
+    bars.setAttribute('aria-hidden', 'true');
+    [3, 1, 2, 1, 1, 3, 2, 1, 4, 1, 2, 2, 1, 3, 1, 1, 2, 4, 1, 2].forEach((w, i) => {
+      const b = el('i');
+      b.style.width = `${w * 2}px`;
+      if (i % 2) b.style.background = 'transparent';
+      bars.appendChild(b);
+    });
+    photo.appendChild(bars);
     photo.appendChild(el('span', 'id-photocap', 'Photograph of Authorized traveler'));
     const info = el('div', 'id-info');
     info.append(
@@ -497,7 +513,7 @@
     ghprofile: { title: 'Daffadikau — GitHub', skin: 'github', icon: 'github', w: 440, fx: 0.05, fy: 100, build: buildGithub },
     liprofile: { title: 'daffadikau — LinkedIn', skin: 'linkedin', icon: 'linkedin', w: 400, fx: 0.57, fy: 130, build: buildLinkedin },
     gmail: { title: 'Inbox (2) — Gmail', skin: 'gmail', icon: 'gmail', w: 480, fx: 0.26, fy: 400, build: buildGmail },
-    idcard: { title: 'travel-license — Wallet', skin: 'idcard', icon: 'catBox', w: 700, fx: 0.13, fy: 90, build: buildIdcard },
+    idcard: { title: 'travel-license — Wallet', skin: 'idcard', icon: 'catBox', w: 720, fx: 0.13, fy: 90, center: true, build: buildIdcard },
   };
   const GROUPS = {
     projects: ['excel', 'word', 'notion'],
@@ -527,8 +543,15 @@
     const mobile = window.innerWidth <= 640;
     const width = mobile ? Math.min(def.w, window.innerWidth - 16) : def.w;
     win.style.width = `${width}px`;
-    win.style.left = `${mobile ? 8 : Math.min(Math.round(window.innerWidth * def.fx), window.innerWidth - 100)}px`;
-    win.style.top = `${mobile ? 64 + idx * 34 : Math.min(def.fy, Math.max(60, window.innerHeight - 160))}px`;
+    if (def.center && !mobile) {
+      // window yang berdiri sendiri (mis. ID card) diletakkan center supaya
+      // tidak terasa melayang di pojok
+      win.style.left = `${Math.max(8, Math.round((window.innerWidth - width) / 2))}px`;
+      win.style.top = `${Math.max(56, Math.round((window.innerHeight - Math.min(520, window.innerHeight * 0.8)) / 2))}px`;
+    } else {
+      win.style.left = `${mobile ? 8 : Math.min(Math.round(window.innerWidth * def.fx), window.innerWidth - 100)}px`;
+      win.style.top = `${mobile ? 64 + idx * 34 : Math.min(def.fy, Math.max(60, window.innerHeight - 160))}px`;
+    }
     win.setAttribute('role', 'dialog');
     win.setAttribute('aria-label', def.title);
     win.tabIndex = -1;
