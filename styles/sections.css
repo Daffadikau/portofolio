@@ -10,7 +10,7 @@
 .status .dot { display: inline-block; width: 8px; height: 8px; background: var(--tl-green); border: 2px solid var(--ink); margin-right: 6px; }
 .bio { max-width: 60ch; margin: 10px 0 16px; line-height: 1.6; font-size: 14px; }
 .stats { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
-.stat { border: 3px solid var(--ink); padding: 8px 12px; background: #fff; }
+.stat { border: 3px solid var(--ink); padding: 8px 12px; background: var(--surface); }
 .stat b { font-family: var(--font-pixel); display: block; }
 .stat span { font-size: 12px; }
 .panel h2 { font-family: var(--font-pixel); font-size: 16px; margin: 18px 0 8px; border-bottom: 3px solid var(--ink); padding-bottom: 4px; }
@@ -18,7 +18,7 @@
 .xp ul { margin: 6px 0 12px 18px; font-size: 13px; line-height: 1.6; }
 .period { font-size: 12px; opacity: .7; }
 .awards { margin-left: 18px; font-size: 13px; line-height: 1.8; }
-.miniwin { border: 3px solid var(--ink); background: #fff; margin-bottom: 16px; box-shadow: 4px 4px 0 rgba(26,26,26,.3); }
+.miniwin { border: 3px solid var(--ink); background: var(--surface); margin-bottom: 16px; box-shadow: 4px 4px 0 rgba(26,26,26,.3); }
 .miniwin-bar { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-bottom: 3px solid var(--ink); background: var(--win-dark); font-family: var(--font-pixel); font-size: 12px; }
 .mw-dots i { display: inline-block; width: 8px; height: 8px; border: 2px solid var(--ink); margin-right: 3px; background: var(--tl-red); }
 .mw-dots i:nth-child(2) { background: var(--tl-yellow); }
@@ -31,7 +31,7 @@
 .pxbtn { display: inline-block; font-family: var(--font-pixel); font-size: 12px; color: var(--ink); text-decoration: none; border: 3px solid var(--ink); background: var(--tl-yellow); padding: 4px 10px; box-shadow: 3px 3px 0 var(--ink); margin-right: 8px; }
 .pxbtn:active { transform: translate(3px, 3px); box-shadow: none; }
 .pxbtn.big { font-size: 14px; padding: 10px 16px; margin-bottom: 8px; }
-.char-card { display: flex; gap: 18px; align-items: stretch; flex-wrap: wrap; border: 3px solid var(--ink); background: #fff; padding: 14px; box-shadow: 4px 4px 0 rgba(26,26,26,.3); }
+.char-card { display: flex; gap: 18px; align-items: stretch; flex-wrap: wrap; border: 3px solid var(--ink); background: var(--surface); padding: 14px; box-shadow: 4px 4px 0 rgba(26,26,26,.3); }
 .char-portrait { display: grid; place-items: center; gap: 6px; border: 3px solid var(--ink); background: var(--win); padding: 10px 16px; }
 .char-portrait svg { image-rendering: pixelated; animation: catbob 1.2s steps(2) infinite; }
 .char-partner { font-family: var(--font-pixel); font-size: 11px; }
@@ -48,7 +48,7 @@
 .smoky-bubble {
   position: absolute; top: -6px; left: 68%; white-space: nowrap;
   font-family: var(--font-pixel); font-size: 11px;
-  background: #fff; border: 2px solid var(--ink); padding: 3px 8px;
+  background: var(--surface); border: 2px solid var(--ink); padding: 3px 8px;
   box-shadow: 2px 2px 0 var(--ink); z-index: 5;
 }
 @keyframes heartfloat { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-34px); opacity: 0; } }
@@ -60,7 +60,7 @@
 .wr-opts { display: flex; gap: 6px; flex-wrap: wrap; }
 .wr-opt {
   font-family: var(--font-mono); font-size: 12px; color: var(--ink);
-  border: 2px solid var(--ink); background: #fff; padding: 3px 10px;
+  border: 2px solid var(--ink); background: var(--surface); padding: 3px 10px;
 }
 .wr-opt[aria-pressed="true"] { background: var(--tl-yellow); font-weight: 700; box-shadow: 2px 2px 0 var(--ink); }
 .pxbtn.care { display: inline-flex; align-items: center; gap: 6px; background: var(--win); }
@@ -69,7 +69,7 @@
 .skillgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px 20px; }
 .skill { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .bar { display: flex; gap: 3px; }
-.bar i { width: 14px; height: 14px; border: 2px solid var(--ink); background: #fff; }
+.bar i { width: 14px; height: 14px; border: 2px solid var(--ink); background: var(--surface); }
 .bar i.on { background: var(--tl-green); }
 .contact-btns { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 24px; }
 /* tombol easter egg: tanpa chrome tombol sama sekali agar tidak ketahuan */
@@ -216,7 +216,7 @@
 /* speech bubble ala Tomodachi, ekornya nunjuk ke kamar */
 .apt-bubble {
   position: relative; margin: 0 12px 12px 46px;
-  border: 3px solid var(--ink); background: #fffbe8; padding: 10px 12px;
+  border: 3px solid var(--ink); background: var(--surface-soft); padding: 10px 12px;
 }
 .apt-bubble::before {
   content: ''; position: absolute; left: -12px; top: 14px;
@@ -224,7 +224,7 @@
 }
 .apt-bubble::after {
   content: ''; position: absolute; left: -6px; top: 17px;
-  width: 6px; height: 6px; background: #fffbe8;
+  width: 6px; height: 6px; background: var(--surface-soft);
 }
 .apt-bubble ul { margin: 0 0 0 16px; font-size: 12px; line-height: 1.6; }
 .apt-ground {
@@ -472,7 +472,7 @@
 .y2k-purr {
   position: absolute; top: -6px; right: -6px;
   font-family: var(--font-pixel); font-size: 9px; white-space: nowrap;
-  border: 3px solid var(--ink); background: #fffbe8; color: var(--ink);
+  border: 3px solid var(--ink); background: var(--surface-soft); color: var(--ink);
   padding: 4px 6px;
 }
 .y2k-purr[hidden] { display: none; }

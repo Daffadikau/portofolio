@@ -136,7 +136,33 @@
       document.addEventListener('keydown', kick, { once: true });
     }
   } catch (e) { /* ignore */ }
-  titlebar.append(lights, tabbar, musicBtn, adBtn);
+  // Mode gelap. Bawaannya mengikuti setelan sistem; sekali pengunjung memilih
+  // sendiri, pilihannya yang dipakai dan diingat.
+  const themeBtn = el('button', 'ext-btn ext-theme');
+  themeBtn.type = 'button';
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+  let themeChoice = null;
+  try { themeChoice = localStorage.getItem('theme'); } catch (e) { themeChoice = null; }
+  function darkNow() {
+    return themeChoice ? themeChoice === 'dark' : prefersDark.matches;
+  }
+  function syncTheme() {
+    const on = darkNow();
+    document.documentElement.classList.toggle('dark', on);
+    themeBtn.replaceChildren(window.PixelArt.render(on ? 'iconSun' : 'iconMoon', 2));
+    themeBtn.setAttribute('aria-pressed', String(on));
+    themeBtn.title = on ? 'Switch to light mode' : 'Switch to dark mode';
+    themeBtn.setAttribute('aria-label', themeBtn.title);
+  }
+  themeBtn.addEventListener('click', () => {
+    themeChoice = darkNow() ? 'light' : 'dark';
+    try { localStorage.setItem('theme', themeChoice); } catch (e) { /* ignore */ }
+    syncTheme();
+  });
+  // ikut berubah kalau sistem berganti tema, selama pengunjung belum memilih
+  prefersDark.addEventListener('change', () => { if (!themeChoice) syncTheme(); });
+  syncTheme();
+  titlebar.append(lights, tabbar, themeBtn, musicBtn, adBtn);
 
   // baris 2 = toolbar browser: back / forward / reload + address bar
   const toolbar = el('div', 'toolbar');
