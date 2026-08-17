@@ -126,3 +126,42 @@ button:disabled, a:not([href]) { cursor: inherit; }
 :root.dark a[href], :root.dark button, :root.dark summary, :root.dark [role="button"] {
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='16' shape-rendering='crispEdges'%3E%3Crect x='2' y='0' width='2' height='1' fill='%23000000'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23000000'/%3E%3Crect x='2' y='1' width='2' height='1' fill='%23ffffff'/%3E%3Crect x='4' y='1' width='1' height='1' fill='%23000000'/%3E%3Crect x='1' y='2' width='1' height='1' fill='%23000000'/%3E%3Crect x='2' y='2' width='2' height='1' fill='%23ffffff'/%3E%3Crect x='4' y='2' width='1' height='1' fill='%23000000'/%3E%3Crect x='1' y='3' width='1' height='1' fill='%23000000'/%3E%3Crect x='2' y='3' width='2' height='1' fill='%23ffffff'/%3E%3Crect x='4' y='3' width='1' height='1' fill='%23000000'/%3E%3Crect x='1' y='4' width='1' height='1' fill='%23000000'/%3E%3Crect x='2' y='4' width='2' height='1' fill='%23ffffff'/%3E%3Crect x='4' y='4' width='3' height='1' fill='%23000000'/%3E%3Crect x='1' y='5' width='1' height='1' fill='%23000000'/%3E%3Crect x='2' y='5' width='2' height='1' fill='%23ffffff'/%3E%3Crect x='4' y='5' width='1' height='1' fill='%23000000'/%3E%3Crect x='5' y='5' width='2' height='1' fill='%23ffffff'/%3E%3Crect x='7' y='5' width='2' height='1' fill='%23000000'/%3E%3Crect x='0' y='6' width='2' height='1' fill='%23000000'/%3E%3Crect x='2' y='6' width='8' height='1' fill='%23ffffff'/%3E%3Crect x='10' y='6' width='1' height='1' fill='%23000000'/%3E%3Crect x='0' y='7' width='1' height='1' fill='%23000000'/%3E%3Crect x='1' y='7' width='9' height='1' fill='%23ffffff'/%3E%3Crect x='10' y='7' width='1' height='1' fill='%23000000'/%3E%3Crect x='0' y='8' width='1' height='1' fill='%23000000'/%3E%3Crect x='1' y='8' width='9' height='1' fill='%23ffffff'/%3E%3Crect x='10' y='8' width='1' height='1' fill='%23000000'/%3E%3Crect x='1' y='9' width='1' height='1' fill='%23000000'/%3E%3Crect x='2' y='9' width='8' height='1' fill='%23ffffff'/%3E%3Crect x='10' y='9' width='1' height='1' fill='%23000000'/%3E%3Crect x='1' y='10' width='1' height='1' fill='%23000000'/%3E%3Crect x='2' y='10' width='7' height='1' fill='%23ffffff'/%3E%3Crect x='9' y='10' width='1' height='1' fill='%23000000'/%3E%3Crect x='2' y='11' width='1' height='1' fill='%23000000'/%3E%3Crect x='3' y='11' width='6' height='1' fill='%23ffffff'/%3E%3Crect x='9' y='11' width='1' height='1' fill='%23000000'/%3E%3Crect x='2' y='12' width='1' height='1' fill='%23000000'/%3E%3Crect x='3' y='12' width='6' height='1' fill='%23ffffff'/%3E%3Crect x='9' y='12' width='1' height='1' fill='%23000000'/%3E%3Crect x='3' y='13' width='7' height='1' fill='%23000000'/%3E%3C/svg%3E") 2 0, pointer;
 }
+
+/* ── Scrollbar pixel ─────────────────────────────────────────────────
+   Track dan thumb digambar kotak dengan garis tepi tebal, sama seperti
+   komponen lain. Panah atas/bawah memakai SVG piksel, bukan bentuk bulat
+   bawaan peramban. Warnanya lewat token jadi ikut mode gelap. */
+* { scrollbar-width: auto; scrollbar-color: var(--ink) var(--win-dark); }
+::-webkit-scrollbar { width: 16px; height: 16px; }
+::-webkit-scrollbar-track {
+  background: var(--win-dark);
+  border-left: 3px solid var(--ink);
+  background-image: repeating-linear-gradient(45deg,
+    rgba(0, 0, 0, .07) 0 2px, transparent 2px 4px);
+}
+::-webkit-scrollbar-corner { background: var(--win-dark); }
+::-webkit-scrollbar-thumb {
+  background: var(--ink);
+  border: 3px solid var(--win-dark);
+  box-shadow: inset 0 0 0 2px var(--win);
+}
+::-webkit-scrollbar-thumb:hover { box-shadow: inset 0 0 0 2px var(--tl-yellow); }
+/* tombol panah di ujung track */
+::-webkit-scrollbar-button:single-button {
+  background: var(--win); border: 3px solid var(--ink);
+  height: 16px; width: 16px; background-repeat: no-repeat; background-position: center;
+}
+::-webkit-scrollbar-button:single-button:vertical:decrement {
+  background-image: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='12'%20height='12'%20shape-rendering='crispEdges'><rect%20x='5'%20y='3'%20width='2'%20height='1'%20fill='%231a1a1a'/><rect%20x='4'%20y='4'%20width='4'%20height='1'%20fill='%231a1a1a'/><rect%20x='3'%20y='5'%20width='6'%20height='1'%20fill='%231a1a1a'/><rect%20x='2'%20y='6'%20width='8'%20height='1'%20fill='%231a1a1a'/></svg>");
+}
+::-webkit-scrollbar-button:single-button:vertical:increment {
+  background-image: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='12'%20height='12'%20shape-rendering='crispEdges'><rect%20x='2'%20y='4'%20width='8'%20height='1'%20fill='%231a1a1a'/><rect%20x='3'%20y='5'%20width='6'%20height='1'%20fill='%231a1a1a'/><rect%20x='4'%20y='6'%20width='4'%20height='1'%20fill='%231a1a1a'/><rect%20x='5'%20y='7'%20width='2'%20height='1'%20fill='%231a1a1a'/></svg>");
+}
+::-webkit-scrollbar-button:horizontal { display: none; }
+/* di mode gelap panahnya perlu tinta terang */
+:root.dark ::-webkit-scrollbar-button:single-button:vertical:decrement {
+  background-image: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='12'%20height='12'%20shape-rendering='crispEdges'><rect%20x='5'%20y='3'%20width='2'%20height='1'%20fill='%23e9e9ee'/><rect%20x='4'%20y='4'%20width='4'%20height='1'%20fill='%23e9e9ee'/><rect%20x='3'%20y='5'%20width='6'%20height='1'%20fill='%23e9e9ee'/><rect%20x='2'%20y='6'%20width='8'%20height='1'%20fill='%23e9e9ee'/></svg>");
+}
+:root.dark ::-webkit-scrollbar-button:single-button:vertical:increment {
+  background-image: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='12'%20height='12'%20shape-rendering='crispEdges'><rect%20x='2'%20y='4'%20width='8'%20height='1'%20fill='%23e9e9ee'/><rect%20x='3'%20y='5'%20width='6'%20height='1'%20fill='%23e9e9ee'/><rect%20x='4'%20y='6'%20width='4'%20height='1'%20fill='%23e9e9ee'/><rect%20x='5'%20y='7'%20width='2'%20height='1'%20fill='%23e9e9ee'/></svg>");
+}

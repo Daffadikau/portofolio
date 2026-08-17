@@ -73,60 +73,58 @@
   const tabbar = el('div', 'tabbar');
   tabbar.setAttribute('role', 'tablist');
   tabbar.setAttribute('aria-label', 'Sections');
-  // Tombol ala ekstensi browser di ujung kanan: memblokir jendela aplikasi
-  // yang biasanya muncul sendiri tiap pindah tab.
-  let popupsBlocked = false;
-  try { popupsBlocked = localStorage.getItem('popup-blocked') === '1'; } catch (e) { /* ignore */ }
-  let blockedCount = 0;
-  const adBtn = el('button', 'ext-btn');
-  adBtn.type = 'button';
-  adBtn.appendChild(window.PixelArt.render('iconShield', 2));
-  const adBadge = el('span', 'ext-badge');
-  adBadge.hidden = true;
-  adBtn.appendChild(adBadge);
-  function syncAd() {
-    adBtn.setAttribute('aria-pressed', String(popupsBlocked));
-    adBtn.title = popupsBlocked
-      ? 'Pop-up windows blocked. Click to allow them again.'
-      : 'Windows open by themselves. Click to block them.';
-    adBtn.setAttribute('aria-label', adBtn.title);
-    adBadge.hidden = !(popupsBlocked && blockedCount);
-    adBadge.textContent = String(blockedCount);
-  }
-  adBtn.addEventListener('click', () => {
-    popupsBlocked = !popupsBlocked;
-    if (!popupsBlocked) blockedCount = 0;
-    try { localStorage.setItem('popup-blocked', popupsBlocked ? '1' : '0'); } catch (e) { /* ignore */ }
-    syncAd();
-    // langsung terasa: menyalakan menutup yang terbuka, mematikan membukanya
-    const tab = location.hash.replace('#', '') || 'about';
-    if (window.AppWins) {
-      if (popupsBlocked) window.AppWins.closeAll(['terminal', 'spotify']);
-      else if (window.AppWins.GROUPS[tab]) window.AppWins.openGroup(tab);
-    }
-  });
-  syncAd();
-  // Tombol musik latar. Mati secara bawaan: musik yang menyala sendiri itu
-  // mengganggu, dan peramban memang memblokir audio tanpa interaksi dulu.
-  const musicBtn = el('button', 'ext-btn ext-music');
-  musicBtn.type = 'button';
-  function syncMusic(on) {
-    musicBtn.replaceChildren(window.PixelArt.render(on ? 'iconSound' : 'iconMute', 2));
-    musicBtn.setAttribute('aria-pressed', String(on));
-    musicBtn.title = on ? 'Turn the 8-bit soundtrack off' : 'Play the 8-bit soundtrack';
-    musicBtn.setAttribute('aria-label', musicBtn.title);
-  }
-  syncMusic(false);
-  musicBtn.addEventListener('click', () => {
-    if (!window.Music) return;
-    window.Music.toggle();
-    try { localStorage.setItem('music-on', window.Music.isPlaying() ? '1' : '0'); } catch (e) { /* ignore */ }
-  });
-  try { if (window.Music) window.Music.onChange(syncMusic); } catch (e) { /* ignore */ }
-  // pilihan sebelumnya diingat, tapi tetap menunggu satu interaksi apa pun
-  // karena peramban tidak mengizinkan audio dimulai tanpa itu
-  try {
-    if (localStorage.getItem('music-on') === '1') {
+  // Semua setelan situs (tema, musik, pemblokir pop-up) dipusatkan di sini
+  // supaya jendela Settings dan bagian lain memakai sumber yang sama.
+  // Dulu ini tiga tombol di titlebar; sekarang titlebar-nya bersih lagi.
+  (function prefs() {
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const listeners = [];
+    const read = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+    const write = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* ignore */ } };
+    let themeChoice = read('theme');                 // 'light' | 'dark' | null (ikut sistem)
+    let blocked = read('popup-blocked') === '1';
+    let blockedCount = 0;
+    function isDark() { return themeChoice ? themeChoice === 'dark' : media.matches; }
+    function applyTheme() { document.documentElement.classList.toggle('dark', isDark()); }
+    function emit() { listeners.forEach((f) => { try { f(); } catch (e) { /* ignore */ } }); }
+    applyTheme();
+    media.addEventListener('change', () => { if (!themeChoice) { applyTheme(); emit(); } });
+    window.Prefs = {
+      isDark,
+      themeMode: () => themeChoice || 'auto',
+      setTheme(mode) {                                // 'light' | 'dark' | 'auto'
+        themeChoice = mode === 'auto' ? null : mode;
+        if (themeChoice) write('theme', themeChoice);
+        else { try { localStorage.removeItem('theme'); } catch (e) { /* ignore */ } }
+        applyTheme(); emit();
+      },
+      isMusicOn: () => !!(window.Music && window.Music.isPlaying()),
+      setMusic(on) {
+        if (!window.Music) return;
+        if (on) window.Music.start(); else window.Music.stop();
+        write('music-on', on ? '1' : '0');
+        emit();
+      },
+      isBlocked: () => blocked,
+      blockedCount: () => blockedCount,
+      setBlocked(on) {
+        blocked = !!on;
+        if (!blocked) blockedCount = 0;
+        write('popup-blocked', blocked ? '1' : '0');
+        const tab = location.hash.replace('#', '') || 'about';
+        if (window.AppWins) {
+          if (blocked) window.AppWins.closeAll(['terminal', 'spotify', 'settings']);
+          else if (window.AppWins.GROUPS[tab]) window.AppWins.openGroup(tab);
+        }
+        emit();
+      },
+      noteBlocked(n) { blockedCount += n; emit(); },
+      onChange(f) { listeners.push(f); },
+    };
+    try { if (window.Music) window.Music.onChange(emit); } catch (e) { /* ignore */ }
+    // pilihan musik diingat, tapi tetap menunggu satu interaksi karena
+    // peramban tidak mengizinkan audio dimulai tanpa itu
+    if (read('music-on') === '1') {
       const kick = () => {
         document.removeEventListener('pointerdown', kick);
         document.removeEventListener('keydown', kick);
@@ -135,34 +133,8 @@
       document.addEventListener('pointerdown', kick, { once: true });
       document.addEventListener('keydown', kick, { once: true });
     }
-  } catch (e) { /* ignore */ }
-  // Mode gelap. Bawaannya mengikuti setelan sistem; sekali pengunjung memilih
-  // sendiri, pilihannya yang dipakai dan diingat.
-  const themeBtn = el('button', 'ext-btn ext-theme');
-  themeBtn.type = 'button';
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-  let themeChoice = null;
-  try { themeChoice = localStorage.getItem('theme'); } catch (e) { themeChoice = null; }
-  function darkNow() {
-    return themeChoice ? themeChoice === 'dark' : prefersDark.matches;
-  }
-  function syncTheme() {
-    const on = darkNow();
-    document.documentElement.classList.toggle('dark', on);
-    themeBtn.replaceChildren(window.PixelArt.render(on ? 'iconSun' : 'iconMoon', 2));
-    themeBtn.setAttribute('aria-pressed', String(on));
-    themeBtn.title = on ? 'Switch to light mode' : 'Switch to dark mode';
-    themeBtn.setAttribute('aria-label', themeBtn.title);
-  }
-  themeBtn.addEventListener('click', () => {
-    themeChoice = darkNow() ? 'light' : 'dark';
-    try { localStorage.setItem('theme', themeChoice); } catch (e) { /* ignore */ }
-    syncTheme();
-  });
-  // ikut berubah kalau sistem berganti tema, selama pengunjung belum memilih
-  prefersDark.addEventListener('change', () => { if (!themeChoice) syncTheme(); });
-  syncTheme();
-  titlebar.append(lights, tabbar, themeBtn, musicBtn, adBtn);
+  })();
+  titlebar.append(lights, tabbar);
 
   // baris 2 = toolbar browser: back / forward / reload + address bar
   const toolbar = el('div', 'toolbar');
@@ -756,89 +728,7 @@
   })();
   (function renderSkills() {
     const p = document.getElementById('panel-skills');
-    const C = D.character;
-    const card = el('div', 'char-card');
-    const portrait = el('div', 'char-portrait');
-    window.Smoky.attach(portrait, 5);
-    portrait.appendChild(el('span', 'char-partner', `${C.partner.name} · Lv.${C.partner.powerLevel}`));
-    const info = el('div', 'char-info');
-    const nameRow = el('div', 'char-name');
-    nameRow.append(
-      el('span', 'display char-display', D.name),
-      el('span', 'char-lv', `LV ${C.level} (${C.levelLabel})`),
-    );
-    const hearts = el('div', 'char-hearts');
-    hearts.setAttribute('role', 'img');
-    function renderHearts(n) {
-      hearts.setAttribute('aria-label', `Smoky affection: ${n} of 5 hearts`);
-      hearts.replaceChildren();
-      for (let i = 1; i <= 5; i += 1) hearts.appendChild(el('span', i <= n ? 'hh on' : 'hh', i <= n ? '♥' : '♡'));
-    }
-    renderHearts(window.Smoky.getHearts());
-    window.Smoky.onHearts(renderHearts);
-    const care = el('div', 'care-btns');
-    [['feed', 'fish', 'FEED'], ['brush', 'brush', 'BRUSH'], ['play', 'ball', 'PLAY']].forEach(([kind, map, label]) => {
-      const b = el('button', 'pxbtn care');
-      b.appendChild(window.PixelArt.render(map, 2));
-      b.appendChild(el('span', null, label));
-      b.addEventListener('click', () => window.Smoky.interact(kind));
-      care.appendChild(b);
-    });
-    info.append(nameRow, el('p', 'char-class', `CLASS: ${C.class}`), hearts, care);
-    card.append(portrait, info);
-    const snd = el('button', 'pxbtn care', `SOUND: ${window.Smoky.sfx.isMuted() ? 'OFF' : 'ON'}`);
-    snd.setAttribute('aria-pressed', String(!window.Smoky.sfx.isMuted()));
-    snd.addEventListener('click', () => {
-      const muted = window.Smoky.sfx.toggle();
-      snd.textContent = `SOUND: ${muted ? 'OFF' : 'ON'}`;
-      snd.setAttribute('aria-pressed', String(!muted));
-    });
-    care.appendChild(snd);
-    // wardrobe: dandani Smoky — berlaku juga untuk Smoky di tab About
-    const SLOTS = [['hat', 'Hat'], ['outfit', 'Outfit'], ['acc', 'Accessory']];
-    const wardrobe = el('div', 'wardrobe');
-    SLOTS.forEach(([slot, label]) => {
-      const row = el('div', 'wr-slot');
-      row.appendChild(el('span', 'wr-label', label));
-      const opts = el('div', 'wr-opts');
-      opts.setAttribute('role', 'group');
-      opts.setAttribute('aria-label', `${label} options for Smoky`);
-      window.Smoky.WARDROBE[slot].forEach((item) => {
-        const b = el('button', 'wr-opt', item.label);
-        b.dataset.slot = slot;
-        b.dataset.item = item.id;
-        // barang rahasia tampil sebagai ??? sampai dibuka lewat easter egg
-        if (item.secret) {
-          b.dataset.secret = '1';
-          b.dataset.label = item.label;
-          const lockIt = () => {
-            const open = window.Smoky.isUnlocked(item.id);
-            b.textContent = open ? item.label : '???';
-            b.disabled = !open;
-            b.title = open ? item.label : 'Locked. Something unlocks this.';
-          };
-          lockIt();
-          window.Smoky.onUnlock(lockIt);
-        }
-        b.addEventListener('click', () => window.Smoky.wear(slot, item.id));
-        opts.appendChild(b);
-      });
-      row.appendChild(opts);
-      wardrobe.appendChild(row);
-    });
-    function syncWardrobe(w) {
-      wardrobe.querySelectorAll('.wr-opt').forEach((b) => {
-        b.setAttribute('aria-pressed', String(w[b.dataset.slot] === b.dataset.item));
-      });
-    }
-    syncWardrobe(window.Smoky.getWorn());
-    window.Smoky.onOutfit(syncWardrobe);
-
-    p.append(h2icon('about', 'Character'), card,
-      h2icon('cap', 'Wardrobe'),
-      el('p', 'bio', 'Dress Smoky up — whatever he wears here is what he wears everywhere.'),
-      wardrobe,
-      h2icon('chip', 'Toolbox'));
+    p.appendChild(h2icon('chip', 'Toolbox'));
     p.appendChild(el('p', 'bio', 'My skills, opened in their natural habitat — a very busy desktop.'));
     p.appendChild(launcherFor('skills'));
     p.appendChild(el('p', 'launch-hint', 'Tip: drag the windows around · click one to bring it to front · Esc or × closes it'));
@@ -892,6 +782,7 @@
       { map: 'term', app: 'terminal', label: 'Terminal' },
       { map: 'spotify', app: 'spotify', label: 'Spotify' },
       { map: 'iconChat', app: 'smokychat', label: 'Chat with Smoky' },
+      { map: 'iconGear', app: 'settings', label: 'System Settings' },
       { sep: true },
       { map: 'github', url: D.socials.github, label: 'GitHub' },
       { map: 'linkedin', url: D.socials.linkedin, label: 'LinkedIn' },
@@ -954,10 +845,9 @@
     window.AppWins.closeAll(['terminal', 'spotify']);
     const group = window.AppWins.GROUPS[e.detail.id];
     if (!group) return;
-    if (popupsBlocked) {
-      // dihitung supaya lencananya menunjukkan berapa yang dicegah
-      blockedCount += group.length;
-      syncAd();
+    if (window.Prefs && window.Prefs.isBlocked()) {
+      // dihitung supaya jumlahnya bisa ditampilkan di jendela Settings
+      window.Prefs.noteBlocked(group.length);
       return;
     }
     window.AppWins.openGroup(e.detail.id);

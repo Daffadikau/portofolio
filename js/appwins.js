@@ -1126,6 +1126,211 @@
     body.appendChild(wrap);
     setTimeout(() => input.focus(), 80);
   }
+  // Jendela Settings ala System Settings macOS: daftar kategori di kiri,
+  // isinya di kanan. Semua setelan yang dulu jadi tombol di titlebar pindah
+  // ke sini, plus panel Smoky sebagai easter egg.
+  function buildSettings(body) {
+    const P = window.Prefs;
+    const wrap = el('div', 'set-wrap');
+    const side = el('div', 'set-side');
+    side.setAttribute('role', 'tablist');
+    const pane = el('div', 'set-pane');
+    // sakelar kotak, bukan bentuk pil membulat
+    function toggleRow(label, hint, get, set) {
+      const row = el('div', 'set-row');
+      const txt = el('div', 'set-txt');
+      txt.append(el('b', null, label), el('i', null, hint));
+      const sw = el('button', 'set-sw');
+      sw.type = 'button';
+      sw.setAttribute('role', 'switch');
+      const sync = () => {
+        const on = !!get();
+        sw.setAttribute('aria-checked', String(on));
+        sw.setAttribute('aria-label', `${label}: ${on ? 'on' : 'off'}`);
+      };
+      sw.addEventListener('click', () => { set(!get()); sync(); });
+      sync();
+      if (P) P.onChange(sync);
+      row.append(txt, sw);
+      return row;
+    }
+    function segRow(label, hint, options, get, set) {
+      const row = el('div', 'set-row');
+      const txt = el('div', 'set-txt');
+      txt.append(el('b', null, label), el('i', null, hint));
+      const seg = el('div', 'set-seg');
+      seg.setAttribute('role', 'group');
+      const btns = options.map(([val, name]) => {
+        const b = el('button', 'set-segb', name);
+        b.type = 'button';
+        b.addEventListener('click', () => { set(val); sync(); });
+        seg.appendChild(b);
+        return [b, val];
+      });
+      function sync() {
+        const cur = get();
+        btns.forEach(([b, v]) => b.setAttribute('aria-pressed', String(v === cur)));
+      }
+      sync();
+      if (P) P.onChange(sync);
+      row.append(txt, seg);
+      return row;
+    }
+    // ── panel Smoky: kartu karakter + lemari pakaian ──
+    function smokyPane() {
+      const box = el('div');
+      const D2 = window.PORTFOLIO_DATA;
+      const C = D2.character;
+      const card = el('div', 'char-card');
+      const portrait = el('div', 'char-portrait');
+      window.Smoky.attach(portrait, 4);
+      portrait.appendChild(el('span', 'char-partner', `${C.partner.name} · Lv.${C.partner.powerLevel}`));
+      const info = el('div', 'char-info');
+      const nameRow = el('div', 'char-name');
+      nameRow.append(el('span', 'display char-display', D2.name),
+        el('span', 'char-lv', `LV ${C.level} (${C.levelLabel})`));
+      const hearts = el('div', 'char-hearts');
+      hearts.setAttribute('role', 'img');
+      function renderHearts(n) {
+        hearts.setAttribute('aria-label', `Smoky affection: ${n} of 5 hearts`);
+        hearts.replaceChildren();
+        for (let i = 1; i <= 5; i += 1) {
+          hearts.appendChild(el('span', i <= n ? 'hh on' : 'hh', i <= n ? '\u2665' : '\u2661'));
+        }
+      }
+      renderHearts(window.Smoky.getHearts());
+      window.Smoky.onHearts(renderHearts);
+      const care = el('div', 'care-btns');
+      [['feed', 'fish', 'FEED'], ['brush', 'brush', 'BRUSH'], ['play', 'ball', 'PLAY']]
+        .forEach(([kind, map, label]) => {
+          const b = el('button', 'pxbtn care');
+          b.appendChild(window.PixelArt.render(map, 2));
+          b.appendChild(el('span', null, label));
+          b.addEventListener('click', () => window.Smoky.interact(kind));
+          care.appendChild(b);
+        });
+      const snd = el('button', 'pxbtn care', `SOUND: ${window.Smoky.sfx.isMuted() ? 'OFF' : 'ON'}`);
+      snd.setAttribute('aria-pressed', String(!window.Smoky.sfx.isMuted()));
+      snd.addEventListener('click', () => {
+        const muted = window.Smoky.sfx.toggle();
+        snd.textContent = `SOUND: ${muted ? 'OFF' : 'ON'}`;
+        snd.setAttribute('aria-pressed', String(!muted));
+      });
+      care.appendChild(snd);
+      info.append(nameRow, el('p', 'char-class', `CLASS: ${C.class}`), hearts, care);
+      card.append(portrait, info);
+      const SLOTS = [['hat', 'Hat'], ['outfit', 'Outfit'], ['acc', 'Accessory']];
+      const wardrobe = el('div', 'wardrobe');
+      SLOTS.forEach(([slot, label]) => {
+        const row = el('div', 'wr-slot');
+        row.appendChild(el('span', 'wr-label', label));
+        const opts = el('div', 'wr-opts');
+        opts.setAttribute('role', 'group');
+        opts.setAttribute('aria-label', `${label} options for Smoky`);
+        window.Smoky.WARDROBE[slot].forEach((item) => {
+          const b = el('button', 'wr-opt', item.label);
+          b.dataset.slot = slot;
+          b.dataset.item = item.id;
+          if (item.secret) {
+            const lockIt = () => {
+              const open = window.Smoky.isUnlocked(item.id);
+              b.textContent = open ? item.label : '???';
+              b.disabled = !open;
+              b.title = open ? item.label : 'Locked. Something unlocks this.';
+            };
+            lockIt();
+            window.Smoky.onUnlock(lockIt);
+          }
+          b.addEventListener('click', () => window.Smoky.wear(slot, item.id));
+          opts.appendChild(b);
+        });
+        row.appendChild(opts);
+        wardrobe.appendChild(row);
+      });
+      function syncWardrobe(w) {
+        wardrobe.querySelectorAll('.wr-opt').forEach((b) => {
+          b.setAttribute('aria-pressed', String(w[b.dataset.slot] === b.dataset.item));
+        });
+      }
+      syncWardrobe(window.Smoky.getWorn());
+      window.Smoky.onOutfit(syncWardrobe);
+      box.append(card, el('p', 'set-note',
+        'Dress him up — whatever he wears here he wears everywhere on the site.'), wardrobe);
+      return box;
+    }
+    function aboutPane() {
+      const box = el('div', 'set-about');
+      const rows = [
+        ['Site', 'daffa.dev OS — hand-coded, no framework, no build step'],
+        ['Rendering', 'pixel maps drawn as inline SVG, one rect per pixel'],
+        ['Sound', 'synthesised in the browser, no audio files'],
+        ['Data', 'nothing leaves your device except the chat, if you use it'],
+      ];
+      rows.forEach(([k, v]) => {
+        const r = el('div', 'set-arow');
+        r.append(el('b', null, k), el('span', null, v));
+        box.appendChild(r);
+      });
+      return box;
+    }
+    const SECTIONS = [
+      { id: 'appearance', icon: 'setAppearance', name: 'Appearance', build: () => {
+        const b = el('div');
+        b.appendChild(segRow('Theme', 'Auto follows your system setting.',
+          [['auto', 'Auto'], ['light', 'Light'], ['dark', 'Dark']],
+          () => (P ? P.themeMode() : 'auto'), (v) => P && P.setTheme(v)));
+        b.appendChild(el('p', 'set-note',
+          'The desktop wallpaper also goes dark on its own between 8pm and 5am.'));
+        return b;
+      } },
+      { id: 'sound', icon: 'setSound', name: 'Sound', build: () => {
+        const b = el('div');
+        b.appendChild(toggleRow('8-bit soundtrack', 'Original day and night themes. Off by default.',
+          () => P && P.isMusicOn(), (v) => P && P.setMusic(v)));
+        b.appendChild(el('p', 'set-note',
+          'The track changes with the time of day, same clock as the wallpaper.'));
+        return b;
+      } },
+      { id: 'browsing', icon: 'setBlock', name: 'Browsing', build: () => {
+        const b = el('div');
+        b.appendChild(toggleRow('Block pop-up windows',
+          'Stops app windows opening by themselves when you change tabs.',
+          () => P && P.isBlocked(), (v) => P && P.setBlocked(v)));
+        const count = el('p', 'set-note');
+        const sync = () => {
+          const n = P ? P.blockedCount() : 0;
+          count.textContent = n ? `${n} window${n === 1 ? '' : 's'} blocked so far this visit.`
+            : 'You can still open any of them yourself from the dock.';
+        };
+        sync();
+        if (P) P.onChange(sync);
+        b.appendChild(count);
+        return b;
+      } },
+      { id: 'smoky', icon: 'setCat', name: 'Smoky', build: smokyPane },
+      { id: 'about', icon: 'setInfo', name: 'About', build: aboutPane },
+    ];
+    const navs = [];
+    function show(i) {
+      navs.forEach((n, k) => n.setAttribute('aria-selected', String(k === i)));
+      pane.replaceChildren();
+      pane.appendChild(el('h3', 'set-title', SECTIONS[i].name));
+      pane.appendChild(SECTIONS[i].build());
+    }
+    SECTIONS.forEach((sec, i) => {
+      const b = el('button', 'set-nav');
+      b.type = 'button';
+      b.setAttribute('role', 'tab');
+      b.appendChild(window.PixelArt.render(sec.icon, 2));
+      b.appendChild(el('span', null, sec.name));
+      b.addEventListener('click', () => show(i));
+      navs.push(b);
+      side.appendChild(b);
+    });
+    show(0);
+    wrap.append(side, pane);
+    body.appendChild(wrap);
+  }
   const DEFS = {
     excel: { title: 'projects.xlsx — Excel', skin: 'excel', icon: 'excel', w: 470, fx: 0.05, fy: 90, build: buildExcel },
     word: { title: 'report.docx — Word', skin: 'word', icon: 'word', w: 400, fx: 0.56, fy: 140, build: buildWord },
@@ -1144,6 +1349,7 @@
     idcard: { title: 'travel-license — Wallet', skin: 'idcard', icon: 'catBox', w: 720, fx: 0.13, fy: 90, center: true, build: buildIdcard },
     spotify: { title: 'Spotify', skin: 'spotify', icon: 'spotify', w: 340, fx: 0.6, fy: 110, build: buildSpotify },
     smokychat: { title: 'Smoky — Messages', skin: 'chat', icon: 'iconChat', w: 380, fx: 0.34, fy: 120, build: buildSmokyChat },
+    settings: { title: 'System Settings', skin: 'settings', icon: 'iconGear', w: 520, fx: 0.22, fy: 100, build: buildSettings },
   };
   const GROUPS = {
     projects: ['excel', 'word', 'notion', 'n8n', 'gitlab'],
