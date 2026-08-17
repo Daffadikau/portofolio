@@ -212,7 +212,7 @@ window.PORTFOLIO_DATA = {
     // Kosongkan url untuk memakai jawaban kata kunci di atas. Kalau diisi
     // dengan alamat worker (lihat worker/README.md), Smoky memakai model
     // bahasa dan daftar di atas jadi cadangan waktu jaringannya gagal.
-    api: { url: '' },
+    api: { url: 'https://smoky-chat.daffadikau.workers.dev' },
     note: 'Smoky answers from a short list of keywords. No AI, no network.',
     noteApi: 'Smoky is an AI with Daffa\u2019s CV as context. He can still be wrong.',
   },

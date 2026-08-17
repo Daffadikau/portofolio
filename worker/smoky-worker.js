@@ -45,11 +45,10 @@ function cors(origin, allow) {
 // Dicoba berurutan sampai ada yang jawab, jadi rename di sisi Google tidak
 // langsung mematikan obrolan.
 const GEMINI_FALLBACKS = [
-  'gemini-2.0-flash',
-  'gemini-2.0-flash-001',
   'gemini-flash-latest',
   'gemini-2.5-flash',
-  'gemini-1.5-flash',
+  'gemini-flash-lite-latest',
+  'gemini-2.5-flash-lite',
 ];
 // buang apa pun yang menyerupai kunci sebelum pesan error dikirim ke browser
 function scrub(t) {
@@ -59,26 +58,47 @@ async function askGemini(key, messages, preferred) {
   const list = [preferred].concat(GEMINI_FALLBACKS)
     .filter(Boolean)
     .filter((m, i, a) => a.indexOf(m) === i);
-  const body = {
+  // Model flash terbaru itu thinking model: sebagian jatah token keluaran
+  // habis untuk penalaran internal sebelum teksnya keluar, sehingga jawaban
+  // terpotong di tengah. Smoky cuma perlu satu-dua kalimat ketus, jadi
+  // penalarannya dimatikan dan jatah tokennya dinaikkan.
+  const base = {
     systemInstruction: { parts: [{ text: `${PERSONA}\n\nDATA:\n${KB}` }] },
     contents: messages.map((m) => ({
       role: m.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: m.text }],
     })),
-    generationConfig: { temperature: 0.8, maxOutputTokens: 200 },
+  };
+  const withThinking = {
+    ...base,
+    generationConfig: {
+      temperature: 0.9,
+      maxOutputTokens: 400,
+      thinkingConfig: { thinkingBudget: 0 },
+    },
+  };
+  const plain = {
+    ...base,
+    generationConfig: { temperature: 0.9, maxOutputTokens: 400 },
   };
   let last = '';
   for (let i = 0; i < list.length; i += 1) {
     const model = list[i];
     const url = 'https://generativelanguage.googleapis.com/v1beta/models/'
       + encodeURIComponent(model) + ':generateContent?key=' + encodeURIComponent(key);
-    const r = await fetch(url, {
-      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body),
+    const send = (b) => fetch(url, {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(b),
     });
+    let r = await send(withThinking);
+    // model lama menolak thinkingConfig; coba sekali lagi tanpa itu
+    if (r.status === 400) r = await send(plain);
     if (r.status === 404) { last = `404 pada ${model}`; continue; }
     if (!r.ok) throw new Error(`gemini ${r.status}: ${scrub(await r.text())}`);
     const j = await r.json();
-    const text = j?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const cand = j?.candidates?.[0];
+    const text = (cand?.content?.parts || []).map((x) => x.text || '').join('').trim();
+    if (!text && cand?.finishReason) last = `${cand.finishReason} pada ${model}`;
+    if (!text) continue;
     return { text, model };
   }
   throw new Error(`tidak ada model Gemini yang cocok (${last})`);
