@@ -73,60 +73,58 @@
   const tabbar = el('div', 'tabbar');
   tabbar.setAttribute('role', 'tablist');
   tabbar.setAttribute('aria-label', 'Sections');
-  // Tombol ala ekstensi browser di ujung kanan: memblokir jendela aplikasi
-  // yang biasanya muncul sendiri tiap pindah tab.
-  let popupsBlocked = false;
-  try { popupsBlocked = localStorage.getItem('popup-blocked') === '1'; } catch (e) { /* ignore */ }
-  let blockedCount = 0;
-  const adBtn = el('button', 'ext-btn');
-  adBtn.type = 'button';
-  adBtn.appendChild(window.PixelArt.render('iconShield', 2));
-  const adBadge = el('span', 'ext-badge');
-  adBadge.hidden = true;
-  adBtn.appendChild(adBadge);
-  function syncAd() {
-    adBtn.setAttribute('aria-pressed', String(popupsBlocked));
-    adBtn.title = popupsBlocked
-      ? 'Pop-up windows blocked. Click to allow them again.'
-      : 'Windows open by themselves. Click to block them.';
-    adBtn.setAttribute('aria-label', adBtn.title);
-    adBadge.hidden = !(popupsBlocked && blockedCount);
-    adBadge.textContent = String(blockedCount);
-  }
-  adBtn.addEventListener('click', () => {
-    popupsBlocked = !popupsBlocked;
-    if (!popupsBlocked) blockedCount = 0;
-    try { localStorage.setItem('popup-blocked', popupsBlocked ? '1' : '0'); } catch (e) { /* ignore */ }
-    syncAd();
-    // langsung terasa: menyalakan menutup yang terbuka, mematikan membukanya
-    const tab = location.hash.replace('#', '') || 'about';
-    if (window.AppWins) {
-      if (popupsBlocked) window.AppWins.closeAll(['terminal', 'spotify']);
-      else if (window.AppWins.GROUPS[tab]) window.AppWins.openGroup(tab);
-    }
-  });
-  syncAd();
-  // Tombol musik latar. Mati secara bawaan: musik yang menyala sendiri itu
-  // mengganggu, dan peramban memang memblokir audio tanpa interaksi dulu.
-  const musicBtn = el('button', 'ext-btn ext-music');
-  musicBtn.type = 'button';
-  function syncMusic(on) {
-    musicBtn.replaceChildren(window.PixelArt.render(on ? 'iconSound' : 'iconMute', 2));
-    musicBtn.setAttribute('aria-pressed', String(on));
-    musicBtn.title = on ? 'Turn the 8-bit soundtrack off' : 'Play the 8-bit soundtrack';
-    musicBtn.setAttribute('aria-label', musicBtn.title);
-  }
-  syncMusic(false);
-  musicBtn.addEventListener('click', () => {
-    if (!window.Music) return;
-    window.Music.toggle();
-    try { localStorage.setItem('music-on', window.Music.isPlaying() ? '1' : '0'); } catch (e) { /* ignore */ }
-  });
-  try { if (window.Music) window.Music.onChange(syncMusic); } catch (e) { /* ignore */ }
-  // pilihan sebelumnya diingat, tapi tetap menunggu satu interaksi apa pun
-  // karena peramban tidak mengizinkan audio dimulai tanpa itu
-  try {
-    if (localStorage.getItem('music-on') === '1') {
+  // Semua setelan situs (tema, musik, pemblokir pop-up) dipusatkan di sini
+  // supaya jendela Settings dan bagian lain memakai sumber yang sama.
+  // Dulu ini tiga tombol di titlebar; sekarang titlebar-nya bersih lagi.
+  (function prefs() {
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const listeners = [];
+    const read = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+    const write = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* ignore */ } };
+    let themeChoice = read('theme');                 // 'light' | 'dark' | null (ikut sistem)
+    let blocked = read('popup-blocked') === '1';
+    let blockedCount = 0;
+    function isDark() { return themeChoice ? themeChoice === 'dark' : media.matches; }
+    function applyTheme() { document.documentElement.classList.toggle('dark', isDark()); }
+    function emit() { listeners.forEach((f) => { try { f(); } catch (e) { /* ignore */ } }); }
+    applyTheme();
+    media.addEventListener('change', () => { if (!themeChoice) { applyTheme(); emit(); } });
+    window.Prefs = {
+      isDark,
+      themeMode: () => themeChoice || 'auto',
+      setTheme(mode) {                                // 'light' | 'dark' | 'auto'
+        themeChoice = mode === 'auto' ? null : mode;
+        if (themeChoice) write('theme', themeChoice);
+        else { try { localStorage.removeItem('theme'); } catch (e) { /* ignore */ } }
+        applyTheme(); emit();
+      },
+      isMusicOn: () => !!(window.Music && window.Music.isPlaying()),
+      setMusic(on) {
+        if (!window.Music) return;
+        if (on) window.Music.start(); else window.Music.stop();
+        write('music-on', on ? '1' : '0');
+        emit();
+      },
+      isBlocked: () => blocked,
+      blockedCount: () => blockedCount,
+      setBlocked(on) {
+        blocked = !!on;
+        if (!blocked) blockedCount = 0;
+        write('popup-blocked', blocked ? '1' : '0');
+        const tab = location.hash.replace('#', '') || 'about';
+        if (window.AppWins) {
+          if (blocked) window.AppWins.closeAll(['terminal', 'spotify', 'settings']);
+          else if (window.AppWins.GROUPS[tab]) window.AppWins.openGroup(tab);
+        }
+        emit();
+      },
+      noteBlocked(n) { blockedCount += n; emit(); },
+      onChange(f) { listeners.push(f); },
+    };
+    try { if (window.Music) window.Music.onChange(emit); } catch (e) { /* ignore */ }
+    // pilihan musik diingat, tapi tetap menunggu satu interaksi karena
+    // peramban tidak mengizinkan audio dimulai tanpa itu
+    if (read('music-on') === '1') {
       const kick = () => {
         document.removeEventListener('pointerdown', kick);
         document.removeEventListener('keydown', kick);
@@ -135,34 +133,8 @@
       document.addEventListener('pointerdown', kick, { once: true });
       document.addEventListener('keydown', kick, { once: true });
     }
-  } catch (e) { /* ignore */ }
-  // Mode gelap. Bawaannya mengikuti setelan sistem; sekali pengunjung memilih
-  // sendiri, pilihannya yang dipakai dan diingat.
-  const themeBtn = el('button', 'ext-btn ext-theme');
-  themeBtn.type = 'button';
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-  let themeChoice = null;
-  try { themeChoice = localStorage.getItem('theme'); } catch (e) { themeChoice = null; }
-  function darkNow() {
-    return themeChoice ? themeChoice === 'dark' : prefersDark.matches;
-  }
-  function syncTheme() {
-    const on = darkNow();
-    document.documentElement.classList.toggle('dark', on);
-    themeBtn.replaceChildren(window.PixelArt.render(on ? 'iconSun' : 'iconMoon', 2));
-    themeBtn.setAttribute('aria-pressed', String(on));
-    themeBtn.title = on ? 'Switch to light mode' : 'Switch to dark mode';
-    themeBtn.setAttribute('aria-label', themeBtn.title);
-  }
-  themeBtn.addEventListener('click', () => {
-    themeChoice = darkNow() ? 'light' : 'dark';
-    try { localStorage.setItem('theme', themeChoice); } catch (e) { /* ignore */ }
-    syncTheme();
-  });
-  // ikut berubah kalau sistem berganti tema, selama pengunjung belum memilih
-  prefersDark.addEventListener('change', () => { if (!themeChoice) syncTheme(); });
-  syncTheme();
-  titlebar.append(lights, tabbar, themeBtn, musicBtn, adBtn);
+  })();
+  titlebar.append(lights, tabbar);
 
   // baris 2 = toolbar browser: back / forward / reload + address bar
   const toolbar = el('div', 'toolbar');
@@ -715,6 +687,151 @@
       setTimeout(() => wrap.remove(), 3200);
     }
   })();
+  // Finder ala macOS untuk daftar proyek: bilah alat dengan pencarian, bilah
+  // tab, sidebar tempat dan tag, lalu isi yang bisa ditampilkan sebagai ikon
+  // atau daftar. Klik satu berkas membuka jendela Quick Look yang sudah ada.
+  function buildFinder(projects) {
+    const root = el('section', 'fx');
+    root.setAttribute('aria-label', 'Projects, as a Finder window');
+    let view = 'icon';
+    let scope = { kind: 'all', value: 'All Projects' };
+    let query = '';
+    // ── bilah alat ──
+    const bar = el('div', 'fx-bar');
+    const nav = el('div', 'fx-nav');
+    ['\u2039', '\u203a'].forEach((ch, i) => {
+      const b = el('button', 'fx-navb', ch);
+      b.type = 'button';
+      b.disabled = true;                              // dekoratif: tidak ada riwayat
+      b.setAttribute('aria-hidden', 'true');
+      b.tabIndex = -1;
+      nav.appendChild(b);
+    });
+    const views = el('div', 'fx-views');
+    const viewBtns = [['icon', 'Icons'], ['list', 'List']].map(([id, label]) => {
+      const b = el('button', 'fx-viewb', label);
+      b.type = 'button';
+      b.setAttribute('aria-label', `${label} view`);
+      b.addEventListener('click', () => { view = id; render(); });
+      views.appendChild(b);
+      return [b, id];
+    });
+    const title = el('div', 'fx-title');
+    const search = el('input', 'fx-search');
+    search.type = 'search';
+    search.placeholder = 'Search';
+    search.setAttribute('aria-label', 'Search projects');
+    search.addEventListener('input', () => { query = search.value.trim().toLowerCase(); render(); });
+    bar.append(nav, views, title, search);
+    // ── bilah tab ──
+    const tabs = el('div', 'fx-tabs');
+    const TABS = [['all', 'All Projects'], ['in progress', 'In Progress'], ['shipped', 'Shipped']];
+    const tabBtns = TABS.map(([id, label]) => {
+      const b = el('button', 'fx-tab', label);
+      b.type = 'button';
+      b.addEventListener('click', () => { scope = { kind: id, value: label }; render(); });
+      tabs.appendChild(b);
+      return [b, id];
+    });
+    // ── sidebar ──
+    const side = el('div', 'fx-side');
+    function sideGroup(name, items) {
+      side.appendChild(el('h4', 'fx-sh', name));
+      const list = el('div', 'fx-slist');
+      items.forEach(([kind, value, map]) => {
+        const b = el('button', 'fx-sitem');
+        b.type = 'button';
+        b.dataset.kind = kind;
+        b.dataset.value = value;
+        b.appendChild(window.PixelArt.render(map, 2));
+        b.appendChild(el('span', null, value));
+        b.addEventListener('click', () => { scope = { kind, value }; render(); });
+        list.appendChild(b);
+      });
+      side.appendChild(list);
+    }
+    sideGroup('Places', [
+      ['all', 'All Projects', 'folder'],
+      ['in progress', 'In Progress', 'chip'],
+      ['shipped', 'Shipped', 'trophy'],
+    ]);
+    const tagNames = [];
+    projects.forEach((pr) => pr.tech.forEach((t) => {
+      if (t.label && tagNames.indexOf(t.label) === -1) tagNames.push(t.label);
+    }));
+    sideGroup('Tags', tagNames.slice(0, 8).map((t) => ['tag', t, 'fileDoc']));
+    const main = el('div', 'fx-main');
+    const status = el('div', 'fx-status');
+    const body = el('div', 'fx-body');
+    body.append(side, main);
+    root.append(bar, tabs, body, status);
+    function matches(pr) {
+      if (scope.kind === 'in progress' || scope.kind === 'shipped') {
+        if (pr.status !== scope.kind) return false;
+      } else if (scope.kind === 'tag') {
+        if (!pr.tech.some((t) => t.label === scope.value)) return false;
+      }
+      if (!query) return true;
+      const hay = [pr.title, pr.desc, pr.kind, pr.status]
+        .concat(pr.tech.map((t) => t.label)).join(' ').toLowerCase();
+      return hay.indexOf(query) !== -1;
+    }
+    function openFile(pr) { window.AppWins.open(`ql:${projects.indexOf(pr)}`); }
+    function iconView(list) {
+      const grid = el('div', 'fx-grid');
+      list.forEach((pr) => {
+        const f = el('button', 'file');
+        f.type = 'button';
+        f.setAttribute('aria-label', `Quick Look: ${pr.title}`);
+        f.appendChild(window.PixelArt.render('fileDoc', 2));
+        f.appendChild(el('span', 'file-name', pr.title));
+        f.appendChild(el('i', `file-tag st-${pr.status.replace(' ', '-')}`, pr.status));
+        f.addEventListener('click', () => openFile(pr));
+        grid.appendChild(f);
+      });
+      return grid;
+    }
+    function listView(list) {
+      const tbl = el('div', 'fx-list');
+      tbl.setAttribute('role', 'table');
+      const head = el('div', 'fx-lrow fx-lhead');
+      ['Name', 'Kind', 'Tech', 'Status'].forEach((h) => head.appendChild(el('span', null, h)));
+      tbl.appendChild(head);
+      list.forEach((pr) => {
+        const row = el('button', 'fx-lrow');
+        row.type = 'button';
+        row.setAttribute('aria-label', `Quick Look: ${pr.title}`);
+        const nameCell = el('span', 'fx-lname');
+        nameCell.appendChild(window.PixelArt.render('fileDoc', 1));
+        nameCell.appendChild(el('span', null, pr.title));
+        row.append(nameCell, el('span', null, pr.kind || ''),
+          el('span', 'fx-ltech', pr.tech.map((t) => t.label).join(', ')),
+          el('span', `fx-lstat st-${pr.status.replace(' ', '-')}`, pr.status));
+        row.addEventListener('click', () => openFile(pr));
+        tbl.appendChild(row);
+      });
+      return tbl;
+    }
+    function render() {
+      const list = projects.filter(matches);
+      title.textContent = scope.value;
+      viewBtns.forEach(([b, id]) => b.setAttribute('aria-pressed', String(id === view)));
+      tabBtns.forEach(([b, id]) => b.setAttribute('aria-selected', String(id === scope.kind)));
+      side.querySelectorAll('.fx-sitem').forEach((b) => {
+        b.setAttribute('aria-current',
+          String(b.dataset.kind === scope.kind && b.dataset.value === scope.value));
+      });
+      main.replaceChildren(list.length ? (view === 'icon' ? iconView(list) : listView(list))
+        : el('p', 'fx-empty', query ? `Nothing matches \u201c${query}\u201d.` : 'Nothing here.'));
+      const total = projects.length;
+      const shipped = projects.filter((x) => x.status === 'shipped').length;
+      status.textContent = list.length === total
+        ? `${total} items \u00b7 ${shipped} shipped \u00b7 ${total - shipped} in progress`
+        : `${list.length} of ${total} items shown`;
+    }
+    render();
+    return root;
+  }
   function launcherFor(group) {
     const grid = el('div', 'launcher');
     window.AppWins.GROUPS[group].forEach((id) => {
@@ -735,111 +852,141 @@
     p.appendChild(launcherFor('projects'));
     p.appendChild(el('p', 'launch-hint', 'Tip: drag the windows around · click one to bring it to front · Esc or × closes it'));
 
-    // area Finder: tiap project sebagai berkas, klik untuk Quick Look
-    p.appendChild(h2icon('about', 'All files'));
-    const finder = el('div', 'finder');
-    D.projects.forEach((pr, i) => {
-      const f = el('button', 'file');
-      f.setAttribute('aria-label', `Quick Look: ${pr.title}`);
-      f.appendChild(window.PixelArt.render('fileDoc', 2));
-      f.appendChild(el('span', 'file-name', pr.title));
-      const tag = el('i', 'file-tag', i < 2 ? 'in progress' : 'shipped');
-      tag.style.background = COLORS[i % COLORS.length];
-      f.appendChild(tag);
-      f.addEventListener('click', () => window.AppWins.open(`ql:${i}`));
-      finder.appendChild(f);
-    });
-    p.appendChild(finder);
-    const shipped = D.projects.length - 2;
-    p.appendChild(el('div', 'finder-status',
-      `${D.projects.length} items · ${shipped} shipped · 2 in progress · click a file for Quick Look`));
+    // Finder betulan: toolbar + tab + sidebar + pencarian + dua mode tampilan.
+    p.appendChild(buildFinder(D.projects));
   })();
+  // Tab Skills sebagai monitor sistem ala btop: meter per domain, komposisi,
+  // catatan rekam jejak, dan tabel proses yang bisa diurutkan.
+  // Angkanya dari level di data.js — penilaian sendiri, bukan telemetri, dan
+  // itu ditulis apa adanya di kaki panel.
+  function buildBtop(groups, stats, projects) {
+    const root = el('section', 'bt');
+    root.setAttribute('aria-label', 'Skills, as a system monitor');
+    const flat = [];
+    groups.forEach((g) => g.items.forEach((it) => flat.push({
+      name: it.label, group: g.group, level: it.level, icon: it.icon || null,
+    })));
+    const pct = (lvl) => Math.round((lvl / 5) * 100);
+    const cls = (lvl) => (lvl >= 5 ? 'hi' : (lvl >= 4 ? 'mid' : 'lo'));
+    // meter bertangga: kotak-kotak terpisah, bukan bar mulus
+    function meter(lvl, cells) {
+      const m = el('span', `bt-meter ${cls(lvl)}`);
+      const n = cells || 10;
+      const on = Math.round((lvl / 5) * n);
+      for (let i = 0; i < n; i += 1) m.appendChild(el('i', i < on ? 'on' : null));
+      return m;
+    }
+    const head = el('div', 'bt-head');
+    head.append(el('b', null, 'daffa@portfolio'), el('span', null, 'btop++ \u00b7 skills'),
+      el('i', null, `${flat.length} tracked`));
+    root.appendChild(head);
+    const grid = el('div', 'bt-grid');
+    function box(title, cl) {
+      const b = el('div', `bt-box ${cl || ''}`);
+      b.appendChild(el('h4', null, title));
+      return b;
+    }
+    // ── domain: rata-rata level tiap kelompok ──
+    const cpu = box('domains', 'bt-cpu');
+    groups.forEach((g) => {
+      const avg = g.items.reduce((n, i) => n + i.level, 0) / g.items.length;
+      const row = el('div', 'bt-row');
+      row.append(el('span', 'bt-k', g.group), meter(avg, 14),
+        el('b', 'bt-v', `${pct(avg)}%`));
+      cpu.appendChild(row);
+    });
+    grid.appendChild(cpu);
+    // ── komposisi: berapa banyak keahlian per kelompok ──
+    const mem = box('composition', 'bt-mem');
+    const bar = el('div', 'bt-stack');
+    groups.forEach((g, i) => {
+      const seg = el('i', `seg s${i}`);
+      seg.style.flexGrow = String(g.items.length);
+      seg.title = `${g.group}: ${g.items.length}`;
+      bar.appendChild(seg);
+    });
+    mem.appendChild(bar);
+    const legend = el('div', 'bt-legend');
+    groups.forEach((g, i) => {
+      const l = el('span', 'bt-leg');
+      l.append(el('i', `dot s${i}`), el('span', null, `${g.group} ${g.items.length}`));
+      legend.appendChild(l);
+    });
+    mem.appendChild(legend);
+    grid.appendChild(mem);
+    // ── rekam jejak: angka yang memang ada datanya ──
+    const rec = box('record', 'bt-rec');
+    const shipped = projects.filter((x) => x.status === 'shipped').length;
+    const rows = stats.map((st) => [st.short || st.label, st.number])
+      .concat([['PROJ', String(projects.length)], ['SHIP', String(shipped)]]);
+    rows.forEach(([k, v]) => {
+      const r = el('div', 'bt-row');
+      r.append(el('span', 'bt-k', k), el('b', 'bt-v', v));
+      rec.appendChild(r);
+    });
+    grid.appendChild(rec);
+    root.appendChild(grid);
+    // ── tabel proses ──
+    const proc = el('div', 'bt-proc');
+    const COLS = [['name', 'NAME'], ['group', 'GRP'], ['level', 'LVL'], ['use', 'USE%']];
+    let sortKey = 'level';
+    let desc = true;
+    const head2 = el('div', 'bt-prow bt-phead');
+    COLS.forEach(([key, label]) => {
+      const b = el('button', 'bt-th', label);
+      b.type = 'button';
+      b.addEventListener('click', () => {
+        if (sortKey === key) desc = !desc; else { sortKey = key; desc = key !== 'name'; }
+        draw();
+      });
+      head2.appendChild(b);
+    });
+    head2.appendChild(el('span', 'bt-th-static', 'LOAD'));
+    const rowsWrap = el('div', 'bt-prows');
+    proc.append(head2, rowsWrap);
+    function draw() {
+      head2.querySelectorAll('.bt-th').forEach((b, i) => {
+        b.setAttribute('aria-pressed', String(COLS[i][0] === sortKey));
+      });
+      const list = flat.slice().sort((a2, b2) => {
+        let r = 0;
+        if (sortKey === 'name') r = a2.name.localeCompare(b2.name);
+        else if (sortKey === 'group') r = a2.group.localeCompare(b2.group);
+        else r = a2.level - b2.level;
+        if (r === 0) r = a2.name.localeCompare(b2.name);
+        return desc ? -r : r;
+      });
+      rowsWrap.replaceChildren();
+      list.forEach((it, i) => {
+        const r = el('div', 'bt-prow');
+        const nm = el('span', 'bt-pname');
+        if (it.icon) {
+          // ikon bahasa/tool itu berkas SVG di assets/icons/tech, bukan peta
+          // pixel — PixelArt.render tidak mengenalinya
+          const img = el('img');
+          img.src = `assets/icons/tech/${it.icon}.svg`;
+          img.alt = ''; img.width = 12; img.height = 12;
+          nm.appendChild(img);
+        }
+        nm.appendChild(el('span', null, it.name));
+        r.append(nm, el('span', 'bt-pgrp', it.group),
+          el('span', `bt-plvl ${cls(it.level)}`, String(it.level)),
+          el('span', 'bt-puse', `${pct(it.level)}`), meter(it.level, 12));
+        r.style.setProperty('--i', String(i));
+        rowsWrap.appendChild(r);
+      });
+    }
+    draw();
+    root.appendChild(proc);
+    root.appendChild(el('p', 'bt-foot',
+      'Levels are self-rated, not measured \u2014 this panel is a readout of how I would place myself, not telemetry.'));
+    return root;
+  }
   (function renderSkills() {
     const p = document.getElementById('panel-skills');
-    const C = D.character;
-    const card = el('div', 'char-card');
-    const portrait = el('div', 'char-portrait');
-    window.Smoky.attach(portrait, 5);
-    portrait.appendChild(el('span', 'char-partner', `${C.partner.name} · Lv.${C.partner.powerLevel}`));
-    const info = el('div', 'char-info');
-    const nameRow = el('div', 'char-name');
-    nameRow.append(
-      el('span', 'display char-display', D.name),
-      el('span', 'char-lv', `LV ${C.level} (${C.levelLabel})`),
-    );
-    const hearts = el('div', 'char-hearts');
-    hearts.setAttribute('role', 'img');
-    function renderHearts(n) {
-      hearts.setAttribute('aria-label', `Smoky affection: ${n} of 5 hearts`);
-      hearts.replaceChildren();
-      for (let i = 1; i <= 5; i += 1) hearts.appendChild(el('span', i <= n ? 'hh on' : 'hh', i <= n ? '♥' : '♡'));
-    }
-    renderHearts(window.Smoky.getHearts());
-    window.Smoky.onHearts(renderHearts);
-    const care = el('div', 'care-btns');
-    [['feed', 'fish', 'FEED'], ['brush', 'brush', 'BRUSH'], ['play', 'ball', 'PLAY']].forEach(([kind, map, label]) => {
-      const b = el('button', 'pxbtn care');
-      b.appendChild(window.PixelArt.render(map, 2));
-      b.appendChild(el('span', null, label));
-      b.addEventListener('click', () => window.Smoky.interact(kind));
-      care.appendChild(b);
-    });
-    info.append(nameRow, el('p', 'char-class', `CLASS: ${C.class}`), hearts, care);
-    card.append(portrait, info);
-    const snd = el('button', 'pxbtn care', `SOUND: ${window.Smoky.sfx.isMuted() ? 'OFF' : 'ON'}`);
-    snd.setAttribute('aria-pressed', String(!window.Smoky.sfx.isMuted()));
-    snd.addEventListener('click', () => {
-      const muted = window.Smoky.sfx.toggle();
-      snd.textContent = `SOUND: ${muted ? 'OFF' : 'ON'}`;
-      snd.setAttribute('aria-pressed', String(!muted));
-    });
-    care.appendChild(snd);
-    // wardrobe: dandani Smoky — berlaku juga untuk Smoky di tab About
-    const SLOTS = [['hat', 'Hat'], ['outfit', 'Outfit'], ['acc', 'Accessory']];
-    const wardrobe = el('div', 'wardrobe');
-    SLOTS.forEach(([slot, label]) => {
-      const row = el('div', 'wr-slot');
-      row.appendChild(el('span', 'wr-label', label));
-      const opts = el('div', 'wr-opts');
-      opts.setAttribute('role', 'group');
-      opts.setAttribute('aria-label', `${label} options for Smoky`);
-      window.Smoky.WARDROBE[slot].forEach((item) => {
-        const b = el('button', 'wr-opt', item.label);
-        b.dataset.slot = slot;
-        b.dataset.item = item.id;
-        // barang rahasia tampil sebagai ??? sampai dibuka lewat easter egg
-        if (item.secret) {
-          b.dataset.secret = '1';
-          b.dataset.label = item.label;
-          const lockIt = () => {
-            const open = window.Smoky.isUnlocked(item.id);
-            b.textContent = open ? item.label : '???';
-            b.disabled = !open;
-            b.title = open ? item.label : 'Locked. Something unlocks this.';
-          };
-          lockIt();
-          window.Smoky.onUnlock(lockIt);
-        }
-        b.addEventListener('click', () => window.Smoky.wear(slot, item.id));
-        opts.appendChild(b);
-      });
-      row.appendChild(opts);
-      wardrobe.appendChild(row);
-    });
-    function syncWardrobe(w) {
-      wardrobe.querySelectorAll('.wr-opt').forEach((b) => {
-        b.setAttribute('aria-pressed', String(w[b.dataset.slot] === b.dataset.item));
-      });
-    }
-    syncWardrobe(window.Smoky.getWorn());
-    window.Smoky.onOutfit(syncWardrobe);
-
-    p.append(h2icon('about', 'Character'), card,
-      h2icon('cap', 'Wardrobe'),
-      el('p', 'bio', 'Dress Smoky up — whatever he wears here is what he wears everywhere.'),
-      wardrobe,
-      h2icon('chip', 'Toolbox'));
-    p.appendChild(el('p', 'bio', 'My skills, opened in their natural habitat — a very busy desktop.'));
+    p.appendChild(buildBtop(D.skills, D.stats, D.projects));
+    p.appendChild(h2icon('chip', 'Toolbox'));
+    p.appendChild(el('p', 'bio', 'The same skills, opened in their natural habitat — a very busy desktop.'));
     p.appendChild(launcherFor('skills'));
     p.appendChild(el('p', 'launch-hint', 'Tip: drag the windows around · click one to bring it to front · Esc or × closes it'));
   })();
@@ -892,6 +1039,7 @@
       { map: 'term', app: 'terminal', label: 'Terminal' },
       { map: 'spotify', app: 'spotify', label: 'Spotify' },
       { map: 'iconChat', app: 'smokychat', label: 'Chat with Smoky' },
+      { map: 'iconGear', app: 'settings', label: 'System Settings' },
       { sep: true },
       { map: 'github', url: D.socials.github, label: 'GitHub' },
       { map: 'linkedin', url: D.socials.linkedin, label: 'LinkedIn' },
@@ -954,10 +1102,9 @@
     window.AppWins.closeAll(['terminal', 'spotify']);
     const group = window.AppWins.GROUPS[e.detail.id];
     if (!group) return;
-    if (popupsBlocked) {
-      // dihitung supaya lencananya menunjukkan berapa yang dicegah
-      blockedCount += group.length;
-      syncAd();
+    if (window.Prefs && window.Prefs.isBlocked()) {
+      // dihitung supaya jumlahnya bisa ditampilkan di jendela Settings
+      window.Prefs.noteBlocked(group.length);
       return;
     }
     window.AppWins.openGroup(e.detail.id);

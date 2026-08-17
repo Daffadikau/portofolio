@@ -45,11 +45,16 @@ function cors(origin, allow) {
 // Dicoba berurutan sampai ada yang jawab, jadi rename di sisi Google tidak
 // langsung mematikan obrolan.
 const GEMINI_FALLBACKS = [
-  'gemini-flash-latest',
   'gemini-2.5-flash',
-  'gemini-flash-lite-latest',
+  'gemini-flash-latest',
   'gemini-2.5-flash-lite',
+  'gemini-flash-lite-latest',
 ];
+// 404 = model tidak ada. 429/500/502/503 = sisi Google sedang penuh atau
+// bermasalah, dan itu sering terjadi pada alias -latest yang paling ramai.
+// Keduanya layak dicoba ke model berikutnya; status lain berarti permintaan
+// kita yang salah, jadi jangan ditutupi.
+const RETRYABLE = [404, 429, 500, 502, 503];
 // buang apa pun yang menyerupai kunci sebelum pesan error dikirim ke browser
 function scrub(t) {
   return String(t || '').replace(/key=[^&\s"']+/gi, 'key=***').slice(0, 200);
@@ -92,7 +97,7 @@ async function askGemini(key, messages, preferred) {
     let r = await send(withThinking);
     // model lama menolak thinkingConfig; coba sekali lagi tanpa itu
     if (r.status === 400) r = await send(plain);
-    if (r.status === 404) { last = `404 pada ${model}`; continue; }
+    if (RETRYABLE.indexOf(r.status) !== -1) { last = `${r.status} pada ${model}`; continue; }
     if (!r.ok) throw new Error(`gemini ${r.status}: ${scrub(await r.text())}`);
     const j = await r.json();
     const cand = j?.candidates?.[0];
@@ -152,7 +157,7 @@ export default {
         }), { headers: { ...headers, 'Access-Control-Allow-Origin': '*' } });
       }
       return new Response(JSON.stringify({
-        ok: true, provider, model: env.GEMINI_MODEL || 'gemini-2.0-flash',
+        ok: true, provider, model: env.GEMINI_MODEL || GEMINI_FALLBACKS[0],
         kb: KB.length, origins: allow.length,
       }), { headers: { ...headers, 'Access-Control-Allow-Origin': '*' } });
     }

@@ -513,3 +513,75 @@
 }
 @keyframes foil { 0% { left: -120%; } 100% { left: 160%; } }
 @media (prefers-reduced-motion: reduce) { .rar-legendary .joker-face::after { animation: none; opacity: .3; } }
+/* ── Tab Skills sebagai monitor ala btop ────────────────────────────── */
+.bt {
+  border: 3px solid var(--ink); background: #10131a; color: #cfe3d0;
+  font-family: var(--font-mono); margin: 10px 0 18px;
+}
+.bt-head {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  padding: 7px 10px; border-bottom: 3px solid var(--ink); background: #1a2030;
+}
+/* font pixel Silkscreen tidak punya glyph @ yang benar — 'daffa@portfolio'
+   terbaca 'daffaEportfolio'. Baris ini pakai mono, tetap terasa terminal. */
+.bt-head b { font-family: var(--font-mono); font-weight: 700; font-size: 12px; color: #7fd070; }
+.bt-head span { font-size: 11px; opacity: .7; }
+.bt-head i { font-style: normal; font-size: 10px; opacity: .5; margin-left: auto; }
+.bt-grid {
+  display: grid; grid-template-columns: 1.5fr 1.2fr .9fr; gap: 0;
+  border-bottom: 3px solid var(--ink);
+}
+.bt-box { padding: 9px 10px; border-right: 2px solid #263043; min-width: 0; }
+.bt-box:last-child { border-right: 0; }
+.bt-box h4 {
+  font-family: var(--font-pixel); font-size: 8px; letter-spacing: 1px;
+  color: #7fd070; margin-bottom: 7px; text-transform: uppercase;
+}
+.bt-row { display: flex; align-items: center; gap: 7px; padding: 3px 0; font-size: 11px; }
+.bt-k { flex: 0 0 auto; min-width: 62px; opacity: .8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bt-v { margin-left: auto; font-family: var(--font-pixel); font-size: 9px; color: #e8e8ea; }
+/* meter bertangga — kotak terpisah, bukan bar mulus */
+.bt-meter { display: inline-flex; gap: 2px; flex: 1 1 auto; min-width: 40px; }
+.bt-meter i { flex: 1 1 auto; height: 9px; background: #23304a; display: block; }
+.bt-meter.hi i.on { background: #7fd070; }
+.bt-meter.mid i.on { background: #d7c552; }
+.bt-meter.lo i.on { background: #d78b52; }
+.bt-stack { display: flex; gap: 2px; height: 16px; margin-bottom: 8px; }
+.bt-stack .seg { display: block; }
+.seg.s0, .dot.s0 { background: #7fd070; }
+.seg.s1, .dot.s1 { background: #5aa9d6; }
+.seg.s2, .dot.s2 { background: #d7c552; }
+.seg.s3, .dot.s3 { background: #c07fd0; }
+.bt-legend { display: flex; flex-direction: column; gap: 3px; }
+.bt-leg { display: flex; align-items: center; gap: 6px; font-size: 10px; opacity: .8; }
+.bt-leg .dot { width: 9px; height: 9px; display: block; flex: 0 0 auto; }
+.bt-proc { padding: 8px 10px 10px; }
+.bt-prow {
+  display: grid; grid-template-columns: 1.7fr 1.2fr 34px 46px 1.1fr;
+  gap: 8px; align-items: center; padding: 2px 0; font-size: 11px;
+}
+.bt-phead { border-bottom: 2px solid #263043; padding-bottom: 4px; margin-bottom: 4px; }
+.bt-th, .bt-th-static {
+  font-family: var(--font-pixel); font-size: 8px; letter-spacing: .5px;
+  background: none; border: 0; color: #7fd070; text-align: left; padding: 0; opacity: .75;
+}
+.bt-th[aria-pressed="true"] { opacity: 1; text-decoration: underline; }
+.bt-pname { display: flex; align-items: center; gap: 5px; min-width: 0; }
+.bt-pname img { image-rendering: pixelated; flex: 0 0 auto; display: block; }
+.bt-pname span, .bt-pgrp { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bt-pgrp { opacity: .55; font-size: 10px; }
+.bt-plvl { font-family: var(--font-pixel); font-size: 9px; }
+.bt-plvl.hi { color: #7fd070; }
+.bt-plvl.mid { color: #d7c552; }
+.bt-plvl.lo { color: #d78b52; }
+.bt-puse { font-size: 10px; opacity: .7; text-align: right; }
+.bt-foot {
+  border-top: 2px solid #263043; padding: 7px 10px;
+  font-size: 10px; opacity: .55; line-height: 1.5;
+}
+@media (max-width: 640px) {
+  .bt-grid { grid-template-columns: 1fr; }
+  .bt-box { border-right: 0; border-bottom: 2px solid #263043; }
+  .bt-prow { grid-template-columns: 1.6fr 40px 46px; }
+  .bt-pgrp, .bt-prow .bt-meter { display: none; }
+}
