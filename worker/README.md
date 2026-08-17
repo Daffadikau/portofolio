@@ -52,8 +52,19 @@ cd worker && wrangler deploy
 | Jawaban terasa kaku seperti sebelumnya | `api.url` masih kosong, atau worker balas error sehingga jatuh ke cadangan |
 | Muncul "connection to the cat failed" | worker error — cek `wrangler tail` |
 | Error 403 di konsol peramban | asal situsmu belum ada di `ALLOWED_ORIGINS` di `wrangler.toml` |
-| Error 404 dari Gemini | nama model berubah; ganti `GEMINI_MODEL` di `wrangler.toml` |
+| Error 404 dari Gemini | nama model tidak tersedia untuk kuncimu — lihat "Cari nama model" di bawah |
 | Error 429 | kuota harian habis, tunggu reset |
+### Cari nama model yang boleh dipakai kuncimu
+Nama model Gemini berubah cukup sering, dan yang tidak ada balas 404. Worker
+bisa menanyakannya sendiri ke Google:
+```
+https://smoky-chat.<akunmu>.workers.dev/?models=1
+```
+Yang keluar hanya daftar nama model — kuncinya tidak pernah ikut keluar.
+Ambil salah satu nama dari daftar itu, isikan ke `GEMINI_MODEL` di
+`wrangler.toml`, lalu deploy lagi.
+Worker juga sudah mencoba beberapa nama cadangan sendiri, jadi 404 pada satu
+nama tidak langsung mematikan obrolan.
 Lihat log langsung:
 ```
 cd worker && wrangler tail

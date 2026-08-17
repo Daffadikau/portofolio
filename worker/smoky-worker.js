@@ -41,10 +41,24 @@ function cors(origin, allow) {
     'Access-Control-Max-Age': '86400',
   };
 }
-async function askGemini(key, messages, model) {
-  const url = 'https://generativelanguage.googleapis.com/v1beta/models/'
-    + encodeURIComponent(model || 'gemini-2.0-flash')
-    + ':generateContent?key=' + encodeURIComponent(key);
+// Nama model Gemini berubah cukup sering dan yang tidak ada balas 404.
+// Dicoba berurutan sampai ada yang jawab, jadi rename di sisi Google tidak
+// langsung mematikan obrolan.
+const GEMINI_FALLBACKS = [
+  'gemini-2.0-flash',
+  'gemini-2.0-flash-001',
+  'gemini-flash-latest',
+  'gemini-2.5-flash',
+  'gemini-1.5-flash',
+];
+// buang apa pun yang menyerupai kunci sebelum pesan error dikirim ke browser
+function scrub(t) {
+  return String(t || '').replace(/key=[^&\s"']+/gi, 'key=***').slice(0, 200);
+}
+async function askGemini(key, messages, preferred) {
+  const list = [preferred].concat(GEMINI_FALLBACKS)
+    .filter(Boolean)
+    .filter((m, i, a) => a.indexOf(m) === i);
   const body = {
     systemInstruction: { parts: [{ text: `${PERSONA}\n\nDATA:\n${KB}` }] },
     contents: messages.map((m) => ({
@@ -53,12 +67,21 @@ async function askGemini(key, messages, model) {
     })),
     generationConfig: { temperature: 0.8, maxOutputTokens: 200 },
   };
-  const r = await fetch(url, {
-    method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body),
-  });
-  if (!r.ok) throw new Error(`gemini ${r.status}`);
-  const j = await r.json();
-  return j?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  let last = '';
+  for (let i = 0; i < list.length; i += 1) {
+    const model = list[i];
+    const url = 'https://generativelanguage.googleapis.com/v1beta/models/'
+      + encodeURIComponent(model) + ':generateContent?key=' + encodeURIComponent(key);
+    const r = await fetch(url, {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body),
+    });
+    if (r.status === 404) { last = `404 pada ${model}`; continue; }
+    if (!r.ok) throw new Error(`gemini ${r.status}: ${scrub(await r.text())}`);
+    const j = await r.json();
+    const text = j?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    return { text, model };
+  }
+  throw new Error(`tidak ada model Gemini yang cocok (${last})`);
 }
 async function askClaude(key, messages) {
   const r = await fetch('https://api.anthropic.com/v1/messages', {
@@ -91,6 +114,23 @@ export default {
     // GET dipakai untuk memastikan deploy berhasil — tidak membocorkan apa pun
     if (request.method === 'GET') {
       const provider = env.GEMINI_API_KEY ? 'gemini' : (env.ANTHROPIC_API_KEY ? 'anthropic' : 'none');
+      // ?models=1 menanyakan ke Google model apa saja yang boleh dipakai kunci
+      // ini. Hanya nama model yang dikembalikan; kuncinya tidak pernah keluar.
+      if (new URL(request.url).searchParams.get('models') === '1' && env.GEMINI_API_KEY) {
+        const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models?key='
+          + encodeURIComponent(env.GEMINI_API_KEY));
+        const raw = await r.text();
+        let names = [];
+        try {
+          names = (JSON.parse(raw).models || [])
+            .filter((m) => (m.supportedGenerationMethods || []).indexOf('generateContent') !== -1)
+            .map((m) => String(m.name).replace('models/', ''));
+        } catch (e) { /* biarkan kosong, raw yang dilaporkan */ }
+        return new Response(JSON.stringify({
+          status: r.status, count: names.length, models: names.slice(0, 40),
+          error: names.length ? undefined : scrub(raw),
+        }), { headers: { ...headers, 'Access-Control-Allow-Origin': '*' } });
+      }
       return new Response(JSON.stringify({
         ok: true, provider, model: env.GEMINI_MODEL || 'gemini-2.0-flash',
         kb: KB.length, origins: allow.length,
@@ -114,12 +154,18 @@ export default {
     if (!messages.length) return new Response('{"error":"empty"}', { status: 400, headers });
     try {
       let reply = '';
-      if (env.GEMINI_API_KEY) reply = await askGemini(env.GEMINI_API_KEY, messages, env.GEMINI_MODEL);
-      else if (env.ANTHROPIC_API_KEY) reply = await askClaude(env.ANTHROPIC_API_KEY, messages);
-      else return new Response('{"error":"no provider key"}', { status: 500, headers });
+      let used = '';
+      if (env.GEMINI_API_KEY) {
+        const out = await askGemini(env.GEMINI_API_KEY, messages, env.GEMINI_MODEL);
+        reply = out.text; used = out.model;
+      } else if (env.ANTHROPIC_API_KEY) {
+        reply = await askClaude(env.ANTHROPIC_API_KEY, messages); used = 'claude';
+      } else {
+        return new Response('{"error":"no provider key"}', { status: 500, headers });
+      }
       reply = (reply || '').trim().slice(0, 600);
       if (!reply) throw new Error('empty reply');
-      return new Response(JSON.stringify({ reply }), { headers });
+      return new Response(JSON.stringify({ reply, model: used }), { headers });
     } catch (err) {
       // browser akan jatuh ke jawaban kata kunci bawaannya
       return new Response(JSON.stringify({ error: String(err.message || err) }), { status: 502, headers });
