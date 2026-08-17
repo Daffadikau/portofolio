@@ -47,7 +47,7 @@ window.PORTFOLIO_DATA = {
   ],
   projects: [
     {
-      title: 'CBRN Drone Monitoring',
+      title: 'CBRN Drone Monitoring', status: 'in progress', kind: 'IoT platform',
       desc: 'Real-time CBRN (Chemical, Biological, Radiological, Nuclear) monitoring platform for UAVs at PT IROSTECH — backend for high-frequency sensor telemetry, low-latency drone-to-command-center streams, AI-driven hazard detection.',
       tech: [
         { label: 'Backend', icon: 'node' }, { label: 'AI Analytics', icon: 'py' },
@@ -56,7 +56,7 @@ window.PORTFOLIO_DATA = {
       links: [],
     },
     {
-      title: 'TestKit Gas Monitor',
+      title: 'TestKit Gas Monitor', status: 'in progress', kind: 'IoT platform',
       desc: 'Real-time IoT gas monitoring platform: sensor ingestion API, live dashboard with charts and alerting, time-series storage, Dockerized VPS deployment.',
       tech: [
         { label: 'FastAPI', icon: 'py' }, { label: 'Next.js', icon: 'next' },
@@ -65,7 +65,7 @@ window.PORTFOLIO_DATA = {
       links: [],
     },
     {
-      title: 'BengkelBot',
+      title: 'BengkelBot', status: 'shipped', kind: 'AI chatbot',
       desc: 'AI chatbot for auto repair shops — answers service questions and guides bookings. Final project of the Hacktiv8 "Maju Bareng AI" program.',
       tech: [
         { label: 'Gemini API', icon: null }, { label: 'Node.js', icon: 'node' },
@@ -74,7 +74,7 @@ window.PORTFOLIO_DATA = {
       links: [{ label: 'GitHub', url: 'https://github.com/Daffadikau/bengkelbot' }],
     },
     {
-      title: 'OMR Automated Grading',
+      title: 'OMR Automated Grading', status: 'shipped', kind: 'Computer vision',
       desc: 'AI answer-sheet grading app (Intelligent Device Systems, graded 4.00/4.00) — pattern recognition + image preprocessing, 99.7% accuracy, cuts manual grading time by 90%.',
       tech: [
         { label: 'YOLO', icon: null }, { label: 'Python', icon: 'py' },
@@ -83,7 +83,7 @@ window.PORTFOLIO_DATA = {
       links: [{ label: 'GitHub', url: 'https://github.com/Daffadikau' }],
     },
     {
-      title: 'Trias Bakti MSME Platform',
+      title: 'Trias Bakti MSME Platform', status: 'shipped', kind: 'Web platform',
       desc: 'Web platform digitalizing MSMEs in Drawati Village — backend services, database schemas for inventory & transactions, full SRS documentation, and onboarding for local stakeholders.',
       tech: [
         { label: 'Backend', icon: 'php' }, { label: 'SQL', icon: 'sql' },
@@ -92,7 +92,7 @@ window.PORTFOLIO_DATA = {
       links: [],
     },
     {
-      title: 'Mentorly',
+      title: 'Mentorly', status: 'shipped', kind: 'Mobile app',
       desc: 'Cross-platform mobile mentoring platform with 2FA, RBAC, AES-256 encryption, real-time chat, payments, and mentor ratings. Published in Jurnal Informatika Teknologi dan Sains.',
       tech: [
         { label: 'Flutter', icon: 'dart' }, { label: 'Firebase', icon: null },
@@ -101,7 +101,7 @@ window.PORTFOLIO_DATA = {
       links: [{ label: 'GitHub', url: 'https://github.com/Daffadikau' }],
     },
     {
-      title: 'Kuai DryVault',
+      title: 'Kuai DryVault', status: 'shipped', kind: 'IoT device',
       desc: 'IoT shoe-drying cabinet for a local shoe laundry: ESP32 with temperature & humidity sensors automating airflow and heating, Flutter app with Firebase realtime monitoring.',
       tech: [
         { label: 'ESP32', icon: 'c' }, { label: 'IoT', icon: null },

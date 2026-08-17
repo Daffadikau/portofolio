@@ -687,6 +687,151 @@
       setTimeout(() => wrap.remove(), 3200);
     }
   })();
+  // Finder ala macOS untuk daftar proyek: bilah alat dengan pencarian, bilah
+  // tab, sidebar tempat dan tag, lalu isi yang bisa ditampilkan sebagai ikon
+  // atau daftar. Klik satu berkas membuka jendela Quick Look yang sudah ada.
+  function buildFinder(projects) {
+    const root = el('section', 'fx');
+    root.setAttribute('aria-label', 'Projects, as a Finder window');
+    let view = 'icon';
+    let scope = { kind: 'all', value: 'All Projects' };
+    let query = '';
+    // ── bilah alat ──
+    const bar = el('div', 'fx-bar');
+    const nav = el('div', 'fx-nav');
+    ['\u2039', '\u203a'].forEach((ch, i) => {
+      const b = el('button', 'fx-navb', ch);
+      b.type = 'button';
+      b.disabled = true;                              // dekoratif: tidak ada riwayat
+      b.setAttribute('aria-hidden', 'true');
+      b.tabIndex = -1;
+      nav.appendChild(b);
+    });
+    const views = el('div', 'fx-views');
+    const viewBtns = [['icon', 'Icons'], ['list', 'List']].map(([id, label]) => {
+      const b = el('button', 'fx-viewb', label);
+      b.type = 'button';
+      b.setAttribute('aria-label', `${label} view`);
+      b.addEventListener('click', () => { view = id; render(); });
+      views.appendChild(b);
+      return [b, id];
+    });
+    const title = el('div', 'fx-title');
+    const search = el('input', 'fx-search');
+    search.type = 'search';
+    search.placeholder = 'Search';
+    search.setAttribute('aria-label', 'Search projects');
+    search.addEventListener('input', () => { query = search.value.trim().toLowerCase(); render(); });
+    bar.append(nav, views, title, search);
+    // ── bilah tab ──
+    const tabs = el('div', 'fx-tabs');
+    const TABS = [['all', 'All Projects'], ['in progress', 'In Progress'], ['shipped', 'Shipped']];
+    const tabBtns = TABS.map(([id, label]) => {
+      const b = el('button', 'fx-tab', label);
+      b.type = 'button';
+      b.addEventListener('click', () => { scope = { kind: id, value: label }; render(); });
+      tabs.appendChild(b);
+      return [b, id];
+    });
+    // ── sidebar ──
+    const side = el('div', 'fx-side');
+    function sideGroup(name, items) {
+      side.appendChild(el('h4', 'fx-sh', name));
+      const list = el('div', 'fx-slist');
+      items.forEach(([kind, value, map]) => {
+        const b = el('button', 'fx-sitem');
+        b.type = 'button';
+        b.dataset.kind = kind;
+        b.dataset.value = value;
+        b.appendChild(window.PixelArt.render(map, 2));
+        b.appendChild(el('span', null, value));
+        b.addEventListener('click', () => { scope = { kind, value }; render(); });
+        list.appendChild(b);
+      });
+      side.appendChild(list);
+    }
+    sideGroup('Places', [
+      ['all', 'All Projects', 'folder'],
+      ['in progress', 'In Progress', 'chip'],
+      ['shipped', 'Shipped', 'trophy'],
+    ]);
+    const tagNames = [];
+    projects.forEach((pr) => pr.tech.forEach((t) => {
+      if (t.label && tagNames.indexOf(t.label) === -1) tagNames.push(t.label);
+    }));
+    sideGroup('Tags', tagNames.slice(0, 8).map((t) => ['tag', t, 'fileDoc']));
+    const main = el('div', 'fx-main');
+    const status = el('div', 'fx-status');
+    const body = el('div', 'fx-body');
+    body.append(side, main);
+    root.append(bar, tabs, body, status);
+    function matches(pr) {
+      if (scope.kind === 'in progress' || scope.kind === 'shipped') {
+        if (pr.status !== scope.kind) return false;
+      } else if (scope.kind === 'tag') {
+        if (!pr.tech.some((t) => t.label === scope.value)) return false;
+      }
+      if (!query) return true;
+      const hay = [pr.title, pr.desc, pr.kind, pr.status]
+        .concat(pr.tech.map((t) => t.label)).join(' ').toLowerCase();
+      return hay.indexOf(query) !== -1;
+    }
+    function openFile(pr) { window.AppWins.open(`ql:${projects.indexOf(pr)}`); }
+    function iconView(list) {
+      const grid = el('div', 'fx-grid');
+      list.forEach((pr) => {
+        const f = el('button', 'file');
+        f.type = 'button';
+        f.setAttribute('aria-label', `Quick Look: ${pr.title}`);
+        f.appendChild(window.PixelArt.render('fileDoc', 2));
+        f.appendChild(el('span', 'file-name', pr.title));
+        f.appendChild(el('i', `file-tag st-${pr.status.replace(' ', '-')}`, pr.status));
+        f.addEventListener('click', () => openFile(pr));
+        grid.appendChild(f);
+      });
+      return grid;
+    }
+    function listView(list) {
+      const tbl = el('div', 'fx-list');
+      tbl.setAttribute('role', 'table');
+      const head = el('div', 'fx-lrow fx-lhead');
+      ['Name', 'Kind', 'Tech', 'Status'].forEach((h) => head.appendChild(el('span', null, h)));
+      tbl.appendChild(head);
+      list.forEach((pr) => {
+        const row = el('button', 'fx-lrow');
+        row.type = 'button';
+        row.setAttribute('aria-label', `Quick Look: ${pr.title}`);
+        const nameCell = el('span', 'fx-lname');
+        nameCell.appendChild(window.PixelArt.render('fileDoc', 1));
+        nameCell.appendChild(el('span', null, pr.title));
+        row.append(nameCell, el('span', null, pr.kind || ''),
+          el('span', 'fx-ltech', pr.tech.map((t) => t.label).join(', ')),
+          el('span', `fx-lstat st-${pr.status.replace(' ', '-')}`, pr.status));
+        row.addEventListener('click', () => openFile(pr));
+        tbl.appendChild(row);
+      });
+      return tbl;
+    }
+    function render() {
+      const list = projects.filter(matches);
+      title.textContent = scope.value;
+      viewBtns.forEach(([b, id]) => b.setAttribute('aria-pressed', String(id === view)));
+      tabBtns.forEach(([b, id]) => b.setAttribute('aria-selected', String(id === scope.kind)));
+      side.querySelectorAll('.fx-sitem').forEach((b) => {
+        b.setAttribute('aria-current',
+          String(b.dataset.kind === scope.kind && b.dataset.value === scope.value));
+      });
+      main.replaceChildren(list.length ? (view === 'icon' ? iconView(list) : listView(list))
+        : el('p', 'fx-empty', query ? `Nothing matches \u201c${query}\u201d.` : 'Nothing here.'));
+      const total = projects.length;
+      const shipped = projects.filter((x) => x.status === 'shipped').length;
+      status.textContent = list.length === total
+        ? `${total} items \u00b7 ${shipped} shipped \u00b7 ${total - shipped} in progress`
+        : `${list.length} of ${total} items shown`;
+    }
+    render();
+    return root;
+  }
   function launcherFor(group) {
     const grid = el('div', 'launcher');
     window.AppWins.GROUPS[group].forEach((id) => {
@@ -707,24 +852,8 @@
     p.appendChild(launcherFor('projects'));
     p.appendChild(el('p', 'launch-hint', 'Tip: drag the windows around · click one to bring it to front · Esc or × closes it'));
 
-    // area Finder: tiap project sebagai berkas, klik untuk Quick Look
-    p.appendChild(h2icon('about', 'All files'));
-    const finder = el('div', 'finder');
-    D.projects.forEach((pr, i) => {
-      const f = el('button', 'file');
-      f.setAttribute('aria-label', `Quick Look: ${pr.title}`);
-      f.appendChild(window.PixelArt.render('fileDoc', 2));
-      f.appendChild(el('span', 'file-name', pr.title));
-      const tag = el('i', 'file-tag', i < 2 ? 'in progress' : 'shipped');
-      tag.style.background = COLORS[i % COLORS.length];
-      f.appendChild(tag);
-      f.addEventListener('click', () => window.AppWins.open(`ql:${i}`));
-      finder.appendChild(f);
-    });
-    p.appendChild(finder);
-    const shipped = D.projects.length - 2;
-    p.appendChild(el('div', 'finder-status',
-      `${D.projects.length} items · ${shipped} shipped · 2 in progress · click a file for Quick Look`));
+    // Finder betulan: toolbar + tab + sidebar + pencarian + dua mode tampilan.
+    p.appendChild(buildFinder(D.projects));
   })();
   (function renderSkills() {
     const p = document.getElementById('panel-skills');
