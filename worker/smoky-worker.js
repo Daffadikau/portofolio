@@ -41,9 +41,10 @@ function cors(origin, allow) {
     'Access-Control-Max-Age': '86400',
   };
 }
-async function askGemini(key, messages) {
+async function askGemini(key, messages, model) {
   const url = 'https://generativelanguage.googleapis.com/v1beta/models/'
-    + 'gemini-2.0-flash:generateContent?key=' + encodeURIComponent(key);
+    + encodeURIComponent(model || 'gemini-2.0-flash')
+    + ':generateContent?key=' + encodeURIComponent(key);
   const body = {
     systemInstruction: { parts: [{ text: `${PERSONA}\n\nDATA:\n${KB}` }] },
     contents: messages.map((m) => ({
@@ -87,6 +88,14 @@ export default {
     const origin = request.headers.get('Origin') || '';
     const headers = { ...cors(origin, allow), 'content-type': 'application/json' };
     if (request.method === 'OPTIONS') return new Response(null, { headers });
+    // GET dipakai untuk memastikan deploy berhasil — tidak membocorkan apa pun
+    if (request.method === 'GET') {
+      const provider = env.GEMINI_API_KEY ? 'gemini' : (env.ANTHROPIC_API_KEY ? 'anthropic' : 'none');
+      return new Response(JSON.stringify({
+        ok: true, provider, model: env.GEMINI_MODEL || 'gemini-2.0-flash',
+        kb: KB.length, origins: allow.length,
+      }), { headers: { ...headers, 'Access-Control-Allow-Origin': '*' } });
+    }
     if (request.method !== 'POST') return new Response('{"error":"POST only"}', { status: 405, headers });
     // endpoint ini publik; batasi ke asal situs sendiri supaya tidak dipakai
     // orang lain sebagai LLM gratis
@@ -105,7 +114,7 @@ export default {
     if (!messages.length) return new Response('{"error":"empty"}', { status: 400, headers });
     try {
       let reply = '';
-      if (env.GEMINI_API_KEY) reply = await askGemini(env.GEMINI_API_KEY, messages);
+      if (env.GEMINI_API_KEY) reply = await askGemini(env.GEMINI_API_KEY, messages, env.GEMINI_MODEL);
       else if (env.ANTHROPIC_API_KEY) reply = await askClaude(env.ANTHROPIC_API_KEY, messages);
       else return new Response('{"error":"no provider key"}', { status: 500, headers });
       reply = (reply || '').trim().slice(0, 600);

@@ -1,0 +1,6 @@
+name = "smoky-chat"
+main = "smoky-worker.js"
+compatibility_date = "2026-08-01"
+[vars]
+ALLOWED_ORIGINS = "https://daffadikau.github.io,http://127.0.0.1:8899,http://localhost:8899"
+GEMINI_MODEL = "gemini-2.0-flash"
