@@ -855,10 +855,138 @@
     // Finder betulan: toolbar + tab + sidebar + pencarian + dua mode tampilan.
     p.appendChild(buildFinder(D.projects));
   })();
+  // Tab Skills sebagai monitor sistem ala btop: meter per domain, komposisi,
+  // catatan rekam jejak, dan tabel proses yang bisa diurutkan.
+  // Angkanya dari level di data.js — penilaian sendiri, bukan telemetri, dan
+  // itu ditulis apa adanya di kaki panel.
+  function buildBtop(groups, stats, projects) {
+    const root = el('section', 'bt');
+    root.setAttribute('aria-label', 'Skills, as a system monitor');
+    const flat = [];
+    groups.forEach((g) => g.items.forEach((it) => flat.push({
+      name: it.label, group: g.group, level: it.level, icon: it.icon || null,
+    })));
+    const pct = (lvl) => Math.round((lvl / 5) * 100);
+    const cls = (lvl) => (lvl >= 5 ? 'hi' : (lvl >= 4 ? 'mid' : 'lo'));
+    // meter bertangga: kotak-kotak terpisah, bukan bar mulus
+    function meter(lvl, cells) {
+      const m = el('span', `bt-meter ${cls(lvl)}`);
+      const n = cells || 10;
+      const on = Math.round((lvl / 5) * n);
+      for (let i = 0; i < n; i += 1) m.appendChild(el('i', i < on ? 'on' : null));
+      return m;
+    }
+    const head = el('div', 'bt-head');
+    head.append(el('b', null, 'daffa@portfolio'), el('span', null, 'btop++ \u00b7 skills'),
+      el('i', null, `${flat.length} tracked`));
+    root.appendChild(head);
+    const grid = el('div', 'bt-grid');
+    function box(title, cl) {
+      const b = el('div', `bt-box ${cl || ''}`);
+      b.appendChild(el('h4', null, title));
+      return b;
+    }
+    // ── domain: rata-rata level tiap kelompok ──
+    const cpu = box('domains', 'bt-cpu');
+    groups.forEach((g) => {
+      const avg = g.items.reduce((n, i) => n + i.level, 0) / g.items.length;
+      const row = el('div', 'bt-row');
+      row.append(el('span', 'bt-k', g.group), meter(avg, 14),
+        el('b', 'bt-v', `${pct(avg)}%`));
+      cpu.appendChild(row);
+    });
+    grid.appendChild(cpu);
+    // ── komposisi: berapa banyak keahlian per kelompok ──
+    const mem = box('composition', 'bt-mem');
+    const bar = el('div', 'bt-stack');
+    groups.forEach((g, i) => {
+      const seg = el('i', `seg s${i}`);
+      seg.style.flexGrow = String(g.items.length);
+      seg.title = `${g.group}: ${g.items.length}`;
+      bar.appendChild(seg);
+    });
+    mem.appendChild(bar);
+    const legend = el('div', 'bt-legend');
+    groups.forEach((g, i) => {
+      const l = el('span', 'bt-leg');
+      l.append(el('i', `dot s${i}`), el('span', null, `${g.group} ${g.items.length}`));
+      legend.appendChild(l);
+    });
+    mem.appendChild(legend);
+    grid.appendChild(mem);
+    // ── rekam jejak: angka yang memang ada datanya ──
+    const rec = box('record', 'bt-rec');
+    const shipped = projects.filter((x) => x.status === 'shipped').length;
+    const rows = stats.map((st) => [st.short || st.label, st.number])
+      .concat([['PROJ', String(projects.length)], ['SHIP', String(shipped)]]);
+    rows.forEach(([k, v]) => {
+      const r = el('div', 'bt-row');
+      r.append(el('span', 'bt-k', k), el('b', 'bt-v', v));
+      rec.appendChild(r);
+    });
+    grid.appendChild(rec);
+    root.appendChild(grid);
+    // ── tabel proses ──
+    const proc = el('div', 'bt-proc');
+    const COLS = [['name', 'NAME'], ['group', 'GRP'], ['level', 'LVL'], ['use', 'USE%']];
+    let sortKey = 'level';
+    let desc = true;
+    const head2 = el('div', 'bt-prow bt-phead');
+    COLS.forEach(([key, label]) => {
+      const b = el('button', 'bt-th', label);
+      b.type = 'button';
+      b.addEventListener('click', () => {
+        if (sortKey === key) desc = !desc; else { sortKey = key; desc = key !== 'name'; }
+        draw();
+      });
+      head2.appendChild(b);
+    });
+    head2.appendChild(el('span', 'bt-th-static', 'LOAD'));
+    const rowsWrap = el('div', 'bt-prows');
+    proc.append(head2, rowsWrap);
+    function draw() {
+      head2.querySelectorAll('.bt-th').forEach((b, i) => {
+        b.setAttribute('aria-pressed', String(COLS[i][0] === sortKey));
+      });
+      const list = flat.slice().sort((a2, b2) => {
+        let r = 0;
+        if (sortKey === 'name') r = a2.name.localeCompare(b2.name);
+        else if (sortKey === 'group') r = a2.group.localeCompare(b2.group);
+        else r = a2.level - b2.level;
+        if (r === 0) r = a2.name.localeCompare(b2.name);
+        return desc ? -r : r;
+      });
+      rowsWrap.replaceChildren();
+      list.forEach((it, i) => {
+        const r = el('div', 'bt-prow');
+        const nm = el('span', 'bt-pname');
+        if (it.icon) {
+          // ikon bahasa/tool itu berkas SVG di assets/icons/tech, bukan peta
+          // pixel — PixelArt.render tidak mengenalinya
+          const img = el('img');
+          img.src = `assets/icons/tech/${it.icon}.svg`;
+          img.alt = ''; img.width = 12; img.height = 12;
+          nm.appendChild(img);
+        }
+        nm.appendChild(el('span', null, it.name));
+        r.append(nm, el('span', 'bt-pgrp', it.group),
+          el('span', `bt-plvl ${cls(it.level)}`, String(it.level)),
+          el('span', 'bt-puse', `${pct(it.level)}`), meter(it.level, 12));
+        r.style.setProperty('--i', String(i));
+        rowsWrap.appendChild(r);
+      });
+    }
+    draw();
+    root.appendChild(proc);
+    root.appendChild(el('p', 'bt-foot',
+      'Levels are self-rated, not measured \u2014 this panel is a readout of how I would place myself, not telemetry.'));
+    return root;
+  }
   (function renderSkills() {
     const p = document.getElementById('panel-skills');
+    p.appendChild(buildBtop(D.skills, D.stats, D.projects));
     p.appendChild(h2icon('chip', 'Toolbox'));
-    p.appendChild(el('p', 'bio', 'My skills, opened in their natural habitat — a very busy desktop.'));
+    p.appendChild(el('p', 'bio', 'The same skills, opened in their natural habitat — a very busy desktop.'));
     p.appendChild(launcherFor('skills'));
     p.appendChild(el('p', 'launch-hint', 'Tip: drag the windows around · click one to bring it to front · Esc or × closes it'));
   })();
