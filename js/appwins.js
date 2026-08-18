@@ -1063,7 +1063,15 @@
         const r = await fetch(apiUrl, {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ messages: history.slice(-8) }),
+          // jam lokal dan tab yang sedang dibuka dikirim supaya Smoky bisa
+          // menyesuaikan suasana hatinya; worker memvalidasi keduanya
+          body: JSON.stringify({
+            messages: history.slice(-8),
+            ctx: {
+              hour: new Date().getHours(),
+              tab: (location.hash.replace('#', '') || 'about'),
+            },
+          }),
           signal: ctrl.signal,
         });
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
