@@ -177,8 +177,8 @@ window.PORTFOLIO_DATA = {
   // bukan model bahasa — jadi jawabannya ditulis semua di sini.
   chat: {
     intro: [
-      'mrrp. you found the chat app.',
-      "I'm a cat, not an AI. I know maybe eight things. Try a button below.",
+      'mrrp. you woke me up.',
+      'ask about daffa \u2014 projects, skills, hiring, whatever. i was there for most of it.',
     ],
     quick: ['projects', 'skills', 'hire him', 'cv', 'music', 'who are you'],
     rules: [
@@ -204,17 +204,17 @@ window.PORTFOLIO_DATA = {
       { k: ['love', 'cute', 'lucu', 'keren'], r: ['obviously.'] },
     ],
     fallback: [
-      "I'm a cat. try: projects, skills, hire him, cv, music.",
+      'ask me about his projects, skills, or how to hire him.',
       'mrrp?',
       '*stares at you until you rephrase*',
-      'that word is not in my eight words.',
+      '*bats at the router* say that again.',
     ],
     // Kosongkan url untuk memakai jawaban kata kunci di atas. Kalau diisi
     // dengan alamat worker (lihat worker/README.md), Smoky memakai model
     // bahasa dan daftar di atas jadi cadangan waktu jaringannya gagal.
     api: { url: 'https://smoky-chat.daffadikau.workers.dev' },
-    note: 'Smoky answers from a short list of keywords. No AI, no network.',
-    noteApi: 'Smoky is an AI with Daffa\u2019s CV as context. He can still be wrong.',
+    note: 'Right now Smoky answers from a short keyword list \u2014 no AI, no network.',
+    noteApi: 'Smoky is AI-backed and reads Daffa\u2019s CV. He is a cat, so he can still be wrong.',
   },
   // Zona di apartemen Smoky (tab About). pct = posisi Smoky dalam persen
   // lebar denah; act = yang dia lakukan begitu sampai di zona itu.
